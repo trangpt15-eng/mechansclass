@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mẹ Chan's English Class - Daily Learning Corner</title>
+  <title>Mẹ Chan's English Class - Daily Learning Hub</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -87,9 +87,9 @@
         <div>
           <span class="font-bold text-xl sm:text-2xl text-slate-800 tracking-tight flex items-center gap-2">
             Mẹ Chan's <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">English Class</span>
-            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning 🌸</span>
+            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning</span>
           </span>
-          <p class="text-xs text-slate-400 font-medium hidden sm:block">✮⋆˙Let's learn together ˙⋆✮</p>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">Daily adventures, to-do missions & sweet rewards</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@
           />
         </div>
         <div id="teacher-login-error" class="text-rose-500 text-xs hidden font-bold">
-          Wrong PIN!
+          Wrong PIN! Hint: Default PIN is 1234
         </div>
         <div class="flex gap-3">
           <button type="button" onclick="app.closeTeacherModal()" class="w-1/2 py-3 px-4 rounded-2xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm">
@@ -269,6 +269,84 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 6. Add Student Modal (Fixed & Added) -->
+  <div id="add-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border-2 border-pink-100 relative">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-pink-100">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-pink-500"></i> Add New Student
+        </h3>
+        <button type="button" onclick="app.closeAddStudentModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.handleAddStudentSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
+          <input 
+            type="text" 
+            id="new-std-name" 
+            required 
+            placeholder="e.g. Emma Watson" 
+            class="w-full px-4 py-2.5 bg-pink-50/50 border border-pink-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Secret Passcode *</label>
+          <input 
+            type="text" 
+            id="new-std-pass" 
+            required 
+            placeholder="e.g. 123" 
+            class="w-full px-4 py-2.5 bg-pink-50/50 border border-pink-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Choose Avatar Preset</label>
+          <div id="preset-avatars" class="flex items-center gap-2.5 mb-2 overflow-x-auto pb-1"></div>
+          <label class="block text-[11px] font-bold text-slate-400 uppercase mt-2 mb-1">Or Paste Image URL</label>
+          <input 
+            type="url" 
+            id="new-std-avatar" 
+            placeholder="https://..." 
+            class="w-full px-3.5 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-purple-400"
+          />
+        </div>
+
+        <div class="flex gap-2.5 pt-3 border-t border-pink-100">
+          <button type="button" onclick="app.closeAddStudentModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-pink-200">
+            Create Student Box
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Confirm Delete Modal (Custom UI modal without browser alerts) -->
+  <div id="confirm-delete-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-rose-100 text-center">
+      <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-rose-200">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800" id="confirm-delete-title">Are you sure?</h3>
+      <p class="text-xs text-slate-400 mb-5 leading-relaxed" id="confirm-delete-message">This action cannot be undone.</p>
+      <div class="flex gap-2">
+        <button type="button" onclick="app.closeConfirmDeleteModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+          Cancel
+        </button>
+        <button type="button" id="confirm-delete-btn" class="w-1/2 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold shadow-md shadow-rose-200">
+          Yes, Delete
+        </button>
+      </div>
     </div>
   </div>
 
@@ -531,6 +609,19 @@
       await this.syncToCloud();
     }
 
+    async deleteStudent(studentId) {
+      this.students = this.students.filter(s => s.id !== studentId);
+      // Remove submissions belonging to this student
+      this.submissions = this.submissions.filter(s => s.studentId !== studentId);
+      // Remove student from task assignment lists
+      this.tasks.forEach(t => {
+        if (Array.isArray(t.assignedTo)) {
+          t.assignedTo = t.assignedTo.filter(id => id !== studentId);
+        }
+      });
+      await this.syncToCloud();
+    }
+
     async updateStudentPassword(studentId, newPassword) {
       const student = this.students.find(s => s.id === studentId);
       if (student) {
@@ -541,6 +632,12 @@
 
     async addTask(task) {
       this.tasks.unshift(task);
+      await this.syncToCloud();
+    }
+
+    async deleteTask(taskId) {
+      this.tasks = this.tasks.filter(t => t.id !== taskId);
+      this.submissions = this.submissions.filter(s => s.taskId !== taskId);
       await this.syncToCloud();
     }
 
@@ -786,7 +883,7 @@
         document.getElementById('add-student-modal').classList.add('hidden');
       },
 
-      handleAddStudentSubmit(e) {
+      async handleAddStudentSubmit(e) {
         e.preventDefault();
         const name = document.getElementById('new-std-name').value.trim();
         const password = document.getElementById('new-std-pass').value.trim();
@@ -800,10 +897,50 @@
           joinedAt: new Date().toISOString().split('T')[0]
         };
 
-        window.store.addStudent(newStudent);
+        await window.store.addStudent(newStudent);
         this.closeAddStudentModal();
         this.showToast(`Student ${name} added successfully! 🌸`, 'success');
         this.render();
+      },
+
+      // Delete Modals
+      openConfirmDeleteModal(title, message, onConfirmCallback) {
+        document.getElementById('confirm-delete-title').innerText = title;
+        document.getElementById('confirm-delete-message').innerText = message;
+        const confirmBtn = document.getElementById('confirm-delete-btn');
+        confirmBtn.onclick = async () => {
+          await onConfirmCallback();
+          this.closeConfirmDeleteModal();
+        };
+        document.getElementById('confirm-delete-modal').classList.remove('hidden');
+      },
+
+      closeConfirmDeleteModal() {
+        document.getElementById('confirm-delete-modal').classList.add('hidden');
+      },
+
+      promptDeleteStudent(studentId, studentName) {
+        this.openConfirmDeleteModal(
+          `Delete "${studentName}"?`,
+          `This will delete ${studentName}'s learning box and all their submissions permanently.`,
+          async () => {
+            await window.store.deleteStudent(studentId);
+            this.showToast(`Student ${studentName} was removed.`, 'info');
+            this.render();
+          }
+        );
+      },
+
+      promptDeleteTask(taskId, taskTitle) {
+        this.openConfirmDeleteModal(
+          `Delete Task?`,
+          `Are you sure you want to delete "${taskTitle}" and its submissions?`,
+          async () => {
+            await window.store.deleteTask(taskId);
+            this.showToast(`Task removed successfully.`, 'info');
+            this.render();
+          }
+        );
       },
 
       switchTeacherTab(tab) {
@@ -1251,15 +1388,70 @@
                       </div>
                     </div>
 
-                    <div class="pt-3 border-t border-pink-50 flex items-center justify-between">
-                      <span class="text-[11px] text-slate-400 font-medium">Joined: ${s.joinedAt || 'Recently'}</span>
+                    <div class="pt-3 border-t border-pink-50 flex items-center justify-between gap-2">
+                      <button 
+                        type="button" 
+                        onclick="app.promptDeleteStudent('${s.id}', '${s.name.replace(/'/g, "\\'")}')" 
+                        class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-all border border-rose-200 flex items-center gap-1"
+                        title="Delete student"
+                      >
+                        <i class="fa-solid fa-trash-can text-[11px]"></i>
+                        <span>Delete</span>
+                      </button>
                       <button 
                         type="button" 
                         onclick="app.openChangePasswordModal('${s.id}', true)" 
-                        class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-purple-200"
+                        class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-purple-200 ml-auto"
                       >
                         <i class="fa-solid fa-key text-[10px]"></i>
-                        <span>Reset Password</span>
+                        <span>Reset Pass</span>
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        // 2. Scheduled tasks tab
+        if (tab === 'assignments') {
+          return `
+            <div class="space-y-4">
+              ${tasks.length === 0 ? '<p class="text-slate-400 text-center py-10">No tasks created yet.</p>' : ''}
+              ${tasks.map(task => {
+                const isAll = task.assignedTo.includes('all');
+                const assignedNames = isAll 
+                  ? 'All Students' 
+                  : task.assignedTo.map(id => students.find(s => s.id === id)?.name || id).join(', ');
+
+                return `
+                  <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-xl">
+                          <i class="fa-solid fa-calendar-day mr-1"></i> Date: ${task.scheduledDate}
+                        </span>
+                        <span class="text-xs font-bold text-pink-700 bg-pink-100 px-2.5 py-0.5 rounded-xl">
+                          Topic: ${task.majorTopic} &gt; ${task.subTopic}
+                        </span>
+                      </div>
+                      <h4 class="text-base font-bold text-slate-800">${task.title}</h4>
+                      <p class="text-xs text-slate-500 line-clamp-2">${task.instructions}</p>
+                      <p class="text-[11px] text-slate-400">Assigned to: <span class="font-semibold text-slate-600">${assignedNames}</span></p>
+                    </div>
+
+                    <div class="flex items-center gap-2 self-end md:self-center">
+                      ${task.link ? `<a href="${task.link}" target="_blank" class="p-2 text-xs bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100"><i class="fa-solid fa-link"></i> Link</a>` : ''}
+                      ${task.fileAttachment ? `<a href="${task.fileAttachment}" target="_blank" class="p-2 text-xs bg-pink-50 text-pink-600 rounded-xl hover:bg-pink-100"><i class="fa-regular fa-image"></i> Image</a>` : ''}
+                      <button 
+                        type="button" 
+                        onclick="app.promptDeleteTask('${task.id}', '${task.title.replace(/'/g, "\\'")}')" 
+                        class="p-2 text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all flex items-center gap-1 font-bold"
+                        title="Delete task"
+                      >
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Delete</span>
                       </button>
                     </div>
                   </div>
