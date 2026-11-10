@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mẹ Chan's English Class - Daily Learning Hub</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Font 'Mali' -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Mali"', 'cursive', 'sans-serif'],
+          },
+          colors: {
+            pastel: {
+              pinkLight: '#fff0f5',
+              pink: '#fbcfe8',
+              pinkDeep: '#f472b6',
+              rose: '#fb7185',
+              purpleLight: '#f3e8ff',
+              purple: '#d8b4fe',
+              purpleDeep: '#a855f7',
+              lavender: '#e9d5ff',
+              mint: '#ccfbf1',
+              peach: '#fed7aa',
+              cardBg: '#ffffff'
+            }
+          },
+          boxShadow: {
+            'soft': '0 8px 30px rgba(244, 114, 182, 0.12)',
+            'card': '0 4px 20px rgba(168, 85, 247, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Mali', cursive, sans-serif;
+      background: linear-gradient(135deg, #fff5f8 0%, #faf5ff 50%, #fdf2f8 100%);
+    }
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #fdf2f8;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #f472b6;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a855f7;
+    }
+    .bubble-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+  </style>
+</head>
+<body class="text-slate-700 min-h-screen flex flex-col antialiased selection:bg-pink-200 selection:text-pink-900">
+
+  <!-- ================= TOP NAVIGATION ================= -->
+  <header class="bg-white/85 backdrop-blur-md border-b border-pink-100 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo & Name -->
+      <div class="flex items-center space-x-3 cursor-pointer group" onclick="app.navigateHome()">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-400 via-rose-300 to-purple-400 flex items-center justify-center text-white shadow-md shadow-pink-200 group-hover:scale-105 transition-all duration-300">
+          <i class="fa-solid fa-heart text-xl bubble-float"></i>
+        </div>
+        <div>
+          <span class="font-bold text-xl sm:text-2xl text-slate-800 tracking-tight flex items-center gap-2">
+            Mẹ Chan's <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">English Class</span>
+            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning</span>
+          </span>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">Daily adventures, to-do missions & sweet rewards</p>
+        </div>
+      </div>
+
+      <!-- Action Button (Teacher's Desk) -->
+      <div class="flex items-center space-x-2 sm:space-x-3" id="nav-actions">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= TOAST NOTIFICATION CONTAINER ================= -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ================= MAIN CONTENT ROOT ================= -->
+  <main id="app-root" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Rendered dynamically -->
+  </main>
+
+  <!-- ================= POPUP MODALS ================= -->
+
+  <!-- 1. Student Password Modal -->
+  <div id="student-auth-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-soft border-2 border-pink-100 text-center relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-pink-100 rounded-full blur-2xl opacity-70"></div>
+      <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-100 rounded-full blur-2xl opacity-70"></div>
+
+      <div class="relative">
+        <div class="relative inline-block mb-3">
+          <img id="modal-student-avatar" src="" alt="Avatar" class="w-24 h-24 rounded-3xl mx-auto object-cover ring-4 ring-pink-200 shadow-md">
+          <span class="absolute -bottom-1 -right-1 bg-gradient-to-r from-pink-400 to-purple-500 text-white p-2 rounded-2xl text-xs shadow-md">
+            <i class="fa-solid fa-key"></i>
+          </span>
+        </div>
+        
+        <h3 id="modal-student-name" class="text-2xl font-bold text-slate-800">Student Name</h3>
+        <p class="text-xs text-slate-500 mb-6 mt-1 font-medium">Enter your secret password to unlock your box!</p>
+
+        <form onsubmit="app.handleStudentLogin(event)" class="space-y-4">
+          <div>
+            <input 
+              type="password" 
+              id="student-login-password" 
+              placeholder="Password (Default: 123)" 
+              class="w-full px-5 py-3.5 bg-pink-50/50 border-2 border-pink-200 rounded-2xl text-center text-lg font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-400 focus:bg-white transition-all shadow-inner"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <div id="student-login-error" class="text-rose-500 text-xs hidden font-bold bg-rose-50 py-1.5 px-3 rounded-xl border border-rose-200">
+            Oops! Incorrect password. Please check again or ask Mẹ Chan.
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button type="button" onclick="app.closeStudentModal()" class="w-1/2 py-3 px-4 rounded-2xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm transition-all">
+              Cancel
+            </button>
+            <button type="submit" class="w-1/2 py-3 px-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold text-sm shadow-md shadow-pink-200 transition-all flex items-center justify-center gap-2">
+              <span>Open Box</span>
+              <i class="fa-solid fa-sparkles text-xs"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Teacher Passcode Modal -->
+  <div id="teacher-auth-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-soft border-2 border-purple-100 text-center">
+      <div class="w-16 h-16 bg-gradient-to-tr from-purple-100 to-pink-100 text-purple-600 rounded-3xl flex items-center justify-center text-2xl mx-auto mb-4 border border-purple-200 shadow-sm">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-800">Teacher's Desk</h3>
+      <p class="text-xs text-slate-500 mb-5">Enter Mẹ Chan's secret PIN to open the dashboard</p>
+
+      <form onsubmit="app.handleTeacherLogin(event)" class="space-y-4">
+        <div>
+          <input 
+            type="password" 
+            id="teacher-login-pin" 
+            placeholder="PIN (Default: 1234)" 
+            maxlength="6"
+            class="w-full px-4 py-3 bg-purple-50/50 border-2 border-purple-200 rounded-2xl text-center text-xl font-bold tracking-widest text-slate-800 focus:outline-none focus:border-purple-400 focus:bg-white"
+            required
+          />
+        </div>
+        <div id="teacher-login-error" class="text-rose-500 text-xs hidden font-bold">
+          Wrong PIN! Hint: Default PIN is 1234
+        </div>
+        <div class="flex gap-3">
+          <button type="button" onclick="app.closeTeacherModal()" class="w-1/2 py-3 px-4 rounded-2xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm">
+            Back
+          </button>
+          <button type="submit" class="w-1/2 py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 font-bold text-sm shadow-md shadow-purple-200">
+            Sign In
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add Student Modal -->
+  <div id="add-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-soft border-2 border-pink-100 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-pink-100 mb-4">
+        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-pink-500"></i> Add New Student
+        </h3>
+        <button onclick="app.closeAddStudentModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.handleAddStudentSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
+          <input type="text" id="new-std-name" required placeholder="e.g. Jenny Nguyen" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Personal Box Password *</label>
+          <input type="text" id="new-std-pass" required placeholder="e.g. 123" value="123" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none font-semibold">
+          <p class="text-[11px] text-slate-400 mt-1">Student will use this code to unlock their daily box.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Avatar Picture URL or Preset</label>
+          <input type="url" id="new-std-avatar" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none">
+          <div class="mt-2.5">
+            <span class="text-[11px] text-slate-500 font-bold block mb-1.5">Pick a cute avatar preset:</span>
+            <div class="flex gap-2 flex-wrap" id="preset-avatars">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3">
+          <button type="button" onclick="app.closeAddStudentModal()" class="px-5 py-2.5 text-sm font-bold rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 text-sm font-bold rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:opacity-95 shadow-md shadow-pink-200">Save Student</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= FIREBASE & APP SCRIPT ================= -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getFirestore, doc, setDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  // =========================================================================
+  // BƯỚC DÁN MÃ: Đã kết nối với dự án mechanclass-84244 của Mẹ Chan
+  // =========================================================================
+  const myFirebaseConfig = {
+    apiKey: "AIzaSyDa7XGG7PwttJzpV4Ab2R0eWilBY070Tm0",
+    authDomain: "mechanclass-84244.firebaseapp.com",
+    projectId: "mechanclass-84244",
+    storageBucket: "mechanclass-84244.firebasestorage.app",
+    messagingSenderId: "213810276722",
+    appId: "1:213810276722:web:21f7337c568ac2103455eb"
+  };
+
+  // Initial Mock Seed Data
+  const INITIAL_STUDENTS = [
+    {
+      id: 'std_1',
+      name: 'Lily Dang',
+      password: '123',
+      avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
+      joinedAt: '2026-11-01'
+    },
+    {
+      id: 'std_2',
+      name: 'Lucas Tran',
+      password: '123',
+      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+      joinedAt: '2026-11-02'
+    },
+    {
+      id: 'std_3',
+      name: 'Mia Hoang',
+      password: '123',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+      joinedAt: '2026-11-03'
+    },
+    {
+      id: 'std_4',
+      name: 'Leo Nguyen',
+      password: '123',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      joinedAt: '2026-11-04'
+    }
+  ];
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+  const INITIAL_TASKS = [
+    {
+      id: 'task_1',
+      title: 'Phonics Letter A & Sound Practice',
+      majorTopic: 'English',
+      subTopic: 'Phonics ABC & Vocabulary',
+      scheduledDate: todayStr,
+      instructions: 'Watch the phonics video link below, read aloud 5 words starting with letter A (Apple, Ant, Airplane, Alligator, Arrow), and write down 3 words in your notebook with a picture!',
+      link: 'https://www.youtube.com',
+      fileAttachment: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80',
+      assignedTo: ['all'],
+      createdAt: '2026-11-08'
+    },
+    {
+      id: 'task_2',
+      title: 'Speaking Drill: My Favorite Toy',
+      majorTopic: 'English',
+      subTopic: 'Speaking & Storytelling',
+      scheduledDate: todayStr,
+      instructions: 'Take a picture of your favorite toy! Then write 3 sentences describing: 1. What is it? 2. What color is it? 3. Why do you love it?',
+      link: '',
+      fileAttachment: '',
+      assignedTo: ['std_1', 'std_2', 'std_3'],
+      createdAt: '2026-11-09'
+    },
+    {
+      id: 'task_3',
+      title: 'Grammar Bites: Simple Present Verbs',
+      majorTopic: 'Grammar',
+      subTopic: 'Action Verbs in Daily Routine',
+      scheduledDate: tomorrowStr,
+      instructions: 'Write 3 complete sentences about what you do every morning (e.g., I brush my teeth, I eat breakfast). Take a photo of your handwriting!',
+      link: 'https://learnenglishkids.britishcouncil.org',
+      fileAttachment: '',
+      assignedTo: ['all'],
+      createdAt: '2026-11-09'
+    }
+  ];
+
+  const INITIAL_TOPIC_GROUPS = [
+    {
+      major: 'English',
+      subs: ['Phonics ABC & Vocabulary', 'Speaking & Storytelling', 'Reading Comprehension', 'Daily Diary']
+    },
+    {
+      major: 'Grammar',
+      subs: ['Action Verbs in Daily Routine', 'Nouns & Adjectives', 'Simple Present & Past']
+    },
+    {
+      major: 'Sight Words',
+      subs: ['Level 1 Fry Words', 'Level 2 Sentences']
+    }
+  ];
+
+  const INITIAL_SUBMISSIONS = [
+    {
+      id: 'sub_1',
+      taskId: 'task_1',
+      studentId: 'std_1',
+      commentText: 'Hi Mẹ Chan, I completed writing all 5 words in my notebook and drew a big apple!',
+      imagePreview: 'https://images.unsplash.com/photo-1543332164-6e82f355badc?w=400&auto=format&fit=crop&q=80',
+      submittedAt: 'Today at 09:30 AM',
+      status: 'reviewed',
+      sticker: '⭐ Excellent!',
+      teacherComment: 'Super neat handwriting and clear pronunciation Lily! Mẹ Chan loves your work!'
+    }
+  ];
+
+  // Cloud Firestore + Local Hybrid Repository
+  class CloudClassStore {
+    constructor() {
+      this.students = JSON.parse(localStorage.getItem('mc_students')) || INITIAL_STUDENTS;
+      this.tasks = JSON.parse(localStorage.getItem('mc_tasks')) || INITIAL_TASKS;
+      this.submissions = JSON.parse(localStorage.getItem('mc_submissions')) || INITIAL_SUBMISSIONS;
+      this.topicGroups = JSON.parse(localStorage.getItem('mc_topic_groups')) || INITIAL_TOPIC_GROUPS;
+      this.isCloudConnected = false;
+      this.db = null;
+      this.initFirebase();
+    }
+
+    async initFirebase() {
+      if (!myFirebaseConfig || !myFirebaseConfig.apiKey) {
+        console.warn("Firebase config not found. Running in local mode.");
+        return;
+      }
+
+      try {
+        const app = initializeApp(myFirebaseConfig);
+        this.db = getFirestore(app);
+        this.isCloudConnected = true;
+        console.log("🌸 Kết nối Firebase Firestore thành công!");
+        this.subscribeToCloud();
+      } catch (err) {
+        console.error("Firebase init failed:", err);
+      }
+    }
+
+    subscribeToCloud() {
+      if (!this.db) return;
+
+      const docRef = doc(this.db, 'meChanClass', 'mainDatabase');
+      
+      onSnapshot(docRef, async (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (Array.isArray(data.students)) this.students = data.students;
+          if (Array.isArray(data.tasks)) this.tasks = data.tasks;
+          if (Array.isArray(data.submissions)) this.submissions = data.submissions;
+          if (Array.isArray(data.topicGroups)) this.topicGroups = data.topicGroups;
+
+          localStorage.setItem('mc_students', JSON.stringify(this.students));
+          localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
+          localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
+          localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
+          
+          if (window.app) window.app.render();
+        } else {
+          // Initialize first seed to cloud safely
+          try {
+            await setDoc(docRef, {
+              students: this.students,
+              tasks: this.tasks,
+              submissions: this.submissions,
+              topicGroups: this.topicGroups
+            });
+          } catch (initErr) {
+            console.warn("Could not seed initial data to cloud:", initErr.message);
+          }
+        }
+      }, (err) => {
+        console.warn("⚠️ Firebase Firestore Permissions Warning:", err.message);
+        // Graceful fallback: continue offline/locally seamlessly
+        if (err.code === 'permission-denied') {
+          console.info("💡 Hướng dẫn: Vào Firebase Console > Firestore Database > Rules và đổi sang: allow read, write: if true;");
+        }
+      });
+    }
+
+    async syncToCloud() {
+      // Local backup first
+      localStorage.setItem('mc_students', JSON.stringify(this.students));
+      localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
+      localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
+      localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
+
+      // Push to Firestore if permission is available
+      if (this.isCloudConnected && this.db) {
+        try {
+          const docRef = doc(this.db, 'meChanClass', 'mainDatabase');
+          await setDoc(docRef, {
+            students: this.students,
+            tasks: this.tasks,
+            submissions: this.submissions,
+            topicGroups: this.topicGroups,
+            lastUpdated: new Date().toISOString()
+          }, { merge: true });
+        } catch (e) {
+          console.warn("Lưu Firestore bị chặn do Rules chưa mở quyền, dữ liệu tạm lưu trên máy:", e.message);
+        }
+      }
+    }
+
+    getStudents() { return this.students; }
+    getTasks() { return this.tasks; }
+    getSubmissions() { return this.submissions; }
+    getTopicGroups() { return this.topicGroups; }
+
+    async ensureTopic(major, sub) {
+      if (!major) return;
+      let group = this.topicGroups.find(g => g.major.toLowerCase() === major.toLowerCase());
+      let modified = false;
+
+      if (!group) {
+        group = { major, subs: sub ? [sub] : [] };
+        this.topicGroups.push(group);
+        modified = true;
+      } else if (sub && !group.subs.some(s => s.toLowerCase() === sub.toLowerCase())) {
+        group.subs.push(sub);
+        modified = true;
+      }
+
+      if (modified) {
+        await this.syncToCloud();
+      }
+    }
+
+    async addStudent(student) {
+      this.students.push(student);
+      await this.syncToCloud();
+    }
+
+    async addTask(task) {
+      this.tasks.unshift(task);
+      await this.syncToCloud();
+    }
+
+    async saveSubmission(sub) {
+      const index = this.submissions.findIndex(s => s.taskId === sub.taskId && s.studentId === sub.studentId);
+      if (index >= 0) {
+        this.submissions[index] = { ...this.submissions[index], ...sub };
+      } else {
+        this.submissions.unshift(sub);
+      }
+      await this.syncToCloud();
+    }
+
+    async reviewSubmission(subId, sticker, comment) {
+      const sub = this.submissions.find(s => s.id === subId);
+      if (sub) {
+        sub.sticker = sticker;
+        sub.teacherComment = comment;
+        sub.status = 'reviewed';
+        await this.syncToCloud();
+      }
+    }
+  }
+
+  window.store = new CloudClassStore();
+
+  // Application State
+  window.appState = {
+    role: 'guest',
+    activeStudentId: null,
+    teacherPin: '1234',
+    currentTab: 'boxes',
+    selectedDate: new Date().toISOString().split('T')[0],
+    activeTaskId: null,
+  };
+
+  // Application UI Controller
+  window.app = {
+    targetLoginStudentId: null,
+
+      init() {
+        this.renderNavbar();
+        this.render();
+      },
+
+      showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        const icon = type === 'success' ? 'fa-heart text-pink-500' : (type === 'error' ? 'fa-triangle-exclamation text-rose-500' : 'fa-wand-magic-sparkles text-purple-500');
+        
+        toast.className = `p-4 rounded-2xl bg-white border border-pink-100 shadow-soft flex items-center space-x-3 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0`;
+        toast.innerHTML = `
+          <i class="fa-solid ${icon} text-lg"></i>
+          <span class="text-xs font-bold text-slate-700">${message}</span>
+        `;
+        container.appendChild(toast);
+        
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      },
+
+      navigateHome() {
+        window.appState.role = 'guest';
+        window.appState.activeStudentId = null;
+        window.appState.activeTaskId = null;
+        this.renderNavbar();
+        this.render();
+      },
+
+      // Teacher Auth
+      openTeacherModal() {
+        document.getElementById('teacher-login-error').classList.add('hidden');
+        document.getElementById('teacher-login-pin').value = '';
+        document.getElementById('teacher-auth-modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('teacher-login-pin').focus(), 50);
+      },
+
+      closeTeacherModal() {
+        document.getElementById('teacher-auth-modal').classList.add('hidden');
+      },
+
+      handleTeacherLogin(e) {
+        e.preventDefault();
+        const pin = document.getElementById('teacher-login-pin').value;
+        if (pin === window.appState.teacherPin || pin === '1234') {
+          window.appState.role = 'teacher';
+          window.appState.activeStudentId = null;
+          this.closeTeacherModal();
+          this.renderNavbar();
+          this.render();
+          this.showToast('Welcome to Teacher Portal, Mẹ Chan! 🌸', 'success');
+        } else {
+          document.getElementById('teacher-login-error').classList.remove('hidden');
+        }
+      },
+
+      // Student Auth
+      openStudentModal(studentId) {
+        const student = window.store.getStudents().find(s => s.id === studentId);
+        if (!student) return;
+        this.targetLoginStudentId = studentId;
+
+        document.getElementById('modal-student-avatar').src = student.avatar;
+        document.getElementById('modal-student-name').innerText = student.name;
+        document.getElementById('student-login-password').value = '';
+        document.getElementById('student-login-error').classList.add('hidden');
+        document.getElementById('student-auth-modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('student-login-password').focus(), 50);
+      },
+
+      closeStudentModal() {
+        document.getElementById('student-auth-modal').classList.add('hidden');
+      },
+
+      handleStudentLogin(e) {
+        e.preventDefault();
+        const enteredPass = document.getElementById('student-login-password').value.trim();
+        const student = window.store.getStudents().find(s => s.id === this.targetLoginStudentId);
+
+        if (student && student.password === enteredPass) {
+          window.appState.role = 'student';
+          window.appState.activeStudentId = student.id;
+          window.appState.activeTaskId = null;
+          this.closeStudentModal();
+          this.renderNavbar();
+          this.render();
+          this.showToast(`Welcome back, ${student.name}! Let's learn! ✨`, 'success');
+        } else {
+          document.getElementById('student-login-error').classList.remove('hidden');
+        }
+      },
+
+      logout() {
+        window.appState.role = 'guest';
+        window.appState.activeStudentId = null;
+        window.appState.activeTaskId = null;
+        this.renderNavbar();
+        this.render();
+        this.showToast('Signed out safely.');
+      },
+
+      // Add Student
+      openAddStudentModal() {
+        const presets = [
+          'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+        ];
+        const container = document.getElementById('preset-avatars');
+        container.innerHTML = presets.map((url, i) => `
+          <img src="${url}" onclick="document.getElementById('new-std-avatar').value='${url}'" class="w-10 h-10 rounded-2xl object-cover cursor-pointer ring-2 ring-transparent hover:ring-pink-400 transition-all shadow-sm" title="Choose avatar ${i+1}">
+        `).join('');
+
+        document.getElementById('new-std-name').value = '';
+        document.getElementById('new-std-pass').value = '123';
+        document.getElementById('new-std-avatar').value = presets[0];
+        document.getElementById('add-student-modal').classList.remove('hidden');
+      },
+
+      closeAddStudentModal() {
+        document.getElementById('add-student-modal').classList.add('hidden');
+      },
+
+      handleAddStudentSubmit(e) {
+        e.preventDefault();
+        const name = document.getElementById('new-std-name').value.trim();
+        const password = document.getElementById('new-std-pass').value.trim();
+        const avatar = document.getElementById('new-std-avatar').value.trim() || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80';
+
+        const newStudent = {
+          id: 'std_' + Date.now(),
+          name,
+          password,
+          avatar,
+          joinedAt: new Date().toISOString().split('T')[0]
+        };
+
+        window.store.addStudent(newStudent);
+        this.closeAddStudentModal();
+        this.showToast(`Student ${name} added successfully! 🌸`, 'success');
+        this.render();
+      },
+
+      switchTeacherTab(tab) {
+        window.appState.currentTab = tab;
+        this.render();
+      },
+
+      // Date selector
+      selectDate(dateStr) {
+        window.appState.selectedDate = dateStr;
+        window.appState.activeTaskId = null; // Return to list view on date change
+        this.render();
+      },
+
+      viewTaskDetail(taskId) {
+        window.appState.activeTaskId = taskId;
+        this.render();
+      },
+
+      backToTaskList() {
+        window.appState.activeTaskId = null;
+        this.render();
+      },
+
+      // Teacher Task Creation by Date
+      handleCreateTask(e) {
+        e.preventDefault();
+        const title = document.getElementById('task-title').value.trim();
+        
+        // Resolve Major Topic (Dropdown or Custom Input)
+        const majorSelect = document.getElementById('task-major-select').value;
+        const majorCustom = document.getElementById('task-major-custom').value.trim();
+        const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
+
+        // Resolve Sub Topic (Dropdown or Custom Input)
+        const subSelect = document.getElementById('task-sub-select').value;
+        const subCustom = document.getElementById('task-sub-custom').value.trim();
+        const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
+
+        const scheduledDate = document.getElementById('task-date').value;
+        const instructions = document.getElementById('task-instructions').value.trim();
+        const link = document.getElementById('task-link').value.trim();
+        const fileAttachment = document.getElementById('task-file').value.trim();
+
+        if (majorSelect === '__new__' && !majorCustom) {
+          this.showToast('Please type a name for the new Major Topic!', 'error');
+          return;
+        }
+
+        const selectAll = document.getElementById('assign-all-students').checked;
+        let assignedTo = ['all'];
+        if (!selectAll) {
+          const checked = Array.from(document.querySelectorAll('.assign-student-cb:checked')).map(cb => cb.value);
+          if (checked.length === 0) {
+            this.showToast('Please select at least one student!', 'error');
+            return;
+          }
+          assignedTo = checked;
+        }
+
+        // Save topics to list for reuse
+        window.store.ensureTopic(majorTopic, subTopic);
+
+        const newTask = {
+          id: 'task_' + Date.now(),
+          title,
+          majorTopic,
+          subTopic,
+          scheduledDate,
+          instructions,
+          link,
+          fileAttachment,
+          assignedTo,
+          createdAt: new Date().toISOString().split('T')[0]
+        };
+
+        window.store.addTask(newTask);
+        this.showToast(`Daily task for ${scheduledDate} assigned! 🎉`, 'success');
+        this.switchTeacherTab('assignments');
+      },
+
+      // Topic dropdown change handlers
+      onMajorTopicChange(selectVal) {
+        const customInput = document.getElementById('task-major-custom-wrap');
+        if (selectVal === '__new__') {
+          customInput.classList.remove('hidden');
+          document.getElementById('task-major-custom').focus();
+        } else {
+          customInput.classList.add('hidden');
+        }
+        this.updateSubTopicDropdown(selectVal);
+      },
+
+      updateSubTopicDropdown(selectedMajor) {
+        const subSelect = document.getElementById('task-sub-select');
+        const customSubWrap = document.getElementById('task-sub-custom-wrap');
+        const topicGroups = window.store.getTopicGroups();
+
+        let subs = [];
+        if (selectedMajor !== '__new__') {
+          const matchedGroup = topicGroups.find(g => g.major.toLowerCase() === selectedMajor.toLowerCase());
+          if (matchedGroup) {
+            subs = matchedGroup.subs || [];
+          }
+        }
+
+        let optionsHtml = '';
+        if (subs.length > 0) {
+          optionsHtml += subs.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        optionsHtml += `<option value="__new__">✨ + Add New Sub-Topic...</option>`;
+        subSelect.innerHTML = optionsHtml;
+
+        // Reset sub custom input
+        if (subs.length === 0) {
+          subSelect.value = '__new__';
+          customSubWrap.classList.remove('hidden');
+        } else {
+          subSelect.value = subs[0];
+          customSubWrap.classList.add('hidden');
+        }
+      },
+
+      onSubTopicChange(selectVal) {
+        const customInput = document.getElementById('task-sub-custom-wrap');
+        if (selectVal === '__new__') {
+          customInput.classList.remove('hidden');
+          document.getElementById('task-sub-custom').focus();
+        } else {
+          customInput.classList.add('hidden');
+        }
+      },
+
+      // Handle Student Homework Photo Selection
+      handleImageSelection(taskId, event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const previewContainer = document.getElementById(`img-preview-box-${taskId}`);
+          previewContainer.innerHTML = `
+            <div class="relative inline-block mt-2">
+              <img src="${e.target.result}" class="max-h-56 rounded-2xl border-2 border-pink-200 shadow-sm object-cover">
+              <button type="button" onclick="app.removeImagePreview('${taskId}')" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <input type="hidden" id="stored-img-${taskId}" value="${e.target.result}">
+          `;
+        };
+        reader.readAsDataURL(file);
+      },
+
+      removeImagePreview(taskId) {
+        document.getElementById(`img-preview-box-${taskId}`).innerHTML = '';
+      },
+
+      // Student Task Submission
+      handleSubmitTask(e, taskId) {
+        e.preventDefault();
+        const commentText = document.getElementById(`submission-text-${taskId}`).value.trim();
+        const imgInput = document.getElementById(`stored-img-${taskId}`);
+        const imagePreview = imgInput ? imgInput.value : '';
+
+        if (!commentText && !imagePreview) {
+          this.showToast('Please type your answer or upload a photo of your work!', 'error');
+          return;
+        }
+
+        const studentId = window.appState.activeStudentId;
+        const existingSub = window.store.getSubmissions().find(s => s.taskId === taskId && s.studentId === studentId);
+
+        const subData = {
+          id: existingSub ? existingSub.id : ('sub_' + Date.now()),
+          taskId,
+          studentId,
+          commentText,
+          imagePreview,
+          submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          status: 'submitted',
+          sticker: existingSub ? existingSub.sticker : '',
+          teacherComment: existingSub ? existingSub.teacherComment : ''
+        };
+
+        window.store.saveSubmission(subData);
+        this.showToast('Awesome! Your homework is submitted to Mẹ Chan! 💖', 'success');
+        this.render();
+      },
+
+      // Teacher Review
+      handleReviewSubmission(e, subId) {
+        e.preventDefault();
+        const sticker = document.getElementById(`sticker-select-${subId}`).value;
+        const comment = document.getElementById(`comment-input-${subId}`).value.trim();
+
+        window.store.reviewSubmission(subId, sticker, comment);
+        this.showToast('Feedback & cute sticker saved for student! 🌸', 'success');
+        this.render();
+      },
+
+      // Progress Calculation
+      getStudentProgress(studentId) {
+        const allTasks = window.store.getTasks();
+        const studentTasks = allTasks.filter(t => t.assignedTo.includes('all') || t.assignedTo.includes(studentId));
+        const submissions = window.store.getSubmissions().filter(s => s.studentId === studentId);
+
+        const total = studentTasks.length;
+        const completed = submissions.length;
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return { total, completed, percent };
+      },
+
+      // Generate Calendar Dates for a week around today
+      getCalendarDates() {
+        const dates = [];
+        const base = new Date();
+        base.setDate(base.getDate() - 2);
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(base);
+          d.setDate(base.getDate() + i);
+          const iso = d.toISOString().split('T')[0];
+          const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+          const dayNum = d.getDate();
+          dates.push({ iso, dayName, dayNum });
+        }
+        return dates;
+      },
+
+      // Render Top Navigation
+      renderNavbar() {
+        const navActions = document.getElementById('nav-actions');
+        const role = window.appState.role;
+
+        if (role === 'guest') {
+          navActions.innerHTML = `
+            <button onclick="app.openTeacherModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 text-xs sm:text-sm font-bold shadow-md shadow-pink-200 transition-all">
+              <i class="fa-solid fa-chalkboard-user"></i>
+              <span>Teacher's Desk</span>
+            </button>
+          `;
+        } else if (role === 'teacher') {
+          navActions.innerHTML = `
+            <div class="flex items-center gap-2 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-2xl">
+              <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span>
+              <span class="text-xs font-bold text-purple-900 hidden sm:inline">Teacher: Mẹ Chan</span>
+            </div>
+            <button onclick="app.logout()" class="px-3.5 py-1.5 rounded-2xl border border-pink-200 text-pink-700 hover:bg-rose-50 text-xs font-bold transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>Exit Desk</span>
+            </button>
+          `;
+        } else if (role === 'student') {
+          const student = window.store.getStudents().find(s => s.id === window.appState.activeStudentId);
+          navActions.innerHTML = `
+            <div class="flex items-center gap-2.5 bg-pink-50 border border-pink-200 px-3 py-1 rounded-2xl">
+              <img src="${student?.avatar}" class="w-8 h-8 rounded-xl object-cover ring-2 ring-pink-300">
+              <span class="text-xs font-bold text-pink-900">${student?.name}</span>
+            </div>
+            <button onclick="app.logout()" class="px-3.5 py-1.5 rounded-2xl border border-purple-200 text-purple-700 hover:bg-purple-50 text-xs font-bold transition-all">
+              Switch Box
+            </button>
+          `;
+        }
+      },
+
+      // View Dispatcher
+      render() {
+        const root = document.getElementById('app-root');
+        const role = window.appState.role;
+
+        if (role === 'guest') {
+          this.renderGuestView(root);
+        } else if (role === 'teacher') {
+          this.renderTeacherView(root);
+        } else if (role === 'student') {
+          this.renderStudentView(root);
+        }
+      },
+
+      // ================= 1. GUEST / HOMEPAGE BOXES =================
+      renderGuestView(container) {
+        const students = window.store.getStudents();
+
+        container.innerHTML = `
+          <!-- Hero Banner -->
+          <div class="text-center max-w-2xl mx-auto mt-4 mb-10">
+            <span class="px-4 py-1.5 bg-white border border-pink-200 text-pink-600 rounded-full text-xs font-bold tracking-wide uppercase inline-flex items-center gap-2 shadow-xs mb-3">
+              <i class="fa-solid fa-sparkles text-purple-400"></i> Welcome Kids & Parents!
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-800 tracking-tight leading-tight">
+              Mẹ Chan's <span class="bg-gradient-to-r from-pink-500 via-rose-400 to-purple-600 bg-clip-text text-transparent">Learning Boxes</span>
+            </h1>
+            <p class="text-sm sm:text-base text-slate-500 mt-3 font-medium">
+              Click on your cute avatar box below, enter your secret passcode, and check your daily to-do list!
+            </p>
+          </div>
+
+          <!-- Student Boxes Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            ${students.map(student => {
+              const progress = this.getStudentProgress(student.id);
+              const isAllDone = progress.completed >= progress.total && progress.total > 0;
+
+              return `
+                <div 
+                  onclick="app.openStudentModal('${student.id}')"
+                  class="group relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 border-2 border-pink-100/80 hover:border-pink-300 shadow-card hover:shadow-soft hover:-translate-y-2 transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden"
+                >
+                  <div class="absolute -top-6 -right-6 w-20 h-20 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full blur-xl group-hover:scale-125 transition-all"></div>
+
+                  <div class="relative text-center">
+                    <div class="relative w-24 h-24 mx-auto mb-4">
+                      <img 
+                        src="${student.avatar}" 
+                        alt="${student.name}" 
+                        class="w-full h-full rounded-3xl object-cover ring-4 ring-pink-100 group-hover:ring-pink-300 shadow-md group-hover:scale-105 transition-all duration-300"
+                        onerror="this.src='https://placehold.co/150x150/fbcfe8/701a75?text=Student'"
+                      >
+                      <div class="absolute -bottom-1 -right-1 bg-white p-1 rounded-2xl shadow-sm">
+                        <span class="w-6 h-6 rounded-xl ${isAllDone ? 'bg-emerald-400' : 'bg-gradient-to-r from-pink-500 to-purple-500'} text-white flex items-center justify-center text-[11px]">
+                          <i class="fa-solid ${isAllDone ? 'fa-star' : 'fa-lock'}"></i>
+                        </span>
+                      </div>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
+                      ${student.name}
+                    </h3>
+                    <p class="text-[11px] text-purple-400 font-bold mt-0.5">Box ID: ${student.id}</p>
+                  </div>
+
+                  <!-- Progress Bar -->
+                  <div class="mt-6 pt-4 border-t border-pink-50">
+                    <div class="flex items-center justify-between text-xs font-bold mb-2">
+                      <span class="text-slate-400">Tasks Progress</span>
+                      <span class="${isAllDone ? 'text-emerald-500' : 'text-pink-600'}">
+                        ${progress.completed}/${progress.total} (${progress.percent}%)
+                      </span>
+                    </div>
+                    <div class="w-full bg-pink-100/60 rounded-full h-3 overflow-hidden p-0.5">
+                      <div 
+                        class="h-full rounded-full transition-all duration-700 ${isAllDone ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 'bg-gradient-to-r from-pink-400 to-purple-400'}" 
+                        style="width: ${progress.percent}%"
+                      ></div>
+                    </div>
+                  </div>
+
+                  <!-- Unlock Button -->
+                  <div class="mt-5 text-center">
+                    <span class="w-full inline-flex items-center justify-center gap-2 text-xs font-bold text-pink-600 group-hover:text-white bg-pink-50 group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-purple-500 py-2.5 px-4 rounded-2xl border border-pink-100 group-hover:border-transparent transition-all shadow-xs">
+                      <i class="fa-solid fa-key text-[10px]"></i> Open My Box
+                    </span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      },
+
+      // ================= 2. TEACHER DASHBOARD =================
+      renderTeacherView(container) {
+        const students = window.store.getStudents();
+        const tasks = window.store.getTasks();
+        const submissions = window.store.getSubmissions();
+        const currentTab = window.appState.currentTab;
+
+        const totalPending = submissions.filter(s => s.status === 'submitted').length;
+
+        container.innerHTML = `
+          <!-- Teacher Top Header -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 flex items-center gap-2.5">
+                <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-400 to-pink-400 text-white flex items-center justify-center text-lg shadow-sm">
+                  <i class="fa-solid fa-palette"></i>
+                </span>
+                Mẹ Chan's Teaching Desk
+              </h1>
+              <p class="text-xs sm:text-sm text-slate-500 mt-1">Assign daily tasks, organize topic hierarchies, check submitted homework & add stickers.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="app.openAddStudentModal()" class="px-4 py-2.5 rounded-2xl border-2 border-pink-200 bg-white hover:bg-pink-50 text-pink-700 text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-user-plus"></i> Add Student
+              </button>
+              <button onclick="app.switchTeacherTab('create')" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-pink-200 flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-calendar-plus"></i> Assign New Daily Task
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab Bar -->
+          <div class="flex border-b border-pink-100 mb-6 gap-2 sm:gap-6 overflow-x-auto">
+            <button onclick="app.switchTeacherTab('boxes')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'boxes' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
+              <i class="fa-solid fa-users"></i> Students (${students.length})
+            </button>
+            <button onclick="app.switchTeacherTab('assignments')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'assignments' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
+              <i class="fa-solid fa-calendar-check"></i> Scheduled Tasks (${tasks.length})
+            </button>
+            <button onclick="app.switchTeacherTab('submissions')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'submissions' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
+              <i class="fa-solid fa-envelope-open-text"></i> Submissions & Feedback
+              ${totalPending > 0 ? `<span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">${totalPending}</span>` : ''}
+            </button>
+            <button onclick="app.switchTeacherTab('create')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'create' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
+              <i class="fa-solid fa-pen-nib"></i> Compose Task
+            </button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div>
+            ${this.renderTeacherTabContent(currentTab, { students, tasks, submissions })}
+          </div>
+        `;
+      },
+
+      renderTeacherTabContent(tab, data) {
+        const { students, tasks, submissions } = data;
+
+        // 1. Students list & progress tab
+        if (tab === 'boxes') {
+          return `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              ${students.map(s => {
+                const prog = this.getStudentProgress(s.id);
+                return `
+                  <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex items-start justify-between gap-4">
+                    <div class="flex items-center gap-3.5">
+                      <img src="${s.avatar}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-pink-200">
+                      <div>
+                        <h4 class="font-bold text-slate-800 text-base">${s.name}</h4>
+                        <p class="text-xs text-purple-500 font-medium">Password: <span class="font-mono bg-purple-50 px-1.5 py-0.5 rounded-md">${s.password}</span></p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Tasks: ${prog.completed} / ${prog.total} completed</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="text-sm font-extrabold ${prog.percent === 100 ? 'text-emerald-500' : 'text-pink-600'}">${prog.percent}%</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        // 2. Scheduled tasks tab
+        if (tab === 'assignments') {
+          return `
+            <div class="space-y-4">
+              ${tasks.length === 0 ? '<p class="text-slate-400 text-center py-10">No tasks created yet.</p>' : ''}
+              ${tasks.map(task => {
+                const isAll = task.assignedTo.includes('all');
+                const assignedNames = isAll 
+                  ? 'All Students' 
+                  : task.assignedTo.map(id => students.find(s => s.id === id)?.name || id).join(', ');
+
+                return `
+                  <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-xl">
+                          <i class="fa-solid fa-calendar-day mr-1"></i> Date: ${task.scheduledDate}
+                        </span>
+                        <span class="text-xs font-bold text-pink-700 bg-pink-100 px-2.5 py-0.5 rounded-xl">
+                          Topic: ${task.majorTopic} &gt; ${task.subTopic}
+                        </span>
+                      </div>
+                      <h4 class="text-base font-bold text-slate-800">${task.title}</h4>
+                      <p class="text-xs text-slate-500 line-clamp-2">${task.instructions}</p>
+                      <p class="text-[11px] text-slate-400">Assigned to: <span class="font-semibold text-slate-600">${assignedNames}</span></p>
+                    </div>
+
+                    <div class="flex items-center gap-2 self-end md:self-center">
+                      ${task.link ? `<a href="${task.link}" target="_blank" class="p-2 text-xs bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100"><i class="fa-solid fa-link"></i> Link</a>` : ''}
+                      ${task.fileAttachment ? `<a href="${task.fileAttachment}" target="_blank" class="p-2 text-xs bg-pink-50 text-pink-600 rounded-xl hover:bg-pink-100"><i class="fa-regular fa-image"></i> Image</a>` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        // 3. Submissions & Feedback tab
+        if (tab === 'submissions') {
+          return `
+            <div class="space-y-5">
+              ${submissions.length === 0 ? '<p class="text-slate-400 text-center py-10">No submissions from students yet.</p>' : ''}
+              ${submissions.map(sub => {
+                const student = students.find(s => s.id === sub.studentId);
+                const task = tasks.find(t => t.id === sub.taskId);
+                const isReviewed = sub.status === 'reviewed';
+
+                return `
+                  <div class="p-6 rounded-3xl border-2 transition-all ${isReviewed ? 'bg-amber-50/40 border-amber-300 ring-2 ring-amber-100 shadow-md' : 'bg-white border-pink-100 shadow-card'}">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-pink-50">
+                      <div class="flex items-center gap-3">
+                        <img src="${student?.avatar}" class="w-12 h-12 rounded-2xl object-cover ring-2 ring-pink-200">
+                        <div>
+                          <h4 class="font-bold text-slate-800 text-sm sm:text-base">${student?.name}</h4>
+                          <p class="text-xs text-slate-400 font-medium">Task: <span class="text-pink-600 font-bold">${task?.title || 'Unknown Task'}</span> (${task?.scheduledDate || ''})</p>
+                        </div>
+                      </div>
+                      <div>
+                        ${isReviewed ? `
+                          <span class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-300 text-amber-950 border border-amber-400 flex items-center gap-1.5 shadow-xs">
+                            <i class="fa-solid fa-star text-amber-600"></i> Graded (${sub.sticker || 'Done'})
+                          </span>
+                        ` : `
+                          <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock"></i> Needs Review
+                          </span>
+                        `}
+                      </div>
+                    </div>
+
+                    <!-- Student Submission Content -->
+                    <div class="py-4 space-y-3">
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 block mb-1">Student's Written Answer / Note:</span>
+                        <p class="text-xs sm:text-sm bg-pink-50/40 p-3.5 rounded-2xl border border-pink-100 text-slate-700 leading-relaxed font-medium">
+                          ${sub.commentText || '<span class="italic text-slate-400">No written answer provided.</span>'}
+                        </p>
+                      </div>
+
+                      ${sub.imagePreview ? `
+                        <div>
+                          <span class="text-xs font-bold text-slate-500 block mb-1.5"><i class="fa-regular fa-image mr-1"></i> Uploaded Photo:</span>
+                          <a href="${sub.imagePreview}" target="_blank">
+                            <img src="${sub.imagePreview}" class="max-h-56 rounded-2xl border border-pink-200 object-cover shadow-sm hover:opacity-95 transition-all">
+                          </a>
+                        </div>
+                      ` : ''}
+                    </div>
+
+                    <!-- Teacher Review Form -->
+                    <form onsubmit="app.handleReviewSubmission(event, '${sub.id}')" class="pt-4 border-t border-pink-100 bg-white/70 p-4 rounded-2xl flex flex-col md:flex-row gap-3 items-end">
+                      <div class="w-full md:w-1/4">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Sticker / Badge</label>
+                        <select id="sticker-select-${sub.id}" class="w-full px-3 py-2 bg-pink-50 border border-pink-200 rounded-xl text-xs font-bold outline-none text-slate-700">
+                          <option value="⭐ Excellent!" ${sub.sticker === '⭐ Excellent!' ? 'selected' : ''}>⭐ Excellent!</option>
+                          <option value="🌸 Perfect Job!" ${sub.sticker === '🌸 Perfect Job!' ? 'selected' : ''}>🌸 Perfect Job!</option>
+                          <option value="🦄 Super Creative!" ${sub.sticker === '🦄 Super Creative!' ? 'selected' : ''}>🦄 Super Creative!</option>
+                          <option value="🍭 Keep Trying!" ${sub.sticker === '🍭 Keep Trying!' ? 'selected' : ''}>🍭 Keep Trying!</option>
+                          <option value="🌟 Mẹ Chan Loves It!" ${sub.sticker === '🌟 Mẹ Chan Loves It!' ? 'selected' : ''}>🌟 Mẹ Chan Loves It!</option>
+                        </select>
+                      </div>
+
+                      <div class="w-full md:w-2/4">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Mẹ Chan's Feedback & Comment</label>
+                        <input type="text" id="comment-input-${sub.id}" value="${sub.teacherComment || ''}" placeholder="Write sweet encouragement or corrections..." class="w-full px-3.5 py-2 bg-pink-50 border border-pink-200 rounded-xl text-xs sm:text-sm outline-none text-slate-700 focus:bg-white focus:border-purple-400">
+                      </div>
+
+                      <div class="w-full md:w-1/4">
+                        <button type="submit" class="w-full py-2 px-4 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 text-xs font-bold shadow-md shadow-purple-200 transition-all flex items-center justify-center gap-1.5">
+                          <i class="fa-solid fa-stamp"></i>
+                          <span>${isReviewed ? 'Update Feedback' : 'Send Feedback'}</span>
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        // 4. Compose / Assign task by date
+        if (tab === 'create') {
+          const topicGroups = window.store.getTopicGroups();
+          const firstGroup = topicGroups[0] || { major: 'English', subs: ['Phonics ABC & Vocabulary'] };
+
+          return `
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-pink-100 shadow-card max-w-3xl mx-auto">
+              <h3 class="text-xl font-bold text-slate-800 mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-plus text-pink-500"></i> Assign Task by Calendar Date
+              </h3>
+              <p class="text-xs text-slate-400 mb-6">Create a daily to-do mission categorized by Major Topic & Sub-Topic with reusable dropdowns.</p>
+
+              <form onsubmit="app.handleCreateTask(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Scheduled Date *</label>
+                    <input type="date" id="task-date" required value="${window.appState.selectedDate}" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Title *</label>
+                    <input type="text" id="task-title" required placeholder="e.g. Phonics Letter B practice" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+                  </div>
+                </div>
+
+                <!-- Topic Hierarchy with Dynamic Dropdown & Custom Inputs -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-purple-50/30 border border-purple-100">
+                  <!-- Major Topic Selection -->
+                  <div>
+                    <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Major Topic (Category) *</label>
+                    <select 
+                      id="task-major-select" 
+                      onchange="app.onMajorTopicChange(this.value)"
+                      class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-2xl text-sm font-semibold text-slate-700 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
+                    >
+                      ${topicGroups.map(g => `<option value="${g.major}">${g.major}</option>`).join('')}
+                      <option value="__new__">✨ + Add New Major Topic...</option>
+                    </select>
+
+                    <div id="task-major-custom-wrap" class="hidden mt-2">
+                      <input 
+                        type="text" 
+                        id="task-major-custom" 
+                        placeholder="Type new Major Topic (e.g. Science, Math)" 
+                        class="w-full px-3.5 py-2 bg-white border-2 border-pink-300 rounded-xl text-xs outline-none focus:border-purple-400 font-medium placeholder-slate-400 shadow-inner"
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Sub Topic Selection -->
+                  <div>
+                    <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Sub-Topic (Detail) *</label>
+                    <select 
+                      id="task-sub-select" 
+                      onchange="app.onSubTopicChange(this.value)"
+                      class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-2xl text-sm font-semibold text-slate-700 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
+                    >
+                      ${(firstGroup.subs || []).map(s => `<option value="${s}">${s}</option>`).join('')}
+                      <option value="__new__">✨ + Add New Sub-Topic...</option>
+                    </select>
+
+                    <div id="task-sub-custom-wrap" class="hidden mt-2">
+                      <input 
+                        type="text" 
+                        id="task-sub-custom" 
+                        placeholder="Type new Sub-Topic (e.g. Unit 3 Quiz)" 
+                        class="w-full px-3.5 py-2 bg-white border-2 border-pink-300 rounded-xl text-xs outline-none focus:border-purple-400 font-medium placeholder-slate-400 shadow-inner"
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions *</label>
+                  <textarea id="task-instructions" rows="3" required placeholder="Detail what students should do today..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Resource Link (Optional)</label>
+                    <input type="url" id="task-link" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Image / Material URL (Optional)</label>
+                    <input type="url" id="task-file" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none">
+                  </div>
+                </div>
+
+                <!-- Assign To -->
+                <div class="pt-2">
+                  <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Assign to Students</label>
+                  <div class="flex items-center gap-3 mb-2">
+                    <input type="checkbox" id="assign-all-students" checked onchange="document.getElementById('specific-students-box').classList.toggle('hidden', this.checked)" class="w-4 h-4 text-pink-600 rounded">
+                    <label for="assign-all-students" class="text-xs font-bold text-slate-700">Assign to ALL students</label>
+                  </div>
+
+                  <div id="specific-students-box" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-pink-100">
+                    ${students.map(s => `
+                      <label class="flex items-center gap-2 p-2 rounded-xl bg-pink-50/50 hover:bg-pink-100/50 text-xs font-medium cursor-pointer">
+                        <input type="checkbox" value="${s.id}" class="assign-student-cb w-4 h-4 text-pink-500 rounded">
+                        <span>${s.name}</span>
+                      </label>
+                    `).join('')}
+                  </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-pink-100">
+                  <button type="button" onclick="app.switchTeacherTab('assignments')" class="px-5 py-2.5 text-xs font-bold rounded-2xl border border-slate-200 text-slate-600">Cancel</button>
+                  <button type="submit" class="px-6 py-2.5 text-xs font-bold rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200">Publish Mission</button>
+                </div>
+              </form>
+            </div>
+          `;
+        }
+      },
+
+      // ================= 3. STUDENT PORTAL (CALENDAR + TO-DO LIST) =================
+      renderStudentView(container) {
+        const studentId = window.appState.activeStudentId;
+        const student = window.store.getStudents().find(s => s.id === studentId);
+        const allTasks = window.store.getTasks().filter(t => t.assignedTo.includes('all') || t.assignedTo.includes(studentId));
+        const submissions = window.store.getSubmissions().filter(s => s.studentId === studentId);
+        const selectedDate = window.appState.selectedDate;
+        const activeTaskId = window.appState.activeTaskId;
+
+        // Daily tasks filtered strictly by the selected calendar date
+        const dailyTasks = allTasks.filter(t => t.scheduledDate === selectedDate);
+        const calendarDates = this.getCalendarDates();
+
+        // Check if student is currently inspecting a specific task
+        const activeTask = activeTaskId ? dailyTasks.find(t => t.id === activeTaskId) : null;
+
+        container.innerHTML = `
+          <!-- Student Greeting Header -->
+          <div class="bg-gradient-to-r from-pink-100/80 via-purple-100/80 to-rose-100/80 rounded-3xl p-6 sm:p-8 border-2 border-white shadow-soft mb-8 flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div class="flex items-center gap-4 text-center sm:text-left">
+              <img src="${student.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
+              <div>
+                <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student.name}'s Missions</h2>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Click any date to see your to-do items. Select a task to complete it!</p>
+              </div>
+            </div>
+
+            <div class="bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-pink-200 text-center shadow-xs">
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Your Total Completed</span>
+              <span class="text-2xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                ${submissions.length} / ${allTasks.length}
+              </span>
+            </div>
+          </div>
+
+          <!-- Interactive Calendar Strip -->
+          <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card mb-8">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                <i class="fa-regular fa-calendar-check text-pink-500"></i> Learning Calendar
+              </h3>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400 font-medium hidden sm:inline">Pick date:</span>
+                <input type="date" value="${selectedDate}" onchange="app.selectDate(this.value)" class="text-xs font-bold bg-pink-50 border border-pink-200 text-slate-700 px-3 py-1.5 rounded-xl outline-none">
+              </div>
+            </div>
+
+            <!-- Date pills slider -->
+            <div class="grid grid-cols-7 gap-2">
+              ${calendarDates.map(item => {
+                const isSelected = item.iso === selectedDate;
+                const hasTasks = allTasks.some(t => t.scheduledDate === item.iso);
+                return `
+                  <button 
+                    onclick="app.selectDate('${item.iso}')"
+                    class="flex flex-col items-center justify-center p-3 rounded-2xl transition-all relative ${isSelected ? 'bg-gradient-to-b from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200 scale-105' : 'bg-pink-50/50 hover:bg-pink-100/60 text-slate-700'}"
+                  >
+                    <span class="text-[11px] font-medium opacity-80">${item.dayName}</span>
+                    <span class="text-lg font-bold">${item.dayNum}</span>
+                    ${hasTasks ? `
+                      <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-pink-500'} mt-1"></span>
+                    ` : `
+                      <span class="w-2 h-2 mt-1"></span>
+                    `}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- VIEW SWITCH: DETAILED TASK VIEW OR CONCISE TO-DO LIST -->
+          ${activeTask ? this.renderSingleTaskDetail(activeTask, submissions.find(s => s.taskId === activeTask.id)) : this.renderConciseTodoList(dailyTasks, submissions, selectedDate)}
+        `;
+      },
+
+      // 3A. Concise To-Do List View
+      renderConciseTodoList(dailyTasks, submissions, selectedDate) {
+        if (dailyTasks.length === 0) {
+          return `
+            <div class="text-center py-16 bg-white rounded-3xl border border-pink-100 shadow-card">
+              <div class="w-16 h-16 bg-pink-50 text-pink-400 rounded-3xl flex items-center justify-center text-2xl mx-auto mb-3">
+                <i class="fa-solid fa-mug-hot"></i>
+              </div>
+              <h4 class="font-bold text-slate-700 text-base">No tasks for ${selectedDate}!</h4>
+              <p class="text-xs text-slate-400 mt-1">Enjoy your free day or pick another date from the calendar above.</p>
+            </div>
+          `;
+        }
+
+        return `
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                <span>To-Do List for:</span>
+                <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm sm:text-base border border-pink-200">${selectedDate}</span>
+              </h3>
+              <span class="text-xs font-bold text-slate-400">${dailyTasks.length} task(s)</span>
+            </div>
+
+            <!-- Concise Task Items -->
+            <div class="space-y-3.5">
+              ${dailyTasks.map(task => {
+                const sub = submissions.find(s => s.taskId === task.id);
+                const isReviewed = sub && sub.status === 'reviewed';
+                const isSubmitted = sub && sub.status === 'submitted';
+
+                // HIGHLIGHT VÀNG RÕ RỆT CHO BÀI ĐÃ ĐƯỢC CHẤM (REVIEWED)
+                let cardStyle = 'bg-white border-pink-100 hover:border-pink-300';
+                let statusBadge = `
+                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1.5">
+                    <i class="fa-regular fa-circle"></i> To-Do
+                  </span>
+                `;
+
+                if (isReviewed) {
+                  cardStyle = 'bg-amber-50/70 border-4 border-amber-300 shadow-lg shadow-amber-200/50 hover:border-amber-400 ring-2 ring-amber-200';
+                  statusBadge = `
+                    <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 flex items-center gap-1.5 shadow-sm animate-bounce">
+                      <i class="fa-solid fa-star text-white"></i> Graded by Mẹ Chan (${sub.sticker || 'Done'})
+                    </span>
+                  `;
+                } else if (isSubmitted) {
+                  cardStyle = 'bg-purple-50/40 border-2 border-purple-200 hover:border-purple-300';
+                  statusBadge = `
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1.5">
+                      <i class="fa-solid fa-clock-rotate-left"></i> Submitted (Waiting Review)
+                    </span>
+                  `;
+                }
+
+                return `
+                  <div 
+                    onclick="app.viewTaskDetail('${task.id}')"
+                    class="p-4 sm:p-5 rounded-3xl border ${cardStyle} cursor-pointer transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group hover:translate-x-1"
+                  >
+                    <div class="space-y-1.5">
+                      <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-xl text-[11px] font-bold bg-pink-100 text-pink-700">
+                          ${task.majorTopic}
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-xl text-[11px] font-bold bg-purple-100 text-purple-700">
+                          ${task.subTopic}
+                        </span>
+                      </div>
+                      <h4 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
+                        ${task.title}
+                      </h4>
+                      <p class="text-xs text-slate-500 line-clamp-1">${task.instructions}</p>
+                    </div>
+
+                    <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-pink-50">
+                      ${statusBadge}
+                      <span class="w-8 h-8 rounded-2xl bg-pink-100/60 group-hover:bg-pink-500 group-hover:text-white text-pink-600 flex items-center justify-center text-xs transition-all">
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      },
+
+      // 3B. Single Task Full Detail View (When Clicked)
+      renderSingleTaskDetail(task, submission) {
+        const isReviewed = submission && submission.status === 'reviewed';
+        const isSubmitted = !!submission;
+
+        // Highlight vàng đặc biệt khi bài đã chấm
+        const containerHighlight = isReviewed 
+          ? 'border-4 border-amber-300 bg-amber-50/30 ring-4 ring-amber-100' 
+          : 'border-2 border-pink-100 bg-white';
+
+        return `
+          <div class="space-y-6">
+            <!-- Back to To-Do List Button -->
+            <button 
+              onclick="app.backToTaskList()"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white border border-pink-200 text-pink-600 hover:bg-pink-50 font-bold text-xs shadow-xs transition-all"
+            >
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Back to To-Do List</span>
+            </button>
+
+            <!-- Detailed Task Card -->
+            <div class="rounded-3xl p-6 sm:p-8 ${containerHighlight} shadow-soft">
+              
+              <!-- Topic Badges & Status -->
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-3 py-1 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-xl text-xs font-bold shadow-xs">
+                    <i class="fa-solid fa-graduation-cap mr-1"></i> Major: ${task.majorTopic}
+                  </span>
+                  <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-xl text-xs font-bold border border-purple-200">
+                    <i class="fa-solid fa-tags mr-1"></i> Sub: ${task.subTopic}
+                  </span>
+                </div>
+
+                ${isReviewed ? `
+                  <span class="px-4 py-1.5 rounded-full text-xs font-bold bg-amber-300 text-amber-950 border border-amber-400 shadow-sm flex items-center gap-2 animate-pulse">
+                    <i class="fa-solid fa-crown text-amber-600"></i> Graded by Mẹ Chan
+                  </span>
+                ` : (isSubmitted ? `
+                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> Submitted
+                  </span>
+                ` : `
+                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1.5">
+                    <i class="fa-regular fa-clock"></i> Not submitted yet
+                  </span>
+                `)}
+              </div>
+
+              <!-- Task Title & Full Instructions -->
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">${task.title}</h2>
+              <div class="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 text-sm sm:text-base text-slate-700 leading-relaxed mb-6">
+                <span class="block text-xs font-bold text-pink-600 uppercase mb-1">Instructions:</span>
+                ${task.instructions}
+              </div>
+
+              <!-- Lesson Links and Files -->
+              ${(task.link || task.fileAttachment) ? `
+                <div class="flex flex-wrap gap-3 mb-6">
+                  ${task.link ? `
+                    <a href="${task.link}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-bold border border-purple-200 shadow-xs transition-all">
+                      <i class="fa-solid fa-up-right-from-square"></i> Open Lesson Link
+                    </a>
+                  ` : ''}
+                  ${task.fileAttachment ? `
+                    <a href="${task.fileAttachment}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold border border-pink-200 shadow-xs transition-all">
+                      <i class="fa-regular fa-image"></i> View Lesson Material
+                    </a>
+                  ` : ''}
+                </div>
+              ` : ''}
+
+              <!-- Teacher's Comment & Sticker Box (Highlighted with Gold) -->
+              ${(submission && submission.teacherComment) ? `
+                <div class="bg-gradient-to-r from-amber-100 via-amber-50 to-yellow-100 p-5 rounded-3xl border-2 border-amber-300 shadow-md mb-6 flex items-start gap-4">
+                  <span class="text-3xl">${submission.sticker || '⭐'}</span>
+                  <div>
+                    <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Mẹ Chan's Feedback & Praise</span>
+                    <p class="text-sm sm:text-base font-bold text-slate-800 mt-1">${submission.teacherComment}</p>
+                    <p class="text-[11px] text-amber-700 mt-1">Reward Sticker: <span class="font-bold">${submission.sticker}</span></p>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Answer & Homework Submission Area (Text & Photo) -->
+              <div class="pt-6 border-t border-pink-100">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-2">
+                  <i class="fa-solid fa-file-arrow-up text-pink-500"></i> Your Answer & Photo Submission
+                </h4>
+
+                <form onsubmit="app.handleSubmitTask(event, '${task.id}')" class="space-y-4">
+                  <!-- Text Answer Box -->
+                  <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">Your Written Answer / Message to Mẹ Chan:</label>
+                    <textarea 
+                      id="submission-text-${task.id}" 
+                      rows="3" 
+                      placeholder="Write your homework answers, sentences, or questions here..." 
+                      class="w-full px-4 py-3 bg-pink-50/30 border border-pink-200 rounded-2xl text-xs sm:text-sm focus:border-purple-400 focus:bg-white outline-none"
+                    >${submission ? (submission.commentText || '') : ''}</textarea>
+                  </div>
+
+                  <!-- Photo Upload Button & Submit Action -->
+                  <div class="flex flex-wrap items-center gap-3">
+                    <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-50 border border-pink-200 hover:bg-pink-100 text-pink-700 text-xs font-bold transition-all shadow-xs">
+                      <i class="fa-solid fa-camera"></i>
+                      <span>Upload Photo of Homework</span>
+                      <input type="file" accept="image/*" class="hidden" onchange="app.handleImageSelection('${task.id}', event)">
+                    </label>
+
+                    <button type="submit" class="ml-auto px-6 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-95 text-white font-bold text-xs sm:text-sm shadow-md shadow-pink-200 transition-all flex items-center gap-2">
+                      <i class="fa-solid fa-paper-plane"></i>
+                      <span>${isSubmitted ? 'Update My Submission' : 'Submit Homework'}</span>
+                    </button>
+                  </div>
+
+                  <!-- Image Preview -->
+                  <div id="img-preview-box-${task.id}">
+                    ${submission && submission.imagePreview ? `
+                      <div class="relative inline-block mt-2">
+                        <img src="${submission.imagePreview}" class="max-h-56 rounded-2xl border-2 border-pink-200 shadow-sm object-cover">
+                        <button type="button" onclick="app.removeImagePreview('${task.id}')" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md">
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                      </div>
+                      <input type="hidden" id="stored-img-${task.id}" value="${submission.imagePreview}">
+                    ` : ''}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    // Initialize application on page load
+    window.onload = function() {
+      app.init();
+    };
+  </script>
+</body>
+</html>
