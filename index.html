@@ -2145,76 +2145,76 @@
       const selectedDate = window.appState.selectedDate;
       const activeTaskId = window.appState.activeTaskId;
 
-    // Teacher Task Creation by Date
-    async handleCreateTask(e) {
-      e.preventDefault();
-      const title = document.getElementById('task-title').value.trim();
-      
-      const majorSelect = document.getElementById('task-major-select').value;
-      const majorCustom = document.getElementById('task-major-custom').value.trim();
-      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
+      const dailyTasks = allTasks.filter(t => t.scheduledDate === selectedDate);
+      const calendarDates = this.getCalendarDates();
+      const activeTask = activeTaskId ? dailyTasks.find(t => t.id === activeTaskId) : null;
 
-      const subSelect = document.getElementById('task-sub-select').value;
-      const subCustom = document.getElementById('task-sub-custom').value.trim();
-      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
+      container.innerHTML = `
+        <!-- Student Greeting Header -->
+        <div class="bg-gradient-to-r from-pink-100/80 via-purple-100/80 to-rose-100/80 rounded-3xl p-6 sm:p-8 border-2 border-white shadow-soft mb-8 flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div class="flex items-center gap-4 text-center sm:text-left">
+            <img src="${student?.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
+                <button 
+                  onclick="app.openChangePasswordModal('${student?.id}', false)" 
+                  class="text-[11px] font-bold text-purple-700 bg-white/80 hover:bg-white px-2.5 py-1 rounded-full border border-purple-200 shadow-xs transition-all flex items-center gap-1"
+                >
+                  <i class="fa-solid fa-lock text-[10px]"></i> Change Password
+                </button>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student?.name}'s Missions</h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Click any date to see your to-do items. Select a task to complete it!</p>
+            </div>
+          </div>
 
-      const scheduledDate = document.getElementById('task-date').value;
-      const instructions = document.getElementById('task-instructions').value;
+          <div class="bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-pink-200 text-center shadow-xs">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Your Total Completed</span>
+            <span class="text-2xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+              ${submissions.length} / ${allTasks.length}
+            </span>
+          </div>
+        </div>
 
-      // Extract multiple links
-      const linkRows = document.querySelectorAll('#task-links-container .link-row');
-      const links = [];
-      linkRows.forEach(row => {
-        const u = row.querySelector('.link-url-input').value.trim();
-        const t = row.querySelector('.link-title-input').value.trim();
-        if (u) links.push({ title: t || 'Lesson Link', url: u });
-      });
+        <!-- Interactive Calendar Strip -->
+        <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i class="fa-regular fa-calendar-check text-pink-500"></i> Learning Calendar
+            </h3>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 font-medium hidden sm:inline">Pick date:</span>
+              <input type="date" value="${selectedDate}" onchange="app.selectDate(this.value)" class="text-xs font-bold bg-pink-50 border border-pink-200 text-slate-700 px-3 py-1.5 rounded-xl outline-none">
+            </div>
+          </div>
 
-      // Extract multiple materials
-      const matRows = document.querySelectorAll('#task-materials-container .material-row');
-      const fileAttachments = [];
-      matRows.forEach(row => {
-        const u = row.querySelector('.material-url-input').value.trim();
-        const t = row.querySelector('.material-title-input').value.trim();
-        if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
-      });
+          <!-- Date pills slider -->
+          <div class="grid grid-cols-7 gap-2">
+            ${calendarDates.map(item => {
+              const isSelected = item.iso === selectedDate;
+              const hasTasks = allTasks.some(t => t.scheduledDate === item.iso);
+              return `
+                <button 
+                  onclick="app.selectDate('${item.iso}')"
+                  class="flex flex-col items-center justify-center p-3 rounded-2xl transition-all relative ${isSelected ? 'bg-gradient-to-b from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200 scale-105' : 'bg-pink-50/50 hover:bg-pink-100/60 text-slate-700'}"
+                >
+                  <span class="text-[11px] font-medium opacity-80">${item.dayName}</span>
+                  <span class="text-lg font-bold">${item.dayNum}</span>
+                  ${hasTasks ? `
+                    <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-pink-500'} mt-1"></span>
+                  ` : `
+                    <span class="w-2 h-2 mt-1"></span>
+                  `}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
 
-      if (majorSelect === '__new__' && !majorCustom) {
-        this.showToast('Please type a name for the new Major Topic!', 'error');
-        return;
-      }
-
-      const selectAll = document.getElementById('assign-all-students').checked;
-      let assignedTo = ['all'];
-      if (!selectAll) {
-        const checked = Array.from(document.querySelectorAll('.assign-student-cb:checked')).map(cb => cb.value);
-        if (checked.length === 0) {
-          this.showToast('Please select at least one student!', 'error');
-          return;
-        }
-        assignedTo = checked;
-      }
-
-      await window.store.ensureTopic(majorTopic, subTopic);
-
-      const newTask = {
-        id: 'task_' + Date.now(),
-        title,
-        majorTopic,
-        subTopic,
-        scheduledDate,
-        instructions,
-        links,
-        fileAttachments,
-        link: links[0]?.url || '',
-        fileAttachment: fileAttachments[0]?.url || '',
-        assignedTo,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-
-      await window.store.addTask(newTask);
-      this.showToast(`Daily task for ${scheduledDate} assigned! 🎉`, 'success');
-      this.switchTeacherTab('assignments');
+        <!-- VIEW SWITCH: DETAILED TASK VIEW OR CONCISE TO-DO LIST -->
+        ${activeTask ? this.renderSingleTaskDetail(activeTask, submissions.find(s => s.taskId === activeTask.id)) : this.renderConciseTodoList(dailyTasks, submissions, selectedDate)}
+      `;
     },
 
     // 3A. Concise To-Do List View
