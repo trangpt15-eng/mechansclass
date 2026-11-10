@@ -195,46 +195,6 @@
     </div>
   </div>
 
-  <!-- 3. Add Student Modal -->
-  <div id="add-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-soft border-2 border-pink-100 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3 border-b border-pink-100 mb-4">
-        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
-          <i class="fa-solid fa-user-plus text-pink-500"></i> Add New Student
-        </h3>
-        <button onclick="app.closeAddStudentModal()" class="text-slate-400 hover:text-slate-600">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <form onsubmit="app.handleAddStudentSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student's Name *</label>
-          <input type="text" id="new-std-name" required placeholder="e.g. Jenny Nguyen" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Personal Box Password *</label>
-          <input type="text" id="new-std-pass" required placeholder="e.g. 123" value="123" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none font-semibold">
-          <p class="text-[11px] text-slate-400 mt-1">Student will use this code to unlock their daily box.</p>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Avatar Picture URL or Preset</label>
-          <input type="url" id="new-std-avatar" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none">
-          <div class="mt-2.5">
-            <span class="text-[11px] text-slate-500 font-bold block mb-1.5">Pick an avatar preset:</span>
-            <div class="flex gap-2 flex-wrap" id="preset-avatars">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-        <div class="flex justify-end gap-2 pt-3">
-          <button type="button" onclick="app.closeAddStudentModal()" class="px-5 py-2.5 text-sm font-bold rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button type="submit" class="px-6 py-2.5 text-sm font-bold rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:opacity-95 shadow-md shadow-pink-200">Save Student</button>
-      </div>
-    </form>
-  </div>
-</div>
-
   <!-- 4. Change Password Modal (For Students & Teacher) -->
   <div id="change-pass-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-pink-100 text-center">
@@ -261,6 +221,51 @@
           </button>
           <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold shadow-md shadow-pink-200">
             Save Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Change Teacher PIN Modal -->
+  <div id="change-teacher-pin-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-purple-200 text-center">
+      <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-purple-200">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800">Change Teacher PIN</h3>
+      <p class="text-xs text-slate-400 mb-4">Protect Mẹ Chan's Desk with a new secret PIN</p>
+
+      <form onsubmit="app.handleSaveTeacherPin(event)" class="space-y-3.5 text-left">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Current PIN *</label>
+          <input 
+            type="password" 
+            id="teacher-old-pin" 
+            required 
+            placeholder="Current PIN (Default: 1234)" 
+            class="w-full px-3.5 py-2.5 bg-purple-50/40 border border-purple-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">New Secret PIN *</label>
+          <input 
+            type="password" 
+            id="teacher-new-pin" 
+            required 
+            placeholder="e.g. 5678 or mypass" 
+            class="w-full px-3.5 py-2.5 bg-purple-50/40 border border-purple-200 rounded-xl text-sm font-bold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
+          />
+        </div>
+        <div id="teacher-pin-error" class="text-rose-500 text-xs hidden font-bold bg-rose-50 py-1 px-2.5 rounded-lg border border-rose-200">
+          Incorrect current PIN!
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="app.closeChangeTeacherPinModal()" class="w-1/2 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-md shadow-purple-200 hover:opacity-95">
+            Update PIN
           </button>
         </div>
       </form>
@@ -396,6 +401,7 @@
       this.tasks = JSON.parse(localStorage.getItem('mc_tasks')) || INITIAL_TASKS;
       this.submissions = JSON.parse(localStorage.getItem('mc_submissions')) || INITIAL_SUBMISSIONS;
       this.topicGroups = JSON.parse(localStorage.getItem('mc_topic_groups')) || INITIAL_TOPIC_GROUPS;
+      this.teacherPin = localStorage.getItem('mc_teacher_pin') || '1234';
       this.isCloudConnected = false;
       this.db = null;
       this.initFirebase();
@@ -430,6 +436,10 @@
           if (Array.isArray(data.tasks)) this.tasks = data.tasks;
           if (Array.isArray(data.submissions)) this.submissions = data.submissions;
           if (Array.isArray(data.topicGroups)) this.topicGroups = data.topicGroups;
+          if (data.teacherPin) {
+            this.teacherPin = data.teacherPin;
+            localStorage.setItem('mc_teacher_pin', this.teacherPin);
+          }
 
           localStorage.setItem('mc_students', JSON.stringify(this.students));
           localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
@@ -444,7 +454,8 @@
               students: this.students,
               tasks: this.tasks,
               submissions: this.submissions,
-              topicGroups: this.topicGroups
+              topicGroups: this.topicGroups,
+              teacherPin: this.teacherPin
             });
           } catch (initErr) {
             console.warn("Could not seed initial data to cloud:", initErr.message);
@@ -465,6 +476,7 @@
       localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
       localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
       localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
+      localStorage.setItem('mc_teacher_pin', this.teacherPin);
 
       // Push to Firestore if permission is available
       if (this.isCloudConnected && this.db) {
@@ -475,6 +487,7 @@
             tasks: this.tasks,
             submissions: this.submissions,
             topicGroups: this.topicGroups,
+            teacherPin: this.teacherPin,
             lastUpdated: new Date().toISOString()
           }, { merge: true });
         } catch (e) {
@@ -487,6 +500,12 @@
     getTasks() { return this.tasks; }
     getSubmissions() { return this.submissions; }
     getTopicGroups() { return this.topicGroups; }
+    getTeacherPin() { return this.teacherPin; }
+
+    async updateTeacherPin(newPin) {
+      this.teacherPin = newPin;
+      await this.syncToCloud();
+    }
 
     async ensureTopic(major, sub) {
       if (!major) return;
@@ -552,7 +571,6 @@
   window.appState = {
     role: 'guest',
     activeStudentId: null,
-    teacherPin: '1234',
     currentTab: 'boxes',
     selectedDate: new Date().toISOString().split('T')[0],
     activeTaskId: null,
@@ -612,7 +630,8 @@
       handleTeacherLogin(e) {
         e.preventDefault();
         const pin = document.getElementById('teacher-login-pin').value;
-        if (pin === window.appState.teacherPin || pin === '1234') {
+        const validPin = window.store.getTeacherPin();
+        if (pin === validPin || (!validPin && pin === '1234')) {
           window.appState.role = 'teacher';
           window.appState.activeStudentId = null;
           this.closeTeacherModal();
@@ -622,6 +641,40 @@
         } else {
           document.getElementById('teacher-login-error').classList.remove('hidden');
         }
+      },
+
+      // Teacher Change PIN Modal Handlers
+      openChangeTeacherPinModal() {
+        document.getElementById('teacher-old-pin').value = '';
+        document.getElementById('teacher-new-pin').value = '';
+        document.getElementById('teacher-pin-error').classList.add('hidden');
+        document.getElementById('change-teacher-pin-modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('teacher-old-pin').focus(), 50);
+      },
+
+      closeChangeTeacherPinModal() {
+        document.getElementById('change-teacher-pin-modal').classList.add('hidden');
+      },
+
+      async handleSaveTeacherPin(e) {
+        e.preventDefault();
+        const oldPin = document.getElementById('teacher-old-pin').value.trim();
+        const newPin = document.getElementById('teacher-new-pin').value.trim();
+        const currentPin = window.store.getTeacherPin();
+
+        if (oldPin !== currentPin) {
+          document.getElementById('teacher-pin-error').classList.remove('hidden');
+          return;
+        }
+
+        if (!newPin) {
+          this.showToast('New PIN cannot be empty!', 'error');
+          return;
+        }
+
+        await window.store.updateTeacherPin(newPin);
+        this.closeChangeTeacherPinModal();
+        this.showToast('Teacher PIN updated & saved to cloud successfully! 🔐💖', 'success');
       },
 
       // Student Auth
@@ -1042,8 +1095,8 @@
               <i class="fa-solid fa-sparkles text-purple-400"></i> Welcome Kids & Parents!
             </span>
             <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-  <span class="bg-gradient-to-r from-pink-500 via-rose-400 to-purple-600 bg-clip-text text-transparent">Mẹ Chan's Students</span>
-</h1>
+              <span class="bg-gradient-to-r from-pink-500 via-rose-400 to-purple-600 bg-clip-text text-transparent">Mẹ Chan's Students</span>
+            </h1>
             <p class="text-sm sm:text-base text-slate-500 mt-3 font-medium">
               Click on your cute avatar box below, enter your secret passcode, and check your daily to-do list!
             </p>
@@ -1134,6 +1187,9 @@
               <p class="text-xs sm:text-sm text-slate-500 mt-1">Assign daily tasks, organize topic hierarchies, check submitted homework & add stickers.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
+              <button onclick="app.openChangeTeacherPinModal()" class="px-3.5 py-2.5 rounded-2xl border-2 border-purple-200 bg-purple-50/50 hover:bg-purple-100/60 text-purple-700 text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-key"></i> Change PIN
+              </button>
               <button onclick="app.openAddStudentModal()" class="px-4 py-2.5 rounded-2xl border-2 border-pink-200 bg-white hover:bg-pink-50 text-pink-700 text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all">
                 <i class="fa-solid fa-user-plus"></i> Add Student
               </button>
