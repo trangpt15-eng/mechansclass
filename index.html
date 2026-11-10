@@ -414,6 +414,95 @@
     </div>
   </div>
 
+  <!-- 8. Edit Task Modal -->
+  <div id="edit-task-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-soft border-2 border-purple-100 my-8 relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-purple-100">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-purple-600"></i> Edit Scheduled Task
+        </h3>
+        <button type="button" onclick="app.closeEditTaskModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.handleUpdateTaskSubmit(event)" class="space-y-4">
+        <input type="hidden" id="edit-task-id" value="">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Scheduled Date *</label>
+            <input type="date" id="edit-task-date" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Title *</label>
+            <input type="text" id="edit-task-title" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-purple-50/30 border border-purple-100">
+          <div>
+            <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Major Topic *</label>
+            <input type="text" id="edit-task-major" required class="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-purple-400">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Sub-Topic *</label>
+            <input type="text" id="edit-task-sub" required class="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-purple-400">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions (Shift+Enter or Enter to break lines) *</label>
+          <textarea id="edit-task-instructions" rows="4" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400 leading-relaxed"></textarea>
+        </div>
+
+        <!-- Dynamic Multi-Link Container for Edit Modal -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold text-slate-600 uppercase">Resource Links</label>
+            <button type="button" onclick="app.addEditLinkRow()" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
+              <i class="fa-solid fa-circle-plus"></i> Add Link
+            </button>
+          </div>
+          <div id="edit-links-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Dynamic Multi-Material Container for Edit Modal -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold text-slate-600 uppercase">Image / Material Files</label>
+            <button type="button" onclick="app.addEditMaterialRow()" class="text-xs font-bold text-pink-600 hover:text-pink-800 flex items-center gap-1">
+              <i class="fa-solid fa-circle-plus"></i> Add Material
+            </button>
+          </div>
+          <div id="edit-materials-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Assign To in Edit Modal -->
+        <div class="pt-2 border-t border-purple-100">
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Assign to Students</label>
+          <div class="flex items-center gap-3 mb-2">
+            <input type="checkbox" id="edit-assign-all" onchange="document.getElementById('edit-specific-students-box').classList.toggle('hidden', this.checked)" class="w-4 h-4 text-purple-600 rounded">
+            <label for="edit-assign-all" class="text-xs font-bold text-slate-700">Assign to ALL students</label>
+          </div>
+
+          <div id="edit-specific-students-box" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+            <!-- Rendered in JS -->
+          </div>
+        </div>
+
+        <div class="flex gap-2.5 pt-4 border-t border-purple-100">
+          <button type="button" onclick="app.closeEditTaskModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-purple-200">
+            Save Task Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 <!-- ================= FIREBASE & APP SCRIPT ================= -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -475,9 +564,9 @@
       majorTopic: 'English',
       subTopic: 'Phonics ABC & Vocabulary',
       scheduledDate: todayStr,
-      instructions: 'Watch the phonics video link below, read aloud 5 words starting with letter A (Apple, Ant, Airplane, Alligator, Arrow), and write down 3 words in your notebook with a picture!',
-      link: 'https://www.youtube.com',
-      fileAttachment: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80',
+      instructions: "Watch the phonics video link below!\nRead aloud 5 words starting with letter A:\n• Apple\n• Ant\n• Airplane\n• Alligator\n• Arrow\n\nWrite down 3 words in your notebook with a colorful drawing!",
+      links: [{ title: 'Phonics Letter A Song', url: 'https://www.youtube.com' }],
+      fileAttachments: [{ title: 'Letter A Flashcard', url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80' }],
       assignedTo: ['all'],
       createdAt: '2026-11-08'
     },
@@ -487,9 +576,9 @@
       majorTopic: 'English',
       subTopic: 'Speaking & Storytelling',
       scheduledDate: todayStr,
-      instructions: 'Take a picture of your favorite toy! Then write 3 sentences describing: 1. What is it? 2. What color is it? 3. Why do you love it?',
-      link: '',
-      fileAttachment: '',
+      instructions: "1. Take a picture of your favorite toy!\n2. Answer these 3 sentences in English:\n   - What is it?\n   - What color is it?\n   - Why do you love it?",
+      links: [],
+      fileAttachments: [],
       assignedTo: ['std_1', 'std_2', 'std_3'],
       createdAt: '2026-11-09'
     },
@@ -499,9 +588,9 @@
       majorTopic: 'Grammar',
       subTopic: 'Action Verbs in Daily Routine',
       scheduledDate: tomorrowStr,
-      instructions: 'Write 3 complete sentences about what you do every morning (e.g., I brush my teeth, I eat breakfast). Take a photo of your handwriting!',
-      link: 'https://learnenglishkids.britishcouncil.org',
-      fileAttachment: '',
+      instructions: "Write 3 complete sentences about what you do every morning:\n1. I brush my teeth.\n2. I eat breakfast.\n3. I go to school.\n\nTake a photo of your clear handwriting!",
+      links: [{ title: 'British Council Kids Grammar', url: 'https://learnenglishkids.britishcouncil.org' }],
+      fileAttachments: [],
       assignedTo: ['all'],
       createdAt: '2026-11-09'
     }
@@ -700,6 +789,14 @@
     async addTask(task) {
       this.tasks.unshift(task);
       await this.syncToCloud();
+    }
+
+    async updateTask(updatedTask) {
+      const index = this.tasks.findIndex(t => t.id === updatedTask.id);
+      if (index >= 0) {
+        this.tasks[index] = { ...this.tasks[index], ...updatedTask };
+        await this.syncToCloud();
+      }
     }
 
     async deleteTask(taskId) {
@@ -1093,6 +1190,183 @@
           this.render();
         }
       );
+    },
+
+    // Dynamic Multi-Link & Multi-Material Rows in Compose Tab
+    addCreateLinkRow(title = '', url = '') {
+      const container = document.getElementById('task-links-container');
+      if (!container) return;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 link-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Title (e.g. YouTube Video, Game)" value="${title}" class="link-title-input w-2/5 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
+        <input type="url" placeholder="https://..." value="${url}" class="link-url-input flex-1 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold" title="Remove link">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+      container.appendChild(row);
+    },
+
+    addCreateMaterialRow(title = '', url = '') {
+      const container = document.getElementById('task-materials-container');
+      if (!container) return;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 material-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Material Name (e.g. Worksheet Image, PDF)" value="${title}" class="material-title-input w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-pink-400">
+        <input type="url" placeholder="Image/File URL https://..." value="${url}" class="material-url-input flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-pink-400">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold" title="Remove material">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+      container.appendChild(row);
+    },
+
+    // Edit Task Handlers
+    openEditTaskModal(taskId) {
+      const task = window.store.getTasks().find(t => t.id === taskId);
+      if (!task) return;
+
+      const students = window.store.getStudents();
+      document.getElementById('edit-task-id').value = task.id;
+      document.getElementById('edit-task-date').value = task.scheduledDate;
+      document.getElementById('edit-task-title').value = task.title;
+      document.getElementById('edit-task-major').value = task.majorTopic;
+      document.getElementById('edit-task-sub').value = task.subTopic;
+      document.getElementById('edit-task-instructions').value = task.instructions || '';
+
+      // Links
+      const linksContainer = document.getElementById('edit-links-list');
+      linksContainer.innerHTML = '';
+      const existingLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Lesson Link', url: task.link }] : []);
+      if (existingLinks.length === 0) {
+        this.addEditLinkRow('', '');
+      } else {
+        existingLinks.forEach(l => this.addEditLinkRow(l.title || '', l.url || ''));
+      }
+
+      // Materials
+      const materialsContainer = document.getElementById('edit-materials-list');
+      materialsContainer.innerHTML = '';
+      const existingMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'Lesson Material', url: task.fileAttachment }] : []);
+      if (existingMaterials.length === 0) {
+        this.addEditMaterialRow('', '');
+      } else {
+        existingMaterials.forEach(m => this.addEditMaterialRow(m.title || '', m.url || ''));
+      }
+
+      // Assign checkboxes
+      const isAll = Array.isArray(task.assignedTo) && task.assignedTo.includes('all');
+      const assignAllCb = document.getElementById('edit-assign-all');
+      assignAllCb.checked = isAll;
+
+      const specificWrap = document.getElementById('edit-specific-students-box');
+      specificWrap.classList.toggle('hidden', isAll);
+      specificWrap.innerHTML = students.map(s => {
+        const isAssigned = isAll || (Array.isArray(task.assignedTo) && task.assignedTo.includes(s.id));
+        return `
+          <label class="flex items-center gap-2 p-2 rounded-xl bg-purple-50/50 hover:bg-purple-100/50 text-xs font-medium cursor-pointer">
+            <input type="checkbox" value="${s.id}" class="edit-assign-student-cb w-4 h-4 text-purple-600 rounded" ${isAssigned ? 'checked' : ''}>
+            <span>${s.name}</span>
+          </label>
+        `;
+      }).join('');
+
+      document.getElementById('edit-task-modal').classList.remove('hidden');
+    },
+
+    closeEditTaskModal() {
+      document.getElementById('edit-task-modal').classList.add('hidden');
+    },
+
+    addEditLinkRow(title = '', url = '') {
+      const container = document.getElementById('edit-links-list');
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 edit-link-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Title" value="${title}" class="edit-link-title w-2/5 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none">
+        <input type="url" placeholder="https://..." value="${url}" class="edit-link-url flex-1 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+      container.appendChild(row);
+    },
+
+    addEditMaterialRow(title = '', url = '') {
+      const container = document.getElementById('edit-materials-list');
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 edit-material-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Material Name" value="${title}" class="edit-mat-title w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+        <input type="url" placeholder="https://..." value="${url}" class="edit-mat-url flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+      container.appendChild(row);
+    },
+
+    async handleUpdateTaskSubmit(e) {
+      e.preventDefault();
+      const taskId = document.getElementById('edit-task-id').value;
+      const scheduledDate = document.getElementById('edit-task-date').value;
+      const title = document.getElementById('edit-task-title').value.trim();
+      const majorTopic = document.getElementById('edit-task-major').value.trim() || 'English';
+      const subTopic = document.getElementById('edit-task-sub').value.trim() || 'General';
+      const instructions = document.getElementById('edit-task-instructions').value;
+
+      // Collect links
+      const linkRows = document.querySelectorAll('.edit-link-row');
+      const links = [];
+      linkRows.forEach(r => {
+        const u = r.querySelector('.edit-link-url').value.trim();
+        const t = r.querySelector('.edit-link-title').value.trim();
+        if (u) links.push({ title: t || 'Lesson Link', url: u });
+      });
+
+      // Collect materials
+      const matRows = document.querySelectorAll('.edit-material-row');
+      const fileAttachments = [];
+      matRows.forEach(r => {
+        const u = r.querySelector('.edit-mat-url').value.trim();
+        const t = r.querySelector('.edit-mat-title').value.trim();
+        if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
+      });
+
+      // Collect assigned
+      const isAll = document.getElementById('edit-assign-all').checked;
+      let assignedTo = ['all'];
+      if (!isAll) {
+        const checked = Array.from(document.querySelectorAll('.edit-assign-student-cb:checked')).map(cb => cb.value);
+        if (checked.length === 0) {
+          this.showToast('Please select at least one student!', 'error');
+          return;
+        }
+        assignedTo = checked;
+      }
+
+      await window.store.ensureTopic(majorTopic, subTopic);
+
+      const updated = {
+        id: taskId,
+        title,
+        majorTopic,
+        subTopic,
+        scheduledDate,
+        instructions,
+        links,
+        fileAttachments,
+        link: links[0]?.url || '',
+        fileAttachment: fileAttachments[0]?.url || '',
+        assignedTo
+      };
+
+      await window.store.updateTask(updated);
+      this.closeEditTaskModal();
+      this.showToast(`Task "${title}" updated successfully! 🌸`, 'success');
+      this.render();
     },
 
     switchTeacherTab(tab) {
@@ -1580,9 +1854,12 @@
                 ? 'All Students' 
                 : task.assignedTo.map(id => students.find(s => s.id === id)?.name || id).join(', ');
 
+              const taskLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Link', url: task.link }] : []);
+              const taskMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'Material', url: task.fileAttachment }] : []);
+
               return `
-                <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div class="space-y-1">
+                <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex flex-col md:flex-row md:items-start justify-between gap-4">
+                  <div class="space-y-1.5 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
                       <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-xl">
                         <i class="fa-solid fa-calendar-day mr-1"></i> Date: ${task.scheduledDate}
@@ -1592,17 +1869,40 @@
                       </span>
                     </div>
                     <h4 class="text-base font-bold text-slate-800">${task.title}</h4>
-                    <p class="text-xs text-slate-500 line-clamp-2">${task.instructions}</p>
-                    <p class="text-[11px] text-slate-400">Assigned to: <span class="font-semibold text-slate-600">${assignedNames}</span></p>
+                    <p class="text-xs text-slate-500 whitespace-pre-line line-clamp-3 leading-relaxed font-normal">${task.instructions}</p>
+                    <p class="text-[11px] text-slate-400 pt-1">Assigned to: <span class="font-semibold text-slate-600">${assignedNames}</span></p>
+
+                    <!-- Resource Pills -->
+                    ${(taskLinks.length > 0 || taskMaterials.length > 0) ? `
+                      <div class="flex flex-wrap items-center gap-2 pt-2">
+                        ${taskLinks.map((l, idx) => `
+                          <a href="${l.url}" target="_blank" class="px-2.5 py-1 text-[11px] bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 border border-purple-200 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-link text-[10px]"></i> ${l.title || `Link ${idx + 1}`}
+                          </a>
+                        `).join('')}
+                        ${taskMaterials.map((m, idx) => `
+                          <a href="${m.url}" target="_blank" class="px-2.5 py-1 text-[11px] bg-pink-50 text-pink-700 rounded-lg hover:bg-pink-100 border border-pink-200 font-bold flex items-center gap-1">
+                            <i class="fa-regular fa-image text-[10px]"></i> ${m.title || `Material ${idx + 1}`}
+                          </a>
+                        `).join('')}
+                      </div>
+                    ` : ''}
                   </div>
 
-                  <div class="flex items-center gap-2 self-end md:self-center">
-                    ${task.link ? `<a href="${task.link}" target="_blank" class="p-2 text-xs bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100"><i class="fa-solid fa-link"></i> Link</a>` : ''}
-                    ${task.fileAttachment ? `<a href="${task.fileAttachment}" target="_blank" class="p-2 text-xs bg-pink-50 text-pink-600 rounded-xl hover:bg-pink-100"><i class="fa-regular fa-image"></i> Image</a>` : ''}
+                  <div class="flex items-center gap-2 self-end md:self-start pt-1">
+                    <button 
+                      type="button" 
+                      onclick="app.openEditTaskModal('${task.id}')" 
+                      class="px-3 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl border border-purple-200 transition-all flex items-center gap-1.5 font-bold"
+                      title="Edit task content, links & materials"
+                    >
+                      <i class="fa-solid fa-pen-to-square"></i>
+                      <span>Edit</span>
+                    </button>
                     <button 
                       type="button" 
                       onclick="app.promptDeleteTask('${task.id}', '${task.title.replace(/'/g, "\\'")}')" 
-                      class="p-2 text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all flex items-center gap-1 font-bold"
+                      class="px-3 py-1.5 text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl border border-rose-200 transition-all flex items-center gap-1.5 font-bold"
                       title="Delete task"
                     >
                       <i class="fa-solid fa-trash-can"></i>
@@ -1710,7 +2010,7 @@
             <h3 class="text-xl font-bold text-slate-800 mb-1 flex items-center gap-2">
               <i class="fa-solid fa-calendar-plus text-pink-500"></i> Assign Task by Calendar Date
             </h3>
-            <p class="text-xs text-slate-400 mb-6">Create a daily to-do mission categorized by Major Topic & Sub-Topic with reusable dropdowns.</p>
+            <p class="text-xs text-slate-400 mb-6">Create a daily to-do mission. Enter breaks lines naturally, and attach multiple links or material URLs.</p>
 
             <form onsubmit="app.handleCreateTask(event)" class="space-y-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1772,18 +2072,39 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions *</label>
-                <textarea id="task-instructions" rows="3" required placeholder="Detail what students should do today..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400"></textarea>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions (Shift+Enter or Enter to break lines) *</label>
+                <textarea id="task-instructions" rows="4" required placeholder="Detail what students should do today...&#10;1. Step one&#10;2. Step two" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400 leading-relaxed"></textarea>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Resource Link (Optional)</label>
-                  <input type="url" id="task-link" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none">
+              <!-- Multiple Links Container -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-bold text-slate-600 uppercase">Resource Links (YouTube, Quizlet, Web...)</label>
+                  <button type="button" onclick="app.addCreateLinkRow()" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-plus"></i> Add Link
+                  </button>
                 </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Image / Material URL (Optional)</label>
-                  <input type="url" id="task-file" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none">
+                <div id="task-links-container" class="space-y-2">
+                  <div class="flex items-center gap-2 link-row">
+                    <input type="text" placeholder="Title (e.g. Phonics Song)" class="link-title-input w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+                    <input type="url" placeholder="https://..." class="link-url-input flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Multiple Materials Container -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="block text-xs font-bold text-slate-600 uppercase">Image / Material Files</label>
+                  <button type="button" onclick="app.addCreateMaterialRow()" class="text-xs font-bold text-pink-600 hover:text-pink-800 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-plus"></i> Add Material
+                  </button>
+                </div>
+                <div id="task-materials-container" class="space-y-2">
+                  <div class="flex items-center gap-2 material-row">
+                    <input type="text" placeholder="Name (e.g. Flashcard 1)" class="material-title-input w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+                    <input type="url" placeholder="Image/File URL https://..." class="material-url-input flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+                  </div>
                 </div>
               </div>
 
@@ -1824,76 +2145,76 @@
       const selectedDate = window.appState.selectedDate;
       const activeTaskId = window.appState.activeTaskId;
 
-      const dailyTasks = allTasks.filter(t => t.scheduledDate === selectedDate);
-      const calendarDates = this.getCalendarDates();
-      const activeTask = activeTaskId ? dailyTasks.find(t => t.id === activeTaskId) : null;
+    // Teacher Task Creation by Date
+    async handleCreateTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('task-title').value.trim();
+      
+      const majorSelect = document.getElementById('task-major-select').value;
+      const majorCustom = document.getElementById('task-major-custom').value.trim();
+      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
 
-      container.innerHTML = `
-        <!-- Student Greeting Header -->
-        <div class="bg-gradient-to-r from-pink-100/80 via-purple-100/80 to-rose-100/80 rounded-3xl p-6 sm:p-8 border-2 border-white shadow-soft mb-8 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div class="flex items-center gap-4 text-center sm:text-left">
-            <img src="${student.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
-                <button 
-                  onclick="app.openChangePasswordModal('${student.id}', false)" 
-                  class="text-[11px] font-bold text-purple-700 bg-white/80 hover:bg-white px-2.5 py-1 rounded-full border border-purple-200 shadow-xs transition-all flex items-center gap-1"
-                >
-                  <i class="fa-solid fa-lock text-[10px]"></i> Change Password
-                </button>
-              </div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student.name}'s Missions</h2>
-              <p class="text-xs text-slate-500 font-medium mt-0.5">Click any date to see your to-do items. Select a task to complete it!</p>
-            </div>
-          </div>
+      const subSelect = document.getElementById('task-sub-select').value;
+      const subCustom = document.getElementById('task-sub-custom').value.trim();
+      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
 
-          <div class="bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-pink-200 text-center shadow-xs">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Your Total Completed</span>
-            <span class="text-2xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              ${submissions.length} / ${allTasks.length}
-            </span>
-          </div>
-        </div>
+      const scheduledDate = document.getElementById('task-date').value;
+      const instructions = document.getElementById('task-instructions').value;
 
-        <!-- Interactive Calendar Strip -->
-        <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card mb-8">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-              <i class="fa-regular fa-calendar-check text-pink-500"></i> Learning Calendar
-            </h3>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 font-medium hidden sm:inline">Pick date:</span>
-              <input type="date" value="${selectedDate}" onchange="app.selectDate(this.value)" class="text-xs font-bold bg-pink-50 border border-pink-200 text-slate-700 px-3 py-1.5 rounded-xl outline-none">
-            </div>
-          </div>
+      // Extract multiple links
+      const linkRows = document.querySelectorAll('#task-links-container .link-row');
+      const links = [];
+      linkRows.forEach(row => {
+        const u = row.querySelector('.link-url-input').value.trim();
+        const t = row.querySelector('.link-title-input').value.trim();
+        if (u) links.push({ title: t || 'Lesson Link', url: u });
+      });
 
-          <!-- Date pills slider -->
-          <div class="grid grid-cols-7 gap-2">
-            ${calendarDates.map(item => {
-              const isSelected = item.iso === selectedDate;
-              const hasTasks = allTasks.some(t => t.scheduledDate === item.iso);
-              return `
-                <button 
-                  onclick="app.selectDate('${item.iso}')"
-                  class="flex flex-col items-center justify-center p-3 rounded-2xl transition-all relative ${isSelected ? 'bg-gradient-to-b from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200 scale-105' : 'bg-pink-50/50 hover:bg-pink-100/60 text-slate-700'}"
-                >
-                  <span class="text-[11px] font-medium opacity-80">${item.dayName}</span>
-                  <span class="text-lg font-bold">${item.dayNum}</span>
-                  ${hasTasks ? `
-                    <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-pink-500'} mt-1"></span>
-                  ` : `
-                    <span class="w-2 h-2 mt-1"></span>
-                  `}
-                </button>
-              `;
-            }).join('')}
-          </div>
-        </div>
+      // Extract multiple materials
+      const matRows = document.querySelectorAll('#task-materials-container .material-row');
+      const fileAttachments = [];
+      matRows.forEach(row => {
+        const u = row.querySelector('.material-url-input').value.trim();
+        const t = row.querySelector('.material-title-input').value.trim();
+        if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
+      });
 
-        <!-- VIEW SWITCH: DETAILED TASK VIEW OR CONCISE TO-DO LIST -->
-        ${activeTask ? this.renderSingleTaskDetail(activeTask, submissions.find(s => s.taskId === activeTask.id)) : this.renderConciseTodoList(dailyTasks, submissions, selectedDate)}
-      `;
+      if (majorSelect === '__new__' && !majorCustom) {
+        this.showToast('Please type a name for the new Major Topic!', 'error');
+        return;
+      }
+
+      const selectAll = document.getElementById('assign-all-students').checked;
+      let assignedTo = ['all'];
+      if (!selectAll) {
+        const checked = Array.from(document.querySelectorAll('.assign-student-cb:checked')).map(cb => cb.value);
+        if (checked.length === 0) {
+          this.showToast('Please select at least one student!', 'error');
+          return;
+        }
+        assignedTo = checked;
+      }
+
+      await window.store.ensureTopic(majorTopic, subTopic);
+
+      const newTask = {
+        id: 'task_' + Date.now(),
+        title,
+        majorTopic,
+        subTopic,
+        scheduledDate,
+        instructions,
+        links,
+        fileAttachments,
+        link: links[0]?.url || '',
+        fileAttachment: fileAttachments[0]?.url || '',
+        assignedTo,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+
+      await window.store.addTask(newTask);
+      this.showToast(`Daily task for ${scheduledDate} assigned! 🎉`, 'success');
+      this.switchTeacherTab('assignments');
     },
 
     // 3A. Concise To-Do List View
@@ -1993,6 +2314,9 @@
         ? 'border-4 border-amber-300 bg-amber-50/30 ring-4 ring-amber-100' 
         : 'border-2 border-pink-100 bg-white';
 
+      const taskLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Open Lesson Link', url: task.link }] : []);
+      const taskMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'View Lesson Material', url: task.fileAttachment }] : []);
+
       return `
         <div class="space-y-6">
           <!-- Back to To-Do List Button -->
@@ -2033,25 +2357,42 @@
               `)}
             </div>
 
-            <!-- Task Title & Full Instructions -->
+            <!-- Task Title & Full Instructions with Line Breaks -->
             <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">${task.title}</h2>
-            <div class="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 text-sm sm:text-base text-slate-700 leading-relaxed mb-6">
-              <span class="block text-xs font-bold text-pink-600 uppercase mb-1">Instructions:</span>
+            <div class="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 text-sm sm:text-base text-slate-700 whitespace-pre-line leading-relaxed mb-6 font-normal">
+              <span class="block text-xs font-bold text-pink-600 uppercase mb-2">Instructions:</span>
               ${task.instructions}
             </div>
 
-            <!-- Lesson Links and Files -->
-            ${(task.link || task.fileAttachment) ? `
-              <div class="flex flex-wrap gap-3 mb-6">
-                ${task.link ? `
-                  <a href="${task.link}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-bold border border-purple-200 shadow-xs transition-all">
-                    <i class="fa-solid fa-up-right-from-square"></i> Open Lesson Link
-                  </a>
+            <!-- Lesson Links & Multiple Files Display -->
+            ${(taskLinks.length > 0 || taskMaterials.length > 0) ? `
+              <div class="space-y-3 mb-6">
+                ${taskLinks.length > 0 ? `
+                  <div>
+                    <span class="block text-[11px] font-bold uppercase text-purple-700 mb-1.5">Lesson Links:</span>
+                    <div class="flex flex-wrap gap-2.5">
+                      ${taskLinks.map((l, idx) => `
+                        <a href="${l.url}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-bold border border-purple-200 shadow-xs transition-all">
+                          <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+                          <span>${l.title || `Resource ${idx + 1}`}</span>
+                        </a>
+                      `).join('')}
+                    </div>
+                  </div>
                 ` : ''}
-                ${task.fileAttachment ? `
-                  <a href="${task.fileAttachment}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold border border-pink-200 shadow-xs transition-all">
-                    <i class="fa-regular fa-image"></i> View Lesson Material
-                  </a>
+
+                ${taskMaterials.length > 0 ? `
+                  <div>
+                    <span class="block text-[11px] font-bold uppercase text-pink-700 mb-1.5">Lesson Materials & Worksheets:</span>
+                    <div class="flex flex-wrap gap-2.5">
+                      ${taskMaterials.map((m, idx) => `
+                        <a href="${m.url}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold border border-pink-200 shadow-xs transition-all">
+                          <i class="fa-regular fa-image text-[11px]"></i>
+                          <span>${m.title || `Material ${idx + 1}`}</span>
+                        </a>
+                      `).join('')}
+                    </div>
+                  </div>
                 ` : ''}
               </div>
             ` : ''}
@@ -2062,7 +2403,7 @@
                 <span class="text-3xl">${submission.sticker || '⭐'}</span>
                 <div>
                   <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Mẹ Chan's Feedback & Praise</span>
-                  <p class="text-sm sm:text-base font-bold text-slate-800 mt-1">${submission.teacherComment}</p>
+                  <p class="text-sm sm:text-base font-bold text-slate-800 mt-1 whitespace-pre-line">${submission.teacherComment}</p>
                   <p class="text-[11px] text-amber-700 mt-1">Reward Sticker: <span class="font-bold">${submission.sticker}</span></p>
                 </div>
               </div>
