@@ -272,7 +272,7 @@
     </div>
   </div>
 
-  <!-- 5. Add Student Modal (Direct Avatar Upload Support) -->
+  <!-- 5. Add Student Modal -->
   <div id="add-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border-2 border-pink-100 relative">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-pink-100">
@@ -618,6 +618,7 @@
       studentId: 'std_1',
       commentText: 'Hi Mẹ Chan, I completed writing all 5 words in my notebook and drew a big apple!',
       imagePreview: 'https://images.unsplash.com/photo-1543332164-6e82f355badc?w=400&auto=format&fit=crop&q=80',
+      vocarooLink: 'https://vocaroo.com/',
       submittedAt: 'Today at 09:30 AM',
       status: 'reviewed',
       sticker: '⭐ Excellent!',
@@ -679,7 +680,6 @@
           
           if (window.app) window.app.render();
         } else {
-          // Initialize first seed to cloud safely
           try {
             await setDoc(docRef, {
               students: this.students,
@@ -698,14 +698,12 @@
     }
 
     async syncToCloud() {
-      // Local backup first
       localStorage.setItem('mc_students', JSON.stringify(this.students));
       localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
       localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
       localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
       localStorage.setItem('mc_teacher_pin', this.teacherPin);
 
-      // Push to Firestore
       if (this.isCloudConnected && this.db) {
         try {
           const docRef = doc(this.db, 'meChanClass', 'mainDatabase');
@@ -788,6 +786,21 @@
 
     async addTask(task) {
       this.tasks.unshift(task);
+      await this.syncToCloud();
+    }
+
+    async duplicateTask(taskId) {
+      const task = this.tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const duplicated = {
+        ...JSON.parse(JSON.stringify(task)),
+        id: 'task_' + Date.now(),
+        title: `[Copy] ${task.title}`,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+
+      this.tasks.unshift(duplicated);
       await this.syncToCloud();
     }
 
@@ -989,7 +1002,7 @@
       this.showToast(`Don't worry! Please tell Mẹ Chan to reset password for ${name} 🌸`, 'info');
     },
 
-    // Student / Teacher Password Change Modal
+    // Password Change Modal
     openChangePasswordModal(studentId, isTeacherAction = false) {
       const student = window.store.getStudents().find(s => s.id === studentId);
       if (!student) return;
@@ -1022,7 +1035,7 @@
       this.render();
     },
 
-    // Generic Image Upload to Base64 (Resize to ~200px square for fast loading and Firestore limit safety)
+    // Avatar Upload Helper
     handleAvatarUpload(event, previewImgId, hiddenInputId) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1152,7 +1165,7 @@
       this.render();
     },
 
-    // Delete Modals
+    // Confirm Delete
     openConfirmDeleteModal(title, message, onConfirmCallback) {
       document.getElementById('confirm-delete-title').innerText = title;
       document.getElementById('confirm-delete-message').innerText = message;
@@ -1190,6 +1203,12 @@
           this.render();
         }
       );
+    },
+
+    async handleDuplicateTask(taskId) {
+      await window.store.duplicateTask(taskId);
+      this.showToast('Task duplicated! You can edit or change its date now ✨', 'success');
+      this.render();
     },
 
     // Dynamic Multi-Link & Multi-Material Rows in Compose Tab
@@ -1236,7 +1255,6 @@
       document.getElementById('edit-task-sub').value = task.subTopic;
       document.getElementById('edit-task-instructions').value = task.instructions || '';
 
-      // Links
       const linksContainer = document.getElementById('edit-links-list');
       linksContainer.innerHTML = '';
       const existingLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Lesson Link', url: task.link }] : []);
@@ -1246,7 +1264,6 @@
         existingLinks.forEach(l => this.addEditLinkRow(l.title || '', l.url || ''));
       }
 
-      // Materials
       const materialsContainer = document.getElementById('edit-materials-list');
       materialsContainer.innerHTML = '';
       const existingMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'Lesson Material', url: task.fileAttachment }] : []);
@@ -1256,7 +1273,6 @@
         existingMaterials.forEach(m => this.addEditMaterialRow(m.title || '', m.url || ''));
       }
 
-      // Assign checkboxes
       const isAll = Array.isArray(task.assignedTo) && task.assignedTo.includes('all');
       const assignAllCb = document.getElementById('edit-assign-all');
       assignAllCb.checked = isAll;
@@ -1317,7 +1333,6 @@
       const subTopic = document.getElementById('edit-task-sub').value.trim() || 'General';
       const instructions = document.getElementById('edit-task-instructions').value;
 
-      // Collect links
       const linkRows = document.querySelectorAll('.edit-link-row');
       const links = [];
       linkRows.forEach(r => {
@@ -1326,7 +1341,6 @@
         if (u) links.push({ title: t || 'Lesson Link', url: u });
       });
 
-      // Collect materials
       const matRows = document.querySelectorAll('.edit-material-row');
       const fileAttachments = [];
       matRows.forEach(r => {
@@ -1335,7 +1349,6 @@
         if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
       });
 
-      // Collect assigned
       const isAll = document.getElementById('edit-assign-all').checked;
       let assignedTo = ['all'];
       if (!isAll) {
@@ -1374,7 +1387,6 @@
       this.render();
     },
 
-    // Date selector
     selectDate(dateStr) {
       window.appState.selectedDate = dateStr;
       window.appState.activeTaskId = null;
@@ -1391,7 +1403,7 @@
       this.render();
     },
 
-    // Teacher Task Creation by Date
+    // Teacher Task Creation
     async handleCreateTask(e) {
       e.preventDefault();
       const title = document.getElementById('task-title').value.trim();
@@ -1405,9 +1417,23 @@
       const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
 
       const scheduledDate = document.getElementById('task-date').value;
-      const instructions = document.getElementById('task-instructions').value.trim();
-      const link = document.getElementById('task-link').value.trim();
-      const fileAttachment = document.getElementById('task-file').value.trim();
+      const instructions = document.getElementById('task-instructions').value;
+
+      const linkRows = document.querySelectorAll('#task-links-container .link-row');
+      const links = [];
+      linkRows.forEach(row => {
+        const u = row.querySelector('.link-url-input').value.trim();
+        const t = row.querySelector('.link-title-input').value.trim();
+        if (u) links.push({ title: t || 'Lesson Link', url: u });
+      });
+
+      const matRows = document.querySelectorAll('#task-materials-container .material-row');
+      const fileAttachments = [];
+      matRows.forEach(row => {
+        const u = row.querySelector('.material-url-input').value.trim();
+        const t = row.querySelector('.material-title-input').value.trim();
+        if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
+      });
 
       if (majorSelect === '__new__' && !majorCustom) {
         this.showToast('Please type a name for the new Major Topic!', 'error');
@@ -1434,8 +1460,10 @@
         subTopic,
         scheduledDate,
         instructions,
-        link,
-        fileAttachment,
+        links,
+        fileAttachments,
+        link: links[0]?.url || '',
+        fileAttachment: fileAttachments[0]?.url || '',
         assignedTo,
         createdAt: new Date().toISOString().split('T')[0]
       };
@@ -1525,11 +1553,12 @@
     async handleSubmitTask(e, taskId) {
       e.preventDefault();
       const commentText = document.getElementById(`submission-text-${taskId}`).value.trim();
+      const vocarooLink = document.getElementById(`vocaroo-link-${taskId}`).value.trim();
       const imgInput = document.getElementById(`stored-img-${taskId}`);
       const imagePreview = imgInput ? imgInput.value : '';
 
-      if (!commentText && !imagePreview) {
-        this.showToast('Please type your answer or upload a photo of your work!', 'error');
+      if (!commentText && !imagePreview && !vocarooLink) {
+        this.showToast('Please type your answer, paste audio link, or upload a photo of your work!', 'error');
         return;
       }
 
@@ -1541,6 +1570,7 @@
         taskId,
         studentId,
         commentText,
+        vocarooLink,
         imagePreview,
         submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         status: 'submitted',
@@ -1892,6 +1922,15 @@
                   <div class="flex items-center gap-2 self-end md:self-start pt-1">
                     <button 
                       type="button" 
+                      onclick="app.handleDuplicateTask('${task.id}')" 
+                      class="px-3 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl border border-emerald-200 transition-all flex items-center gap-1.5 font-bold"
+                      title="Duplicate this task"
+                    >
+                      <i class="fa-regular fa-copy"></i>
+                      <span>Copy</span>
+                    </button>
+                    <button 
+                      type="button" 
                       onclick="app.openEditTaskModal('${task.id}')" 
                       class="px-3 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl border border-purple-200 transition-all flex items-center gap-1.5 font-bold"
                       title="Edit task content, links & materials"
@@ -1957,6 +1996,15 @@
                         ${sub.commentText || '<span class="italic text-slate-400">No written answer provided.</span>'}
                       </p>
                     </div>
+
+                    ${sub.vocarooLink ? `
+                      <div class="pt-1">
+                        <span class="text-xs font-bold text-slate-500 block mb-1"><i class="fa-solid fa-microphone-lines text-purple-600 mr-1"></i> Audio Submission Link:</span>
+                        <a href="${sub.vocarooLink}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold border border-purple-200 transition-all">
+                          <i class="fa-solid fa-play text-[10px]"></i> Listen on Vocaroo (${sub.vocarooLink})
+                        </a>
+                      </div>
+                    ` : ''}
 
                     ${sub.imagePreview ? `
                       <div>
@@ -2153,18 +2201,18 @@
         <!-- Student Greeting Header -->
         <div class="bg-gradient-to-r from-pink-100/80 via-purple-100/80 to-rose-100/80 rounded-3xl p-6 sm:p-8 border-2 border-white shadow-soft mb-8 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div class="flex items-center gap-4 text-center sm:text-left">
-            <img src="${student?.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
+            <img src="${student.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
             <div>
               <div class="flex flex-wrap items-center gap-2">
                 <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
                 <button 
-                  onclick="app.openChangePasswordModal('${student?.id}', false)" 
+                  onclick="app.openChangePasswordModal('${student.id}', false)" 
                   class="text-[11px] font-bold text-purple-700 bg-white/80 hover:bg-white px-2.5 py-1 rounded-full border border-purple-200 shadow-xs transition-all flex items-center gap-1"
                 >
                   <i class="fa-solid fa-lock text-[10px]"></i> Change Password
                 </button>
               </div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student?.name}'s Missions</h2>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student.name}'s Missions</h2>
               <p class="text-xs text-slate-500 font-medium mt-0.5">Click any date to see your to-do items. Select a task to complete it!</p>
             </div>
           </div>
@@ -2196,7 +2244,7 @@
               const hasTasks = allTasks.some(t => t.scheduledDate === item.iso);
               return `
                 <button 
-                  onclick="app.selectDate('${item.iso}')"
+                  onclick="app.selectDate('${item.iso}')" 
                   class="flex flex-col items-center justify-center p-3 rounded-2xl transition-all relative ${isSelected ? 'bg-gradient-to-b from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200 scale-105' : 'bg-pink-50/50 hover:bg-pink-100/60 text-slate-700'}"
                 >
                   <span class="text-[11px] font-medium opacity-80">${item.dayName}</span>
@@ -2221,7 +2269,7 @@
     renderConciseTodoList(dailyTasks, submissions, selectedDate) {
       if (dailyTasks.length === 0) {
         return `
-          <div class="text-center py-16 bg-white rounded-3xl border border-pink-100 shadow-card">
+          <div class="text-center py-16 bg-white rounded-3xl border border-pink-100 shadow-card max-w-xl mx-auto">
             <div class="w-16 h-16 bg-pink-50 text-pink-400 rounded-3xl flex items-center justify-center text-2xl mx-auto mb-3">
               <i class="fa-solid fa-mug-hot"></i>
             </div>
@@ -2232,17 +2280,17 @@
       }
 
       return `
-        <div>
+        <div class="max-w-xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
-              <span>To-Do List for:</span>
-              <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm sm:text-base border border-pink-200">${selectedDate}</span>
+              <span>To-Do List:</span>
+              <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm border border-pink-200">${selectedDate}</span>
             </h3>
             <span class="text-xs font-bold text-slate-400">${dailyTasks.length} task(s)</span>
           </div>
 
           <!-- Concise Task Items -->
-          <div class="space-y-3.5">
+          <div class="space-y-3">
             ${dailyTasks.map(task => {
               const sub = submissions.find(s => s.taskId === task.id);
               const isReviewed = sub && sub.status === 'reviewed';
@@ -2250,23 +2298,23 @@
 
               let cardStyle = 'bg-white border-pink-100 hover:border-pink-300';
               let statusBadge = `
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1.5">
-                  <i class="fa-regular fa-circle"></i> To-Do
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1">
+                  <i class="fa-regular fa-circle text-[10px]"></i> To-Do
                 </span>
               `;
 
               if (isReviewed) {
-                cardStyle = 'bg-amber-50/70 border-4 border-amber-300 shadow-lg shadow-amber-200/50 hover:border-amber-400 ring-2 ring-amber-200';
+                cardStyle = 'bg-amber-50/70 border-2 border-amber-300 shadow-md shadow-amber-200/50 hover:border-amber-400 ring-2 ring-amber-200';
                 statusBadge = `
-                  <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 flex items-center gap-1.5 shadow-sm animate-bounce">
-                    <i class="fa-solid fa-star text-white"></i> Graded by Mẹ Chan (${sub.sticker || 'Done'})
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-amber-950 flex items-center gap-1 shadow-xs">
+                    <i class="fa-solid fa-star text-white text-[10px]"></i> Graded
                   </span>
                 `;
               } else if (isSubmitted) {
                 cardStyle = 'bg-purple-50/40 border-2 border-purple-200 hover:border-purple-300';
                 statusBadge = `
-                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1.5">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Submitted (Waiting Review)
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1">
+                    <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> Submitted
                   </span>
                 `;
               }
@@ -2274,27 +2322,21 @@
               return `
                 <div 
                   onclick="app.viewTaskDetail('${task.id}')"
-                  class="p-4 sm:p-5 rounded-3xl border ${cardStyle} cursor-pointer transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group hover:translate-x-1"
+                  class="p-4 rounded-2xl border ${cardStyle} cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 group hover:translate-x-1"
                 >
-                  <div class="space-y-1.5">
-                    <div class="flex items-center gap-2">
-                      <span class="px-2.5 py-0.5 rounded-xl text-[11px] font-bold bg-pink-100 text-pink-700">
-                        ${task.majorTopic}
-                      </span>
-                      <span class="px-2.5 py-0.5 rounded-xl text-[11px] font-bold bg-purple-100 text-purple-700">
-                        ${task.subTopic}
-                      </span>
-                    </div>
-                    <h4 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
+                  <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-pink-100/70 text-pink-600 flex items-center justify-center text-xs font-bold">
+                      <i class="fa-solid fa-book-open"></i>
+                    </span>
+                    <h4 class="text-base font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
                       ${task.title}
                     </h4>
-                    <p class="text-xs text-slate-500 line-clamp-1">${task.instructions}</p>
                   </div>
 
-                  <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-pink-50">
+                  <div class="flex items-center gap-2">
                     ${statusBadge}
-                    <span class="w-8 h-8 rounded-2xl bg-pink-100/60 group-hover:bg-pink-500 group-hover:text-white text-pink-600 flex items-center justify-center text-xs transition-all">
-                      <i class="fa-solid fa-chevron-right"></i>
+                    <span class="w-6 h-6 rounded-lg bg-pink-50 group-hover:bg-pink-500 group-hover:text-white text-pink-600 flex items-center justify-center text-xs transition-all">
+                      <i class="fa-solid fa-chevron-right text-[10px]"></i>
                     </span>
                   </div>
                 </div>
@@ -2358,8 +2400,8 @@
             </div>
 
             <!-- Task Title & Full Instructions with Line Breaks -->
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">${task.title}</h2>
-            <div class="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 text-sm sm:text-base text-slate-700 whitespace-pre-line leading-relaxed mb-6 font-normal">
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-800 mb-3">${task.title}</h2>
+            <div class="bg-pink-50/50 p-5 sm:p-6 rounded-2xl border border-pink-100 text-base sm:text-lg text-slate-700 whitespace-pre-line leading-relaxed mb-6 font-normal">
               <span class="block text-xs font-bold text-pink-600 uppercase mb-2">Instructions:</span>
               ${task.instructions}
             </div>
@@ -2403,16 +2445,16 @@
                 <span class="text-3xl">${submission.sticker || '⭐'}</span>
                 <div>
                   <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Mẹ Chan's Feedback & Praise</span>
-                  <p class="text-sm sm:text-base font-bold text-slate-800 mt-1 whitespace-pre-line">${submission.teacherComment}</p>
-                  <p class="text-[11px] text-amber-700 mt-1">Reward Sticker: <span class="font-bold">${submission.sticker}</span></p>
+                  <p class="text-base sm:text-lg font-bold text-slate-800 mt-1 whitespace-pre-line">${submission.teacherComment}</p>
+                  <p class="text-xs text-amber-700 mt-1">Reward Sticker: <span class="font-bold">${submission.sticker}</span></p>
                 </div>
               </div>
             ` : ''}
 
-            <!-- Answer & Homework Submission Area (Text & Photo) -->
+            <!-- Answer & Homework Submission Area -->
             <div class="pt-6 border-t border-pink-100">
               <h4 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-file-arrow-up text-pink-500"></i> Your Answer & Photo Submission
+                <i class="fa-solid fa-file-arrow-up text-pink-500"></i> Your Answer, Audio & Photo Submission
               </h4>
 
               <form onsubmit="app.handleSubmitTask(event, '${task.id}')" class="space-y-4">
@@ -2423,8 +2465,29 @@
                     id="submission-text-${task.id}" 
                     rows="3" 
                     placeholder="Write your homework answers, sentences, or questions here..." 
-                    class="w-full px-4 py-3 bg-pink-50/30 border border-pink-200 rounded-2xl text-xs sm:text-sm focus:border-purple-400 focus:bg-white outline-none"
+                    class="w-full px-4 py-3 bg-pink-50/30 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none"
                   >${submission ? (submission.commentText || '') : ''}</textarea>
+                </div>
+
+                <!-- Vocaroo Audio Tool & Link Input -->
+                <div class="p-4 rounded-2xl bg-purple-50/40 border border-purple-100 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <label class="block text-xs font-bold text-purple-900">
+                      <i class="fa-solid fa-microphone-lines mr-1"></i> Audio Speaking Drill (Vocaroo)
+                    </label>
+                    <a href="https://vocaroo.com/" target="_blank" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
+                      <span>Open Vocaroo Website</span>
+                      <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                  </div>
+                  <input 
+                    type="url" 
+                    id="vocaroo-link-${task.id}" 
+                    placeholder="Paste your Vocaroo recording link here (e.g. https://vocaroo.com/...)" 
+                    value="${submission ? (submission.vocarooLink || '') : ''}"
+                    class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-xl text-xs sm:text-sm outline-none focus:border-purple-400"
+                  />
+                  <p class="text-[11px] text-slate-400">Click the link above to record your voice on Vocaroo, then copy and paste the link here!</p>
                 </div>
 
                 <!-- Photo Upload Button & Submit Action -->
