@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mẹ Chan's English Class - Daily Learning Hub</title>
+  <title>Mẹ Chan's English Class - Daily Learning Corner</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -87,9 +87,9 @@
         <div>
           <span class="font-bold text-xl sm:text-2xl text-slate-800 tracking-tight flex items-center gap-2">
             Mẹ Chan's <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">English Class</span>
-            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning</span>
+            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning 🌸</span>
           </span>
-          <p class="text-xs text-slate-400 font-medium hidden sm:block">Daily adventures, to-do missions & sweet rewards</p>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">✮⋆˙Let's learn together ˙⋆✮</p>
         </div>
       </div>
 
@@ -141,6 +141,11 @@
           <div id="student-login-error" class="text-rose-500 text-xs hidden font-bold bg-rose-50 py-1.5 px-3 rounded-xl border border-rose-200">
             Oops! Incorrect password. Please check again or ask Mẹ Chan.
           </div>
+          <div class="text-center pt-1">
+            <button type="button" onclick="app.showForgotPassHint()" class="text-[11px] font-bold text-purple-600 hover:text-pink-600 transition-colors">
+              <i class="fa-regular fa-circle-question mr-1"></i> Forgot password? Ask Mẹ Chan!
+            </button>
+          </div>
           <div class="flex gap-3 pt-2">
             <button type="button" onclick="app.closeStudentModal()" class="w-1/2 py-3 px-4 rounded-2xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm transition-all">
               Cancel
@@ -176,7 +181,7 @@
           />
         </div>
         <div id="teacher-login-error" class="text-rose-500 text-xs hidden font-bold">
-          Wrong PIN! Hint: Default PIN is 1234
+          Wrong PIN!
         </div>
         <div class="flex gap-3">
           <button type="button" onclick="app.closeTeacherModal()" class="w-1/2 py-3 px-4 rounded-2xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm">
@@ -204,7 +209,7 @@
 
       <form onsubmit="app.handleAddStudentSubmit(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student's Name *</label>
           <input type="text" id="new-std-name" required placeholder="e.g. Jenny Nguyen" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none">
         </div>
         <div>
@@ -216,7 +221,7 @@
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Avatar Picture URL or Preset</label>
           <input type="url" id="new-std-avatar" placeholder="https://..." class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none">
           <div class="mt-2.5">
-            <span class="text-[11px] text-slate-500 font-bold block mb-1.5">Pick a cute avatar preset:</span>
+            <span class="text-[11px] text-slate-500 font-bold block mb-1.5">Pick an avatar preset:</span>
             <div class="flex gap-2 flex-wrap" id="preset-avatars">
               <!-- Dynamically populated -->
             </div>
@@ -229,6 +234,38 @@
     </form>
   </div>
 </div>
+
+  <!-- 4. Change Password Modal (For Students & Teacher) -->
+  <div id="change-pass-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-pink-100 text-center">
+      <div class="w-14 h-14 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-pink-200">
+        <i class="fa-solid fa-key"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800" id="change-pass-title">Change Password</h3>
+      <p class="text-xs text-slate-400 mb-4" id="change-pass-sub">Enter a new secret password below</p>
+
+      <form onsubmit="app.handleSaveNewPassword(event)" class="space-y-4">
+        <input type="hidden" id="change-pass-student-id" value="">
+        <div>
+          <input 
+            type="text" 
+            id="change-pass-new-value" 
+            required 
+            placeholder="New Password (e.g. 8888)" 
+            class="w-full px-4 py-3 bg-pink-50/50 border-2 border-pink-200 rounded-2xl text-center text-lg font-bold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
+          />
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="app.closeChangePassModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold shadow-md shadow-pink-200">
+            Save Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
 <!-- ================= FIREBASE & APP SCRIPT ================= -->
 <script type="module">
@@ -475,6 +512,14 @@
       await this.syncToCloud();
     }
 
+    async updateStudentPassword(studentId, newPassword) {
+      const student = this.students.find(s => s.id === studentId);
+      if (student) {
+        student.password = newPassword;
+        await this.syncToCloud();
+      }
+    }
+
     async addTask(task) {
       this.tasks.unshift(task);
       await this.syncToCloud();
@@ -622,6 +667,46 @@
         this.renderNavbar();
         this.render();
         this.showToast('Signed out safely.');
+      },
+
+      // Forgot Password Hint
+      showForgotPassHint() {
+        const student = window.store.getStudents().find(s => s.id === this.targetLoginStudentId);
+        const name = student ? student.name : 'student';
+        this.showToast(`Don't worry! Please tell Mẹ Chan to reset password for ${name} 🌸`, 'info');
+      },
+
+      // Student / Teacher Password Change Modal
+      openChangePasswordModal(studentId, isTeacherAction = false) {
+        const student = window.store.getStudents().find(s => s.id === studentId);
+        if (!student) return;
+
+        document.getElementById('change-pass-student-id').value = student.id;
+        document.getElementById('change-pass-new-value').value = student.password || '';
+        document.getElementById('change-pass-title').innerText = isTeacherAction ? `Reset ${student.name}'s Password` : 'Change Your Password';
+        document.getElementById('change-pass-sub').innerText = isTeacherAction ? `Current password is: ${student.password}` : 'Create a memorable password for your box';
+        document.getElementById('change-pass-modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('change-pass-new-value').focus(), 50);
+      },
+
+      closeChangePassModal() {
+        document.getElementById('change-pass-modal').classList.add('hidden');
+      },
+
+      async handleSaveNewPassword(e) {
+        e.preventDefault();
+        const studentId = document.getElementById('change-pass-student-id').value;
+        const newPassword = document.getElementById('change-pass-new-value').value.trim();
+
+        if (!newPassword) {
+          this.showToast('Password cannot be empty!', 'error');
+          return;
+        }
+
+        await window.store.updateStudentPassword(studentId, newPassword);
+        this.closeChangePassModal();
+        this.showToast('Password updated & synced successfully! 🔐✨', 'success');
+        this.render();
       },
 
       // Add Student
@@ -1092,17 +1177,34 @@
               ${students.map(s => {
                 const prog = this.getStudentProgress(s.id);
                 return `
-                  <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex items-start justify-between gap-4">
-                    <div class="flex items-center gap-3.5">
-                      <img src="${s.avatar}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-pink-200">
-                      <div>
-                        <h4 class="font-bold text-slate-800 text-base">${s.name}</h4>
-                        <p class="text-xs text-purple-500 font-medium">Password: <span class="font-mono bg-purple-50 px-1.5 py-0.5 rounded-md">${s.password}</span></p>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Tasks: ${prog.completed} / ${prog.total} completed</p>
+                  <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex flex-col justify-between gap-4">
+                    <div class="flex items-start justify-between gap-4">
+                      <div class="flex items-center gap-3.5">
+                        <img src="${s.avatar}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-pink-200">
+                        <div>
+                          <h4 class="font-bold text-slate-800 text-base">${s.name}</h4>
+                          <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-xs text-purple-600 font-medium">Password:</span>
+                            <span class="font-mono bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-lg text-xs font-bold text-purple-700">${s.password}</span>
+                          </div>
+                          <p class="text-[11px] text-slate-400 mt-1">Tasks: ${prog.completed} / ${prog.total} completed</p>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-sm font-extrabold ${prog.percent === 100 ? 'text-emerald-500' : 'text-pink-600'}">${prog.percent}%</span>
                       </div>
                     </div>
-                    <div class="text-right">
-                      <span class="text-sm font-extrabold ${prog.percent === 100 ? 'text-emerald-500' : 'text-pink-600'}">${prog.percent}%</span>
+
+                    <div class="pt-3 border-t border-pink-50 flex items-center justify-between">
+                      <span class="text-[11px] text-slate-400 font-medium">Joined: ${s.joinedAt || 'Recently'}</span>
+                      <button 
+                        type="button" 
+                        onclick="app.openChangePasswordModal('${s.id}', true)" 
+                        class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-purple-200"
+                      >
+                        <i class="fa-solid fa-key text-[10px]"></i>
+                        <span>Reset Password</span>
+                      </button>
                     </div>
                   </div>
                 `;
@@ -1370,7 +1472,15 @@
             <div class="flex items-center gap-4 text-center sm:text-left">
               <img src="${student.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
               <div>
-                <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
+                  <button 
+                    onclick="app.openChangePasswordModal('${student.id}', false)" 
+                    class="text-[11px] font-bold text-purple-700 bg-white/80 hover:bg-white px-2.5 py-1 rounded-full border border-purple-200 shadow-xs transition-all flex items-center gap-1"
+                  >
+                    <i class="fa-solid fa-lock text-[10px]"></i> Change Password
+                  </button>
+                </div>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student.name}'s Missions</h2>
                 <p class="text-xs text-slate-500 font-medium mt-0.5">Click any date to see your to-do items. Select a task to complete it!</p>
               </div>
