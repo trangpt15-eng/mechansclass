@@ -410,14 +410,20 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-purple-50/30 border border-purple-100">
           <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Major Topic</label>
-            <input type="text" id="edit-task-major" required class="w-full px-4 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-sm font-semibold text-slate-800 outline-none">
+            <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Major Topic *</label>
+            <select id="edit-task-major-select" onchange="app.onEditMajorTopicChange(this.value)" class="w-full px-4 py-2.5 bg-white border border-purple-200 rounded-xl text-sm font-bold text-slate-800 outline-none cursor-pointer"></select>
+            <div id="edit-task-major-custom-wrap" class="hidden mt-2">
+              <input type="text" id="edit-task-major-custom" placeholder="Type new Major Topic..." class="w-full px-3.5 py-2 bg-white border-2 border-pink-300 rounded-xl text-xs font-bold outline-none">
+            </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Sub Topic</label>
-            <input type="text" id="edit-task-sub" required class="w-full px-4 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-sm font-semibold text-slate-800 outline-none">
+            <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Sub-Topic *</label>
+            <select id="edit-task-sub-select" onchange="app.onEditSubTopicChange(this.value)" class="w-full px-4 py-2.5 bg-white border border-purple-200 rounded-xl text-sm font-bold text-slate-800 outline-none cursor-pointer"></select>
+            <div id="edit-task-sub-custom-wrap" class="hidden mt-2">
+              <input type="text" id="edit-task-sub-custom" placeholder="Type new Sub-Topic..." class="w-full px-3.5 py-2 bg-white border-2 border-pink-300 rounded-xl text-xs font-bold outline-none">
+            </div>
           </div>
         </div>
 
@@ -1359,6 +1365,107 @@
       if (box) box.classList.toggle('hidden');
     },
 
+    // Topic & Sub-Topic Dropdown Handlers (Create Form)
+    onMajorTopicChange(selectVal) {
+      const customWrap = document.getElementById('task-major-custom-wrap');
+      if (selectVal === '__new__') {
+        customWrap.classList.remove('hidden');
+        document.getElementById('task-major-custom').focus();
+      } else {
+        customWrap.classList.add('hidden');
+      }
+      this.updateSubTopicDropdown(selectVal);
+    },
+
+    updateSubTopicDropdown(selectedMajor) {
+      const subSelect = document.getElementById('task-sub-select');
+      const customSubWrap = document.getElementById('task-sub-custom-wrap');
+      if (!subSelect) return;
+
+      const topicGroups = window.store.getTopicGroups();
+      let subs = [];
+      if (selectedMajor !== '__new__') {
+        const matchedGroup = topicGroups.find(g => g.major.toLowerCase() === selectedMajor.toLowerCase());
+        if (matchedGroup) subs = matchedGroup.subs || [];
+      }
+
+      let optionsHtml = subs.map(s => `<option value="${s}">${s}</option>`).join('');
+      optionsHtml += `<option value="__new__">✨ + Add New Sub-Topic...</option>`;
+      subSelect.innerHTML = optionsHtml;
+
+      if (subs.length === 0) {
+        subSelect.value = '__new__';
+        customSubWrap.classList.remove('hidden');
+      } else {
+        subSelect.value = subs[0];
+        customSubWrap.classList.add('hidden');
+      }
+    },
+
+    onSubTopicChange(selectVal) {
+      const customWrap = document.getElementById('task-sub-custom-wrap');
+      if (selectVal === '__new__') {
+        customWrap.classList.remove('hidden');
+        document.getElementById('task-sub-custom').focus();
+      } else {
+        customWrap.classList.add('hidden');
+      }
+    },
+
+    // Topic & Sub-Topic Dropdown Handlers (Edit Modal)
+    onEditMajorTopicChange(selectVal, preferredSub = null) {
+      const customWrap = document.getElementById('edit-task-major-custom-wrap');
+      if (selectVal === '__new__') {
+        customWrap.classList.remove('hidden');
+        document.getElementById('edit-task-major-custom').focus();
+      } else {
+        customWrap.classList.add('hidden');
+      }
+      this.updateEditSubTopicDropdown(selectVal, preferredSub);
+    },
+
+    updateEditSubTopicDropdown(selectedMajor, preferredSub = null) {
+      const subSelect = document.getElementById('edit-task-sub-select');
+      const customSubWrap = document.getElementById('edit-task-sub-custom-wrap');
+      if (!subSelect) return;
+
+      const topicGroups = window.store.getTopicGroups();
+      let subs = [];
+      if (selectedMajor !== '__new__') {
+        const matchedGroup = topicGroups.find(g => g.major.toLowerCase() === selectedMajor.toLowerCase());
+        if (matchedGroup) subs = matchedGroup.subs || [];
+      }
+
+      if (preferredSub && !subs.includes(preferredSub)) {
+        subs = [preferredSub, ...subs];
+      }
+
+      let optionsHtml = subs.map(s => `<option value="${s}">${s}</option>`).join('');
+      optionsHtml += `<option value="__new__">✨ + Add New Sub-Topic...</option>`;
+      subSelect.innerHTML = optionsHtml;
+
+      if (preferredSub && subs.includes(preferredSub)) {
+        subSelect.value = preferredSub;
+        customSubWrap.classList.add('hidden');
+      } else if (subs.length === 0) {
+        subSelect.value = '__new__';
+        customSubWrap.classList.remove('hidden');
+      } else {
+        subSelect.value = subs[0];
+        customSubWrap.classList.add('hidden');
+      }
+    },
+
+    onEditSubTopicChange(selectVal) {
+      const customWrap = document.getElementById('edit-task-sub-custom-wrap');
+      if (selectVal === '__new__') {
+        customWrap.classList.remove('hidden');
+        document.getElementById('edit-task-sub-custom').focus();
+      } else {
+        customWrap.classList.add('hidden');
+      }
+    },
+
     // Dynamic Multi-Links & Multi-Materials
     addCreateLinkRow(title = '', url = '') {
       const container = document.getElementById('create-links-container');
@@ -1874,8 +1981,24 @@
     handleCreateTask(e) {
       e.preventDefault();
       const title = document.getElementById('task-title').value.trim();
-      const majorTopic = document.getElementById('task-major').value.trim() || 'English';
-      const subTopic = document.getElementById('task-sub').value.trim() || 'General';
+
+      const majorSelect = document.getElementById('task-major-select').value;
+      const majorCustom = document.getElementById('task-major-custom').value.trim();
+      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
+
+      const subSelect = document.getElementById('task-sub-select').value;
+      const subCustom = document.getElementById('task-sub-custom').value.trim();
+      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
+
+      if (majorSelect === '__new__' && !majorCustom) {
+        this.showToast('Please enter a name for the new Major Topic!', 'error');
+        return;
+      }
+      if (subSelect === '__new__' && !subCustom) {
+        this.showToast('Please enter a name for the new Sub-Topic!', 'error');
+        return;
+      }
+
       const scheduledDate = document.getElementById('task-date').value;
 
       // Extra material inputs
@@ -1931,8 +2054,14 @@
     // Pre-Publish Mission Preview
     previewMissionBeforePublish() {
       const title = document.getElementById('task-title').value.trim() || 'Untitled Mission';
-      const majorTopic = document.getElementById('task-major').value.trim() || 'English';
-      const subTopic = document.getElementById('task-sub').value.trim() || 'General';
+      const majorSelect = document.getElementById('task-major-select').value;
+      const majorCustom = document.getElementById('task-major-custom').value.trim();
+      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
+
+      const subSelect = document.getElementById('task-sub-select').value;
+      const subCustom = document.getElementById('task-sub-custom').value.trim();
+      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
+
       const scheduledDate = document.getElementById('task-date').value;
       const instructions = document.getElementById('task-instructions') ? document.getElementById('task-instructions').value.trim() : '';
 
@@ -2028,8 +2157,27 @@
       document.getElementById('edit-task-id').value = task.id;
       document.getElementById('edit-task-title').value = task.title;
       document.getElementById('edit-task-date').value = task.scheduledDate;
-      document.getElementById('edit-task-major').value = task.majorTopic;
-      document.getElementById('edit-task-sub').value = task.subTopic;
+
+      // Populate Topic Dropdowns in Edit Modal
+      const topicGroups = window.store.getTopicGroups();
+      const majorSelect = document.getElementById('edit-task-major-select');
+      const majorCustomWrap = document.getElementById('edit-task-major-custom-wrap');
+      const majorCustomInput = document.getElementById('edit-task-major-custom');
+
+      const majors = topicGroups.map(g => g.major);
+      if (task.majorTopic && !majors.includes(task.majorTopic)) {
+        majors.unshift(task.majorTopic);
+      }
+
+      majorSelect.innerHTML = majors.map(m => `<option value="${m}">${m}</option>`).join('') +
+        `<option value="__new__">✨ + Add New Major Topic...</option>`;
+
+      majorSelect.value = task.majorTopic || majors[0] || '__new__';
+      majorCustomWrap.classList.add('hidden');
+      majorCustomInput.value = '';
+
+      this.onEditMajorTopicChange(majorSelect.value, task.subTopic);
+
       document.getElementById('edit-task-instructions').value = task.instructions || '';
 
       const linksContainer = document.getElementById('edit-task-links-container');
@@ -2139,8 +2287,17 @@
       const taskId = document.getElementById('edit-task-id').value;
       const title = document.getElementById('edit-task-title').value.trim();
       const scheduledDate = document.getElementById('edit-task-date').value;
-      const majorTopic = document.getElementById('edit-task-major').value.trim();
-      const subTopic = document.getElementById('edit-task-sub').value.trim();
+
+      const majorSelect = document.getElementById('edit-task-major-select').value;
+      const majorCustom = document.getElementById('edit-task-major-custom').value.trim();
+      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
+
+      const subSelect = document.getElementById('edit-task-sub-select').value;
+      const subCustom = document.getElementById('edit-task-sub-custom').value.trim();
+      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
+
+      await window.store.ensureTopic(majorTopic, subTopic);
+
       const instructions = document.getElementById('edit-task-instructions').value.trim();
 
       const linkRows = document.querySelectorAll('#edit-task-links-container .link-row');
@@ -3260,6 +3417,9 @@
 
       // 5. Compose Task & Interactive Games tab
       if (tab === 'create') {
+        const topicGroups = window.store.getTopicGroups();
+        const firstGroup = topicGroups[0] || { major: 'English', subs: ['Phonics ABC & Vocabulary'] };
+
         return `
           <div class="bg-white rounded-3xl p-6 sm:p-10 border-2 border-pink-100 shadow-soft max-w-5xl mx-auto space-y-8">
             <div>
@@ -3280,13 +3440,47 @@
                   <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1.5">Task Title *</label>
                   <input type="text" id="task-title" required placeholder="e.g. Phonics Unit 2 & Spelling Practice" class="w-full px-4 py-3 bg-white border-2 border-pink-200 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-purple-400">
                 </div>
+
+                <!-- Major Topic Dropdown -->
                 <div>
-                  <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1.5">Major Topic</label>
-                  <input type="text" id="task-major" value="English" class="w-full px-4 py-2.5 bg-white border border-pink-200 rounded-2xl text-sm font-bold text-slate-800 outline-none">
+                  <label class="block text-xs font-extrabold text-purple-900 uppercase mb-1.5">Major Topic (Category) *</label>
+                  <select 
+                    id="task-major-select" 
+                    onchange="app.onMajorTopicChange(this.value)"
+                    class="w-full px-4 py-3 bg-white border-2 border-pink-200 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
+                  >
+                    ${topicGroups.map(g => `<option value="${g.major}">${g.major}</option>`).join('')}
+                    <option value="__new__">✨ + Add New Major Topic...</option>
+                  </select>
+                  <div id="task-major-custom-wrap" class="hidden mt-2">
+                    <input 
+                      type="text" 
+                      id="task-major-custom" 
+                      placeholder="Type new Major Topic (e.g. Science, Math)" 
+                      class="w-full px-4 py-2.5 bg-white border-2 border-pink-400 rounded-xl text-sm font-bold outline-none focus:border-purple-500 shadow-inner"
+                    >
+                  </div>
                 </div>
+
+                <!-- Sub Topic Dropdown -->
                 <div>
-                  <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1.5">Sub Topic</label>
-                  <input type="text" id="task-sub" value="Phonics ABC & Vocabulary" class="w-full px-4 py-2.5 bg-white border border-pink-200 rounded-2xl text-sm font-bold text-slate-800 outline-none">
+                  <label class="block text-xs font-extrabold text-purple-900 uppercase mb-1.5">Sub-Topic (Detail) *</label>
+                  <select 
+                    id="task-sub-select" 
+                    onchange="app.onSubTopicChange(this.value)"
+                    class="w-full px-4 py-3 bg-white border-2 border-pink-200 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
+                  >
+                    ${(firstGroup.subs || []).map(s => `<option value="${s}">${s}</option>`).join('')}
+                    <option value="__new__">✨ + Add New Sub-Topic...</option>
+                  </select>
+                  <div id="task-sub-custom-wrap" class="hidden mt-2">
+                    <input 
+                      type="text" 
+                      id="task-sub-custom" 
+                      placeholder="Type new Sub-Topic (e.g. Unit 3 Quiz)" 
+                      class="w-full px-4 py-2.5 bg-white border-2 border-pink-400 rounded-xl text-sm font-bold outline-none focus:border-purple-500 shadow-inner"
+                    >
+                  </div>
                 </div>
               </div>
 
