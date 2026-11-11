@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mẹ Chan's English Class - Daily Learning Hub</title>
+  <title>Mẹ Chan's English Class - Daily Learning Corner</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -87,9 +87,9 @@
         <div>
           <span class="font-bold text-xl sm:text-2xl text-slate-800 tracking-tight flex items-center gap-2">
             Mẹ Chan's <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">English Class</span>
-            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning</span>
+            <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-0.5 rounded-full border border-pink-200">🌸 Kids Learning 🌸</span>
           </span>
-          <p class="text-xs text-slate-400 font-medium hidden sm:block">Daily adventures, to-do missions & sweet rewards</p>
+          <p class="text-xs text-slate-400 font-medium hidden sm:block">✮⋆˙Let's learn together ˙⋆✮</p>
         </div>
       </div>
 
@@ -174,14 +174,14 @@
           <input 
             type="password" 
             id="teacher-login-pin" 
-            placeholder="PIN (Default: 1234)" 
+            placeholder="PIN" 
             maxlength="6"
             class="w-full px-4 py-3 bg-purple-50/50 border-2 border-purple-200 rounded-2xl text-center text-xl font-bold tracking-widest text-slate-800 focus:outline-none focus:border-purple-400 focus:bg-white"
             required
           />
         </div>
         <div id="teacher-login-error" class="text-rose-500 text-xs hidden font-bold">
-          Wrong PIN! Hint: Default PIN is 1234
+          Wrong PIN!
         </div>
         <div class="flex gap-3">
           <button type="button" onclick="app.closeTeacherModal()" class="w-1/2 py-3 px-4 rounded-2xl border-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm">
@@ -195,7 +195,115 @@
     </div>
   </div>
 
-  <!-- 3. Change Password Modal (For Students & Teacher) -->
+  <!-- 3. Add Student Modal -->
+  <div id="add-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border-2 border-pink-100">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-pink-50">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-pink-500"></i> Add New Student
+        </h3>
+        <button onclick="app.closeAddStudentModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.handleAddStudentSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
+          <input type="text" id="new-std-name" required placeholder="e.g. Emma Watson" class="w-full px-4 py-2.5 bg-pink-50/50 border border-pink-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Initial Password (Default: 123) *</label>
+          <input type="text" id="new-std-pass" required value="123" placeholder="123" class="w-full px-4 py-2.5 bg-pink-50/50 border border-pink-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Student Avatar Photo *</label>
+          <div class="flex items-center gap-4 p-3 bg-pink-50/40 rounded-2xl border border-pink-100 mb-3">
+            <img id="new-std-avatar-preview" src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-pink-300 shadow-sm">
+            <div class="flex-1">
+              <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-pink-50 text-pink-600 rounded-xl border border-pink-200 text-xs font-bold shadow-xs transition-all">
+                <i class="fa-solid fa-camera"></i>
+                <span>Upload From Device</span>
+                <input type="file" accept="image/*" class="hidden" onchange="app.handleNewStudentAvatarUpload(event)">
+              </label>
+              <p class="text-[11px] text-slate-400 mt-1">Select photo from your computer or phone</p>
+            </div>
+          </div>
+          <input type="hidden" id="new-std-avatar" value="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80">
+          
+          <label class="block text-[11px] font-bold text-slate-400 mb-1">Or Pick a Cute Preset Avatar:</label>
+          <div class="flex flex-wrap gap-2" id="preset-avatars">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-3 border-t border-pink-50">
+          <button type="button" onclick="app.closeAddStudentModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs font-bold shadow-md shadow-pink-200 hover:opacity-95">
+            Add Student
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Edit Student Info Modal -->
+  <div id="edit-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border-2 border-purple-100">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-purple-50">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-user-pen text-purple-600"></i> Edit Student Info
+        </h3>
+        <button onclick="app.closeEditStudentModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form onsubmit="app.handleSaveEditedStudent(event)" class="space-y-4">
+        <input type="hidden" id="edit-std-id" value="">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
+          <input type="text" id="edit-std-name" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Student Avatar Photo</label>
+          <div class="flex items-center gap-4 p-3 bg-purple-50/40 rounded-2xl border border-purple-100 mb-3">
+            <img id="edit-std-avatar-preview" src="" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-purple-300 shadow-sm">
+            <div class="flex-1">
+              <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-purple-50 text-purple-700 rounded-xl border border-purple-200 text-xs font-bold shadow-xs transition-all">
+                <i class="fa-solid fa-camera"></i>
+                <span>Upload New Photo</span>
+                <input type="file" accept="image/*" class="hidden" onchange="app.handleEditStudentAvatarUpload(event)">
+              </label>
+              <p class="text-[11px] text-slate-400 mt-1">Pick a new face photo for this student</p>
+            </div>
+          </div>
+          <input type="hidden" id="edit-std-avatar" value="">
+
+          <label class="block text-[11px] font-bold text-slate-400 mb-1">Or Switch to Preset Avatar:</label>
+          <div class="flex flex-wrap gap-2" id="edit-preset-avatars">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-3 border-t border-purple-50">
+          <button type="button" onclick="app.closeEditStudentModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-md shadow-purple-200 hover:opacity-95">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Change Password Modal (For Students & Teacher) -->
   <div id="change-pass-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-pink-100 text-center">
       <div class="w-14 h-14 bg-pink-50 text-pink-500 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-pink-200">
@@ -227,7 +335,7 @@
     </div>
   </div>
 
-  <!-- 4. Change Teacher PIN Modal -->
+  <!-- 6. Change Teacher PIN Modal -->
   <div id="change-teacher-pin-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-purple-200 text-center">
       <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-purple-200">
@@ -272,234 +380,136 @@
     </div>
   </div>
 
-  <!-- 5. Add Student Modal -->
-  <div id="add-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border-2 border-pink-100 relative">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-pink-100">
-        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-user-plus text-pink-500"></i> Add New Student
-        </h3>
-        <button type="button" onclick="app.closeAddStudentModal()" class="text-slate-400 hover:text-slate-600 text-sm">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <form onsubmit="app.handleAddStudentSubmit(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
-          <input 
-            type="text" 
-            id="new-std-name" 
-            required 
-            placeholder="e.g. Emma Watson" 
-            class="w-full px-4 py-2.5 bg-pink-50/50 border border-pink-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
-          />
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Secret Passcode *</label>
-          <input 
-            type="text" 
-            id="new-std-pass" 
-            required 
-            placeholder="e.g. 123" 
-            class="w-full px-4 py-2.5 bg-pink-50/50 border border-pink-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
-          />
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Student Photo / Avatar</label>
-          <div class="flex items-center gap-4 mb-3">
-            <img id="new-std-avatar-preview" src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-pink-300 shadow-sm" alt="Preview">
-            <div>
-              <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-bold border border-pink-200 transition-all shadow-xs">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span>Upload From Device</span>
-                <input type="file" accept="image/*" class="hidden" onchange="app.handleAvatarUpload(event, 'new-std-avatar-preview', 'new-std-avatar')">
-              </label>
-              <p class="text-[10px] text-slate-400 mt-1">Select portrait photo from your computer or phone</p>
-            </div>
-          </div>
-
-          <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Or Pick A Cute Preset</label>
-          <div id="preset-avatars" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
-          <input type="hidden" id="new-std-avatar" value="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80">
-        </div>
-
-        <div class="flex gap-2.5 pt-3 border-t border-pink-100">
-          <button type="button" onclick="app.closeAddStudentModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
-            Cancel
-          </button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-pink-200">
-            Create Student Box
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 6. Edit Student Modal -->
-  <div id="edit-student-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-soft border-2 border-purple-100 relative">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-purple-100">
-        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-user-pen text-purple-600"></i> Edit Student Info
-        </h3>
-        <button type="button" onclick="app.closeEditStudentModal()" class="text-slate-400 hover:text-slate-600 text-sm">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <form onsubmit="app.handleEditStudentSubmit(event)" class="space-y-4">
-        <input type="hidden" id="edit-std-id" value="">
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Student Full Name *</label>
-          <input 
-            type="text" 
-            id="edit-std-name" 
-            required 
-            placeholder="Student Name" 
-            class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm font-semibold text-slate-800 outline-none focus:border-purple-400 focus:bg-white"
-          />
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Change Avatar / Photo</label>
-          <div class="flex items-center gap-4 mb-3">
-            <img id="edit-std-avatar-preview" src="" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-purple-300 shadow-sm" alt="Preview">
-            <div>
-              <label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold border border-purple-200 transition-all shadow-xs">
-                <i class="fa-solid fa-camera"></i>
-                <span>Upload New Photo</span>
-                <input type="file" accept="image/*" class="hidden" onchange="app.handleAvatarUpload(event, 'edit-std-avatar-preview', 'edit-std-avatar')">
-              </label>
-              <p class="text-[10px] text-slate-400 mt-1">Select new image from phone or computer</p>
-            </div>
-          </div>
-
-          <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Or Pick A Cute Preset</label>
-          <div id="edit-preset-avatars" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
-          <input type="hidden" id="edit-std-avatar" value="">
-        </div>
-
-        <div class="flex gap-2.5 pt-3 border-t border-purple-100">
-          <button type="button" onclick="app.closeEditStudentModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
-            Cancel
-          </button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-purple-200">
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 7. Confirm Delete Modal -->
-  <div id="confirm-delete-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-rose-100 text-center">
-      <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-rose-200">
-        <i class="fa-solid fa-trash-can"></i>
-      </div>
-      <h3 class="text-lg font-bold text-slate-800" id="confirm-delete-title">Are you sure?</h3>
-      <p class="text-xs text-slate-400 mb-5 leading-relaxed" id="confirm-delete-message">This action cannot be undone.</p>
-      <div class="flex gap-2">
-        <button type="button" onclick="app.closeConfirmDeleteModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
-          Cancel
-        </button>
-        <button type="button" id="confirm-delete-btn" class="w-1/2 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold shadow-md shadow-rose-200">
-          Yes, Delete
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 8. Edit Task Modal -->
+  <!-- 7. Edit Assignment Modal -->
   <div id="edit-task-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-soft border-2 border-purple-100 my-8 relative max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-purple-100">
-        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-purple-600"></i> Edit Scheduled Task
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-soft border-2 border-purple-100 my-8">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-purple-50">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-purple-600"></i> Edit Daily Assignment
         </h3>
-        <button type="button" onclick="app.closeEditTaskModal()" class="text-slate-400 hover:text-slate-600 text-sm">
-          <i class="fa-solid fa-xmark"></i>
+        <button onclick="app.closeEditTaskModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
-      <form onsubmit="app.handleUpdateTaskSubmit(event)" class="space-y-4">
+      <form onsubmit="app.handleSaveEditedTask(event)" class="space-y-4">
         <input type="hidden" id="edit-task-id" value="">
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Scheduled Date *</label>
-            <input type="date" id="edit-task-date" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+            <input type="date" id="edit-task-date" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm font-semibold outline-none focus:border-purple-400">
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Title *</label>
-            <input type="text" id="edit-task-title" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+            <input type="text" id="edit-task-title" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm font-semibold outline-none focus:border-purple-400">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-purple-50/30 border border-purple-100">
           <div>
             <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Major Topic *</label>
-            <input type="text" id="edit-task-major" required class="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-purple-400">
+            <input type="text" id="edit-task-major" required class="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-xl text-xs font-semibold outline-none focus:border-purple-400">
           </div>
           <div>
             <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Sub-Topic *</label>
-            <input type="text" id="edit-task-sub" required class="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-purple-400">
+            <input type="text" id="edit-task-sub" required class="w-full px-3.5 py-2 bg-white border border-purple-200 rounded-xl text-xs font-semibold outline-none focus:border-purple-400">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions (Shift+Enter or Enter to break lines) *</label>
-          <textarea id="edit-task-instructions" rows="4" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400 leading-relaxed"></textarea>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions (Line breaks preserved) *</label>
+          <textarea id="edit-task-instructions" rows="4" required class="w-full px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-2xl text-sm outline-none focus:border-purple-400"></textarea>
         </div>
 
-        <!-- Dynamic Multi-Link Container for Edit Modal -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-xs font-bold text-slate-600 uppercase">Resource Links</label>
-            <button type="button" onclick="app.addEditLinkRow()" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
-              <i class="fa-solid fa-circle-plus"></i> Add Link
-            </button>
-          </div>
-          <div id="edit-links-list" class="space-y-2"></div>
-        </div>
-
-        <!-- Dynamic Multi-Material Container for Edit Modal -->
+        <!-- Links Container in Edit Modal -->
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-xs font-bold text-slate-600 uppercase">Image / Material Files</label>
-            <button type="button" onclick="app.addEditMaterialRow()" class="text-xs font-bold text-pink-600 hover:text-pink-800 flex items-center gap-1">
-              <i class="fa-solid fa-circle-plus"></i> Add Material
+            <label class="text-xs font-bold text-slate-600 uppercase">Resource Links</label>
+            <button type="button" onclick="app.addEditLinkRow()" class="text-xs font-bold text-purple-600 hover:text-pink-600 flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Link
             </button>
           </div>
-          <div id="edit-materials-list" class="space-y-2"></div>
-        </div>
-
-        <!-- Assign To in Edit Modal -->
-        <div class="pt-2 border-t border-purple-100">
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Assign to Students</label>
-          <div class="flex items-center gap-3 mb-2">
-            <input type="checkbox" id="edit-assign-all" onchange="document.getElementById('edit-specific-students-box').classList.toggle('hidden', this.checked)" class="w-4 h-4 text-purple-600 rounded">
-            <label for="edit-assign-all" class="text-xs font-bold text-slate-700">Assign to ALL students</label>
-          </div>
-
-          <div id="edit-specific-students-box" class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
-            <!-- Rendered in JS -->
+          <div id="edit-links-list" class="space-y-2">
+            <!-- Dynamically populated -->
           </div>
         </div>
 
-        <div class="flex gap-2.5 pt-4 border-t border-purple-100">
+        <!-- Materials Container in Edit Modal -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-bold text-slate-600 uppercase">File / Image Materials</label>
+            <button type="button" onclick="app.addEditMaterialRow()" class="text-xs font-bold text-pink-600 hover:text-purple-600 flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Material
+            </button>
+          </div>
+          <div id="edit-materials-list" class="space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-3 border-t border-purple-100">
           <button type="button" onclick="app.closeEditTaskModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
             Cancel
           </button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-95 text-white text-xs font-bold shadow-md shadow-purple-200">
-            Save Task Changes
+          <button type="submit" class="w-1/2 py-2.5 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-md shadow-purple-200 hover:opacity-95">
+            Update Task
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 8. Confirmation Dialog Modal -->
+  <div id="confirm-modal" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-soft border-2 border-rose-100 text-center">
+      <div class="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-rose-200">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800" id="confirm-modal-title">Are you sure?</h3>
+      <p class="text-xs text-slate-400 mb-5 leading-relaxed" id="confirm-modal-desc">This action cannot be undone.</p>
+
+      <div class="flex gap-3">
+        <button type="button" onclick="app.closeConfirmModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">
+          Cancel
+        </button>
+        <button type="button" id="confirm-modal-btn" class="w-1/2 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold shadow-md shadow-rose-200">
+          Confirm Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Pre-Publish Mission Preview Modal -->
+  <div id="prepublish-preview-modal" class="fixed inset-0 bg-purple-950/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-soft border-2 border-pink-200 my-8 space-y-5 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-pink-100">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 to-purple-500 text-white flex items-center justify-center text-lg shadow-sm">
+            <i class="fa-solid fa-eye"></i>
+          </span>
+          <div>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800">Mission Preview</h3>
+            <p class="text-xs sm:text-sm text-slate-500">Check how your mission looks to your students before publishing!</p>
+          </div>
+        </div>
+        <button onclick="app.closePrepublishPreview()" class="text-slate-400 hover:text-slate-600 p-2">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <div id="prepublish-preview-body" class="space-y-5">
+        <!-- Injected via app.openPrepublishPreview() -->
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-pink-100">
+        <button type="button" onclick="app.closePrepublishPreview()" class="w-full sm:w-auto px-6 py-3 rounded-2xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50">
+          Continue Editing
+        </button>
+        <button type="button" onclick="app.confirmPublishFromPreview()" class="w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-95 text-white font-extrabold text-sm shadow-md shadow-pink-200 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Looks Great, Publish Now!</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -508,9 +518,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
   import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-  // =========================================================================
-  // DỰ ÁN FIREBASE CỦA MẸ CHAN: mechanclass-84244
-  // =========================================================================
+  // Mẹ Chan's Firebase Configuration
   const myFirebaseConfig = {
     apiKey: "AIzaSyDa7XGG7PwttJzpV4Ab2R0eWilBY070Tm0",
     authDomain: "mechanclass-84244.firebaseapp.com",
@@ -520,7 +528,7 @@
     appId: "1:213810276722:web:21f7337c568ac2103455eb"
   };
 
-  // Initial Seed Data
+  // Initial Mock Seed Data
   const INITIAL_STUDENTS = [
     {
       id: 'std_1',
@@ -564,9 +572,39 @@
       majorTopic: 'English',
       subTopic: 'Phonics ABC & Vocabulary',
       scheduledDate: todayStr,
-      instructions: "Watch the phonics video link below!\nRead aloud 5 words starting with letter A:\n• Apple\n• Ant\n• Airplane\n• Alligator\n• Arrow\n\nWrite down 3 words in your notebook with a colorful drawing!",
-      links: [{ title: 'Phonics Letter A Song', url: 'https://www.youtube.com' }],
-      fileAttachments: [{ title: 'Letter A Flashcard', url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80' }],
+      instructions: '1. Watch the phonics video link below.\n2. Read aloud 5 words starting with letter A: Apple, Ant, Airplane, Alligator, Arrow.\n3. Write down 3 words in your notebook and draw a cute apple!\n4. Record your pronunciation on Vocaroo and paste the link below.',
+      links: [
+        { title: 'YouTube Phonics Song', url: 'https://www.youtube.com' },
+        { title: 'British Council ABC', url: 'https://learnenglishkids.britishcouncil.org' }
+      ],
+      fileAttachments: [
+        { title: 'Phonics Worksheet A', url: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&auto=format&fit=crop&q=80' }
+      ],
+      activities: [
+        {
+          id: 'act_1',
+          type: 'quiz',
+          question: 'Which word starts with the letter A?',
+          options: ['Apple', 'Banana', 'Cat', 'Dog'],
+          correctAnswer: 'Apple',
+          mediaType: 'image',
+          mediaUrl: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=300&auto=format&fit=crop&q=80'
+        },
+        {
+          id: 'act_2',
+          type: 'unscramble',
+          question: 'Unscramble the letters to spell the red fruit:',
+          scrambled: 'P P L E A',
+          correctAnswer: 'APPLE'
+        },
+        {
+          id: 'act_3',
+          type: 'sentence',
+          question: 'Build a sentence about this fruit:',
+          words: ['I', 'like', 'red', 'apples'],
+          correctSentence: 'I like red apples'
+        }
+      ],
       assignedTo: ['all'],
       createdAt: '2026-11-08'
     },
@@ -576,9 +614,19 @@
       majorTopic: 'English',
       subTopic: 'Speaking & Storytelling',
       scheduledDate: todayStr,
-      instructions: "1. Take a picture of your favorite toy!\n2. Answer these 3 sentences in English:\n   - What is it?\n   - What color is it?\n   - Why do you love it?",
+      instructions: 'Take a picture of your favorite toy!\nThen answer these 3 questions:\n- What is your toy?\n- What color is it?\n- Why do you love it?',
       links: [],
       fileAttachments: [],
+      activities: [
+        {
+          id: 'act_4',
+          type: 'typing',
+          question: 'Type the English word for this cute toy (hint: T _ _ _ Y):',
+          correctAnswer: 'TEDDY',
+          mediaType: 'image',
+          mediaUrl: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=300&auto=format&fit=crop&q=80'
+        }
+      ],
       assignedTo: ['std_1', 'std_2', 'std_3'],
       createdAt: '2026-11-09'
     },
@@ -588,9 +636,21 @@
       majorTopic: 'Grammar',
       subTopic: 'Action Verbs in Daily Routine',
       scheduledDate: tomorrowStr,
-      instructions: "Write 3 complete sentences about what you do every morning:\n1. I brush my teeth.\n2. I eat breakfast.\n3. I go to school.\n\nTake a photo of your clear handwriting!",
-      links: [{ title: 'British Council Kids Grammar', url: 'https://learnenglishkids.britishcouncil.org' }],
+      instructions: 'Write 3 complete sentences about what you do every morning in your notebook.\nExample: I brush my teeth. I eat breakfast.',
+      links: [{ title: 'Grammar Rule Chart', url: 'https://learnenglishkids.britishcouncil.org' }],
       fileAttachments: [],
+      activities: [
+        {
+          id: 'act_5',
+          type: 'matching',
+          question: 'Match the verb with its daily partner:',
+          pairs: [
+            { left: 'brush', right: 'teeth' },
+            { left: 'eat', right: 'breakfast' },
+            { left: 'drink', right: 'milk' }
+          ]
+        }
+      ],
       assignedTo: ['all'],
       createdAt: '2026-11-09'
     }
@@ -617,8 +677,8 @@
       taskId: 'task_1',
       studentId: 'std_1',
       commentText: 'Hi Mẹ Chan, I completed writing all 5 words in my notebook and drew a big apple!',
+      vocarooUrl: 'https://vocaroo.com',
       imagePreview: 'https://images.unsplash.com/photo-1543332164-6e82f355badc?w=400&auto=format&fit=crop&q=80',
-      vocarooLink: 'https://vocaroo.com/',
       submittedAt: 'Today at 09:30 AM',
       status: 'reviewed',
       sticker: '⭐ Excellent!',
@@ -693,7 +753,7 @@
           }
         }
       }, (err) => {
-        console.warn("⚠️ Firebase Firestore Permissions Warning:", err.message);
+        console.warn("Firebase sync status:", err.message);
       });
     }
 
@@ -716,7 +776,7 @@
             lastUpdated: new Date().toISOString()
           }, { merge: true });
         } catch (e) {
-          console.warn("Lưu Firestore tạm thời offline, đã lưu trên máy:", e.message);
+          console.warn("Firestore save fallback to local:", e.message);
         }
       }
     }
@@ -768,11 +828,6 @@
     async deleteStudent(studentId) {
       this.students = this.students.filter(s => s.id !== studentId);
       this.submissions = this.submissions.filter(s => s.studentId !== studentId);
-      this.tasks.forEach(t => {
-        if (Array.isArray(t.assignedTo)) {
-          t.assignedTo = t.assignedTo.filter(id => id !== studentId);
-        }
-      });
       await this.syncToCloud();
     }
 
@@ -789,21 +844,6 @@
       await this.syncToCloud();
     }
 
-    async duplicateTask(taskId) {
-      const task = this.tasks.find(t => t.id === taskId);
-      if (!task) return;
-
-      const duplicated = {
-        ...JSON.parse(JSON.stringify(task)),
-        id: 'task_' + Date.now(),
-        title: `[Copy] ${task.title}`,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-
-      this.tasks.unshift(duplicated);
-      await this.syncToCloud();
-    }
-
     async updateTask(updatedTask) {
       const index = this.tasks.findIndex(t => t.id === updatedTask.id);
       if (index >= 0) {
@@ -816,6 +856,22 @@
       this.tasks = this.tasks.filter(t => t.id !== taskId);
       this.submissions = this.submissions.filter(s => s.taskId !== taskId);
       await this.syncToCloud();
+    }
+
+    async duplicateTask(taskId) {
+      const original = this.tasks.find(t => t.id === taskId);
+      if (!original) return;
+
+      const duplicated = {
+        ...JSON.parse(JSON.stringify(original)),
+        id: 'task_' + Date.now(),
+        title: `[Copy] ${original.title}`,
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+
+      this.tasks.unshift(duplicated);
+      await this.syncToCloud();
+      return duplicated;
     }
 
     async saveSubmission(sub) {
@@ -848,7 +904,18 @@
     currentTab: 'boxes',
     selectedDate: new Date().toISOString().split('T')[0],
     activeTaskId: null,
+    previewTaskId: null,
+    confirmAction: null,
+    builderActivities: []
   };
+
+  const PRESET_AVATARS = [
+    'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
+  ];
 
   // Application UI Controller
   window.app = {
@@ -885,6 +952,7 @@
       window.appState.role = 'guest';
       window.appState.activeStudentId = null;
       window.appState.activeTaskId = null;
+      window.appState.previewTaskId = null;
       this.renderNavbar();
       this.render();
     },
@@ -917,7 +985,6 @@
       }
     },
 
-    // Teacher Change PIN Modal Handlers
     openChangeTeacherPinModal() {
       document.getElementById('teacher-old-pin').value = '';
       document.getElementById('teacher-new-pin').value = '';
@@ -991,6 +1058,7 @@
       window.appState.role = 'guest';
       window.appState.activeStudentId = null;
       window.appState.activeTaskId = null;
+      window.appState.previewTaskId = null;
       this.renderNavbar();
       this.render();
       this.showToast('Signed out safely.');
@@ -1002,7 +1070,6 @@
       this.showToast(`Don't worry! Please tell Mẹ Chan to reset password for ${name} 🌸`, 'info');
     },
 
-    // Password Change Modal
     openChangePasswordModal(studentId, isTeacherAction = false) {
       const student = window.store.getStudents().find(s => s.id === studentId);
       if (!student) return;
@@ -1035,8 +1102,30 @@
       this.render();
     },
 
-    // Avatar Upload Helper
-    handleAvatarUpload(event, previewImgId, hiddenInputId) {
+    // Add Student
+    openAddStudentModal() {
+      const container = document.getElementById('preset-avatars');
+      container.innerHTML = PRESET_AVATARS.map((url, i) => `
+        <img src="${url}" onclick="app.selectPresetForNewStudent('${url}')" class="w-10 h-10 rounded-2xl object-cover cursor-pointer ring-2 ring-transparent hover:ring-pink-400 transition-all shadow-sm" title="Choose avatar ${i+1}">
+      `).join('');
+
+      document.getElementById('new-std-name').value = '';
+      document.getElementById('new-std-pass').value = '123';
+      document.getElementById('new-std-avatar').value = PRESET_AVATARS[0];
+      document.getElementById('new-std-avatar-preview').src = PRESET_AVATARS[0];
+      document.getElementById('add-student-modal').classList.remove('hidden');
+    },
+
+    closeAddStudentModal() {
+      document.getElementById('add-student-modal').classList.add('hidden');
+    },
+
+    selectPresetForNewStudent(url) {
+      document.getElementById('new-std-avatar').value = url;
+      document.getElementById('new-std-avatar-preview').src = url;
+    },
+
+    handleNewStudentAvatarUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
 
@@ -1045,65 +1134,32 @@
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxDim = 200;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxDim) {
-              height *= maxDim / width;
-              width = maxDim;
-            }
-          } else {
-            if (height > maxDim) {
-              width *= maxDim / height;
-              height = maxDim;
-            }
-          }
-          canvas.width = width;
-          canvas.height = height;
+          const size = 200;
+          canvas.width = size;
+          canvas.height = size;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-          document.getElementById(previewImgId).src = resizedDataUrl;
-          document.getElementById(hiddenInputId).value = resizedDataUrl;
+          const minDim = Math.min(img.width, img.height);
+          const startX = (img.width - minDim) / 2;
+          const startY = (img.height - minDim) / 2;
+
+          ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          document.getElementById('new-std-avatar').value = compressedDataUrl;
+          document.getElementById('new-std-avatar-preview').src = compressedDataUrl;
+          this.showToast('Avatar photo uploaded successfully! 🌸', 'success');
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     },
 
-    // Add Student
-    openAddStudentModal() {
-      const presets = [
-        'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
-      ];
-      const container = document.getElementById('preset-avatars');
-      container.innerHTML = presets.map((url, i) => `
-        <img src="${url}" onclick="document.getElementById('new-std-avatar').value='${url}'; document.getElementById('new-std-avatar-preview').src='${url}';" class="w-10 h-10 rounded-2xl object-cover cursor-pointer ring-2 ring-transparent hover:ring-pink-400 transition-all shadow-sm" title="Avatar ${i+1}">
-      `).join('');
-
-      document.getElementById('new-std-name').value = '';
-      document.getElementById('new-std-pass').value = '123';
-      document.getElementById('new-std-avatar').value = presets[0];
-      document.getElementById('new-std-avatar-preview').src = presets[0];
-      document.getElementById('add-student-modal').classList.remove('hidden');
-    },
-
-    closeAddStudentModal() {
-      document.getElementById('add-student-modal').classList.add('hidden');
-    },
-
     async handleAddStudentSubmit(e) {
       e.preventDefault();
       const name = document.getElementById('new-std-name').value.trim();
       const password = document.getElementById('new-std-pass').value.trim();
-      const avatar = document.getElementById('new-std-avatar').value.trim() || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80';
+      const avatar = document.getElementById('new-std-avatar').value.trim() || PRESET_AVATARS[0];
 
       const newStudent = {
         id: 'std_' + Date.now(),
@@ -1129,16 +1185,9 @@
       document.getElementById('edit-std-avatar').value = student.avatar;
       document.getElementById('edit-std-avatar-preview').src = student.avatar;
 
-      const presets = [
-        'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
-      ];
       const container = document.getElementById('edit-preset-avatars');
-      container.innerHTML = presets.map((url, i) => `
-        <img src="${url}" onclick="document.getElementById('edit-std-avatar').value='${url}'; document.getElementById('edit-std-avatar-preview').src='${url}';" class="w-10 h-10 rounded-2xl object-cover cursor-pointer ring-2 ring-transparent hover:ring-purple-400 transition-all shadow-sm" title="Preset ${i+1}">
+      container.innerHTML = PRESET_AVATARS.map((url, i) => `
+        <img src="${url}" onclick="app.selectPresetForEditStudent('${url}')" class="w-10 h-10 rounded-2xl object-cover cursor-pointer ring-2 ring-transparent hover:ring-purple-400 transition-all shadow-sm" title="Choose avatar ${i+1}">
       `).join('');
 
       document.getElementById('edit-student-modal').classList.remove('hidden');
@@ -1148,7 +1197,42 @@
       document.getElementById('edit-student-modal').classList.add('hidden');
     },
 
-    async handleEditStudentSubmit(e) {
+    selectPresetForEditStudent(url) {
+      document.getElementById('edit-std-avatar').value = url;
+      document.getElementById('edit-std-avatar-preview').src = url;
+    },
+
+    handleEditStudentAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const size = 200;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+
+          const minDim = Math.min(img.width, img.height);
+          const startX = (img.width - minDim) / 2;
+          const startY = (img.height - minDim) / 2;
+
+          ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          document.getElementById('edit-std-avatar').value = compressedDataUrl;
+          document.getElementById('edit-std-avatar-preview').src = compressedDataUrl;
+          this.showToast('New avatar loaded! Remember to click Save. ✨', 'info');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
+    async handleSaveEditedStudent(e) {
       e.preventDefault();
       const studentId = document.getElementById('edit-std-id').value;
       const name = document.getElementById('edit-std-name').value.trim();
@@ -1161,133 +1245,94 @@
 
       await window.store.updateStudentInfo(studentId, name, avatar);
       this.closeEditStudentModal();
-      this.showToast(`Updated info for ${name} successfully! ✨`, 'success');
+      this.showToast(`Updated student info for ${name}! 🌸`, 'success');
       this.render();
     },
 
-    // Confirm Delete
-    openConfirmDeleteModal(title, message, onConfirmCallback) {
-      document.getElementById('confirm-delete-title').innerText = title;
-      document.getElementById('confirm-delete-message').innerText = message;
-      const confirmBtn = document.getElementById('confirm-delete-btn');
-      confirmBtn.onclick = async () => {
-        await onConfirmCallback();
-        this.closeConfirmDeleteModal();
+    // Confirm Modal
+    openConfirmModal(title, desc, onConfirm) {
+      document.getElementById('confirm-modal-title').innerText = title;
+      document.getElementById('confirm-modal-desc').innerText = desc;
+      window.appState.confirmAction = onConfirm;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+
+      const btn = document.getElementById('confirm-modal-btn');
+      btn.onclick = async () => {
+        if (typeof window.appState.confirmAction === 'function') {
+          await window.appState.confirmAction();
+        }
+        app.closeConfirmModal();
       };
-      document.getElementById('confirm-delete-modal').classList.remove('hidden');
     },
 
-    closeConfirmDeleteModal() {
-      document.getElementById('confirm-delete-modal').classList.add('hidden');
+    closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+      window.appState.confirmAction = null;
     },
 
     promptDeleteStudent(studentId, studentName) {
-      this.openConfirmDeleteModal(
-        `Delete "${studentName}"?`,
-        `This will delete ${studentName}'s learning box and all their submissions permanently.`,
+      this.openConfirmModal(
+        `Delete ${studentName}?`,
+        `Are you sure you want to remove ${studentName}? Their assignments and submitted homework will also be cleaned up.`,
         async () => {
           await window.store.deleteStudent(studentId);
-          this.showToast(`Student ${studentName} was removed.`, 'info');
-          this.render();
+          app.showToast(`Student ${studentName} was deleted.`, 'info');
+          app.render();
         }
       );
     },
 
     promptDeleteTask(taskId, taskTitle) {
-      this.openConfirmDeleteModal(
+      this.openConfirmModal(
         `Delete Task?`,
-        `Are you sure you want to delete "${taskTitle}" and its submissions?`,
+        `Are you sure you want to delete "${taskTitle}"? Submitted student responses for this task will also be deleted.`,
         async () => {
           await window.store.deleteTask(taskId);
-          this.showToast(`Task removed successfully.`, 'info');
-          this.render();
+          app.showToast(`Task deleted successfully!`, 'info');
+          app.render();
         }
       );
     },
 
     async handleDuplicateTask(taskId) {
-      await window.store.duplicateTask(taskId);
-      this.showToast('Task duplicated! You can edit or change its date now ✨', 'success');
-      this.render();
+      const duplicated = await window.store.duplicateTask(taskId);
+      if (duplicated) {
+        this.showToast(`Task duplicated as "${duplicated.title}"! 🎉`, 'success');
+        this.render();
+      }
     },
 
-    // Dynamic Multi-Link & Multi-Material Rows in Compose Tab
-    addCreateLinkRow(title = '', url = '') {
-      const container = document.getElementById('task-links-container');
-      if (!container) return;
-      const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 link-row';
-      row.innerHTML = `
-        <input type="text" placeholder="Title (e.g. YouTube Video, Game)" value="${title}" class="link-title-input w-2/5 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
-        <input type="url" placeholder="https://..." value="${url}" class="link-url-input flex-1 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold" title="Remove link">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      `;
-      container.appendChild(row);
-    },
-
-    addCreateMaterialRow(title = '', url = '') {
-      const container = document.getElementById('task-materials-container');
-      if (!container) return;
-      const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 material-row';
-      row.innerHTML = `
-        <input type="text" placeholder="Material Name (e.g. Worksheet Image, PDF)" value="${title}" class="material-title-input w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-pink-400">
-        <input type="url" placeholder="Image/File URL https://..." value="${url}" class="material-url-input flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-pink-400">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold" title="Remove material">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      `;
-      container.appendChild(row);
-    },
-
-    // Edit Task Handlers
+    // Edit Assignment
     openEditTaskModal(taskId) {
       const task = window.store.getTasks().find(t => t.id === taskId);
       if (!task) return;
 
-      const students = window.store.getStudents();
       document.getElementById('edit-task-id').value = task.id;
       document.getElementById('edit-task-date').value = task.scheduledDate;
       document.getElementById('edit-task-title').value = task.title;
       document.getElementById('edit-task-major').value = task.majorTopic;
       document.getElementById('edit-task-sub').value = task.subTopic;
-      document.getElementById('edit-task-instructions').value = task.instructions || '';
+      document.getElementById('edit-task-instructions').value = task.instructions;
 
+      // Populate Links
       const linksContainer = document.getElementById('edit-links-list');
       linksContainer.innerHTML = '';
-      const existingLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Lesson Link', url: task.link }] : []);
-      if (existingLinks.length === 0) {
-        this.addEditLinkRow('', '');
+      const taskLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Resource Link', url: task.link }] : []);
+      if (taskLinks.length === 0) {
+        this.addEditLinkRow();
       } else {
-        existingLinks.forEach(l => this.addEditLinkRow(l.title || '', l.url || ''));
+        taskLinks.forEach(l => this.addEditLinkRow(l.title, l.url));
       }
 
-      const materialsContainer = document.getElementById('edit-materials-list');
-      materialsContainer.innerHTML = '';
-      const existingMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'Lesson Material', url: task.fileAttachment }] : []);
-      if (existingMaterials.length === 0) {
-        this.addEditMaterialRow('', '');
+      // Populate Materials
+      const matsContainer = document.getElementById('edit-materials-list');
+      matsContainer.innerHTML = '';
+      const taskMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'Material', url: task.fileAttachment }] : []);
+      if (taskMaterials.length === 0) {
+        this.addEditMaterialRow();
       } else {
-        existingMaterials.forEach(m => this.addEditMaterialRow(m.title || '', m.url || ''));
+        taskMaterials.forEach(m => this.addEditMaterialRow(m.title, m.url));
       }
-
-      const isAll = Array.isArray(task.assignedTo) && task.assignedTo.includes('all');
-      const assignAllCb = document.getElementById('edit-assign-all');
-      assignAllCb.checked = isAll;
-
-      const specificWrap = document.getElementById('edit-specific-students-box');
-      specificWrap.classList.toggle('hidden', isAll);
-      specificWrap.innerHTML = students.map(s => {
-        const isAssigned = isAll || (Array.isArray(task.assignedTo) && task.assignedTo.includes(s.id));
-        return `
-          <label class="flex items-center gap-2 p-2 rounded-xl bg-purple-50/50 hover:bg-purple-100/50 text-xs font-medium cursor-pointer">
-            <input type="checkbox" value="${s.id}" class="edit-assign-student-cb w-4 h-4 text-purple-600 rounded" ${isAssigned ? 'checked' : ''}>
-            <span>${s.name}</span>
-          </label>
-        `;
-      }).join('');
 
       document.getElementById('edit-task-modal').classList.remove('hidden');
     },
@@ -1298,113 +1343,951 @@
 
     addEditLinkRow(title = '', url = '') {
       const container = document.getElementById('edit-links-list');
-      const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 edit-link-row';
-      row.innerHTML = `
-        <input type="text" placeholder="Title" value="${title}" class="edit-link-title w-2/5 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none">
-        <input type="url" placeholder="https://..." value="${url}" class="edit-link-url flex-1 px-3 py-2 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.innerHTML = `
+        <input type="text" placeholder="Title (e.g. YouTube Video)" value="${title}" class="edit-link-title w-1/3 px-3 py-1.5 bg-purple-50/40 border border-purple-200 rounded-xl text-xs font-semibold outline-none focus:border-purple-400">
+        <input type="url" placeholder="https://..." value="${url}" class="edit-link-url flex-1 px-3 py-1.5 bg-purple-50/40 border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
       `;
-      container.appendChild(row);
+      container.appendChild(div);
     },
 
     addEditMaterialRow(title = '', url = '') {
       const container = document.getElementById('edit-materials-list');
-      const row = document.createElement('div');
-      row.className = 'flex items-center gap-2 edit-material-row';
-      row.innerHTML = `
-        <input type="text" placeholder="Material Name" value="${title}" class="edit-mat-title w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
-        <input type="url" placeholder="https://..." value="${url}" class="edit-mat-url flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
-        <button type="button" onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-bold">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.innerHTML = `
+        <input type="text" placeholder="Title (e.g. Worksheet Image)" value="${title}" class="edit-mat-title w-1/3 px-3 py-1.5 bg-pink-50/40 border border-pink-200 rounded-xl text-xs font-semibold outline-none focus:border-purple-400">
+        <input type="url" placeholder="https://..." value="${url}" class="edit-mat-url flex-1 px-3 py-1.5 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-purple-400">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
       `;
-      container.appendChild(row);
+      container.appendChild(div);
     },
 
-    async handleUpdateTaskSubmit(e) {
+    async handleSaveEditedTask(e) {
       e.preventDefault();
       const taskId = document.getElementById('edit-task-id').value;
       const scheduledDate = document.getElementById('edit-task-date').value;
       const title = document.getElementById('edit-task-title').value.trim();
-      const majorTopic = document.getElementById('edit-task-major').value.trim() || 'English';
-      const subTopic = document.getElementById('edit-task-sub').value.trim() || 'General';
-      const instructions = document.getElementById('edit-task-instructions').value;
+      const majorTopic = document.getElementById('edit-task-major').value.trim();
+      const subTopic = document.getElementById('edit-task-sub').value.trim();
+      const instructions = document.getElementById('edit-task-instructions').value.trim();
 
-      const linkRows = document.querySelectorAll('.edit-link-row');
-      const links = [];
-      linkRows.forEach(r => {
-        const u = r.querySelector('.edit-link-url').value.trim();
-        const t = r.querySelector('.edit-link-title').value.trim();
-        if (u) links.push({ title: t || 'Lesson Link', url: u });
-      });
+      const linkTitles = Array.from(document.querySelectorAll('.edit-link-title')).map(i => i.value.trim());
+      const linkUrls = Array.from(document.querySelectorAll('.edit-link-url')).map(i => i.value.trim());
+      const links = linkUrls.map((url, idx) => ({ title: linkTitles[idx] || 'Resource Link', url })).filter(item => item.url);
 
-      const matRows = document.querySelectorAll('.edit-material-row');
-      const fileAttachments = [];
-      matRows.forEach(r => {
-        const u = r.querySelector('.edit-mat-url').value.trim();
-        const t = r.querySelector('.edit-mat-title').value.trim();
-        if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
-      });
-
-      const isAll = document.getElementById('edit-assign-all').checked;
-      let assignedTo = ['all'];
-      if (!isAll) {
-        const checked = Array.from(document.querySelectorAll('.edit-assign-student-cb:checked')).map(cb => cb.value);
-        if (checked.length === 0) {
-          this.showToast('Please select at least one student!', 'error');
-          return;
-        }
-        assignedTo = checked;
-      }
+      const matTitles = Array.from(document.querySelectorAll('.edit-mat-title')).map(i => i.value.trim());
+      const matUrls = Array.from(document.querySelectorAll('.edit-mat-url')).map(i => i.value.trim());
+      const fileAttachments = matUrls.map((url, idx) => ({ title: matTitles[idx] || 'Material', url })).filter(item => item.url);
 
       await window.store.ensureTopic(majorTopic, subTopic);
 
-      const updated = {
+      await window.store.updateTask({
         id: taskId,
+        scheduledDate,
         title,
         majorTopic,
         subTopic,
-        scheduledDate,
         instructions,
         links,
-        fileAttachments,
-        link: links[0]?.url || '',
-        fileAttachment: fileAttachments[0]?.url || '',
-        assignedTo
-      };
+        fileAttachments
+      });
 
-      await window.store.updateTask(updated);
       this.closeEditTaskModal();
-      this.showToast(`Task "${title}" updated successfully! 🌸`, 'success');
+      this.showToast('Task updated & synced successfully! 🌸', 'success');
       this.render();
     },
 
-    switchTeacherTab(tab) {
-      window.appState.currentTab = tab;
-      this.render();
+    // Interactive Activities Builder Handlers
+    addActivityToBuilder(type) {
+      const actId = 'act_' + Date.now();
+      let activity = { id: actId, type, question: '', mediaType: 'none', mediaUrl: '' };
+
+      if (type === 'quiz') {
+        activity.options = ['', '', '', ''];
+        activity.correctAnswer = '';
+      } else if (type === 'matching') {
+        activity.pairs = [
+          { left: '', right: '' },
+          { left: '', right: '' }
+        ];
+      } else if (type === 'unscramble') {
+        activity.scrambled = '';
+        activity.correctAnswer = '';
+      } else if (type === 'sentence') {
+        activity.correctSentence = '';
+      } else if (type === 'typing') {
+        activity.correctAnswer = '';
+      }
+
+      window.appState.builderActivities.push(activity);
+      this.renderBuilderActivities();
     },
 
-    selectDate(dateStr) {
-      window.appState.selectedDate = dateStr;
-      window.appState.activeTaskId = null;
-      this.render();
+    removeActivityFromBuilder(index) {
+      window.appState.builderActivities.splice(index, 1);
+      this.renderBuilderActivities();
     },
 
-    viewTaskDetail(taskId) {
-      window.appState.activeTaskId = taskId;
-      this.render();
+    renderBuilderActivities() {
+      const container = document.getElementById('builder-activities-container');
+      if (!container) return;
+
+      if (window.appState.builderActivities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 border-2 border-dashed border-purple-200 rounded-2xl bg-purple-50/20 text-xs text-slate-400">
+            No interactive activities added yet. Click one of the buttons above to add a Quiz, Matching, or Word game!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = window.appState.builderActivities.map((act, index) => {
+        return `
+          <div class="p-4 rounded-2xl bg-white border border-purple-200 shadow-sm space-y-3 relative">
+            <div class="flex items-center justify-between pb-2 border-b border-purple-100">
+              <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
+                <i class="fa-solid ${this.getActivityIcon(act.type)}"></i> Question ${index + 1}: ${act.type.toUpperCase()}
+              </span>
+              <button type="button" onclick="app.removeActivityFromBuilder(${index})" class="text-rose-400 hover:text-rose-600 text-xs font-bold flex items-center gap-1">
+                <i class="fa-solid fa-trash-can"></i> Remove
+              </button>
+            </div>
+
+            <!-- Question Prompt -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Question Prompt *</label>
+              <input type="text" value="${act.question || ''}" onchange="appState.builderActivities[${index}].question = this.value" placeholder="e.g. What animal is this?" class="w-full px-3 py-2 bg-purple-50/30 border border-purple-200 rounded-xl text-xs font-medium outline-none focus:border-purple-400">
+            </div>
+
+            <!-- Media Section with Both Direct File Upload & URL Link Options -->
+            <div class="p-3 rounded-2xl bg-purple-50/40 border border-purple-100 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-[11px] font-bold text-purple-900 uppercase flex items-center gap-1.5">
+                  <i class="fa-solid fa-photo-film text-pink-500"></i> Question Media (Image / Audio / Video)
+                </span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="app.setActivityMediaSourceType(${index}, 'file')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${(!act.mediaSource || act.mediaSource === 'file') ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-purple-200'}">
+                    <i class="fa-solid fa-upload mr-1"></i> Upload From Device
+                  </button>
+                  <button type="button" onclick="app.setActivityMediaSourceType(${index}, 'url')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${(act.mediaSource === 'url') ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-purple-200'}">
+                    <i class="fa-solid fa-link mr-1"></i> Web Link / YouTube
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Media Type</label>
+                  <select onchange="app.changeActivityMediaType(${index}, this.value)" class="w-full px-2.5 py-1.5 bg-white border border-purple-200 rounded-xl text-xs font-medium outline-none">
+                    <option value="none" ${act.mediaType === 'none' ? 'selected' : ''}>No Media</option>
+                    <option value="image" ${act.mediaType === 'image' ? 'selected' : ''}>🖼️ Image</option>
+                    <option value="audio" ${act.mediaType === 'audio' ? 'selected' : ''}>🎵 Audio Clip (MP3 / Voice)</option>
+                    <option value="video" ${act.mediaType === 'video' ? 'selected' : ''}>🎬 Video (MP4 / YouTube)</option>
+                  </select>
+                </div>
+
+                <div class="${act.mediaType === 'none' ? 'opacity-40 pointer-events-none' : ''}">
+                  ${(!act.mediaSource || act.mediaSource === 'file') ? `
+                    <label class="block text-[10px] font-bold text-purple-700 uppercase mb-1">Choose File from Device</label>
+                    <label class="cursor-pointer flex items-center justify-center gap-2 px-3 py-1.5 bg-white hover:bg-purple-50 text-purple-700 rounded-xl border border-purple-300 text-xs font-bold transition-all shadow-xs">
+                      <i class="fa-solid fa-cloud-arrow-up"></i>
+                      <span>Choose ${act.mediaType === 'audio' ? 'Audio' : (act.mediaType === 'video' ? 'Video' : 'Image')} File</span>
+                      <input type="file" accept="${act.mediaType === 'audio' ? 'audio/*' : (act.mediaType === 'video' ? 'video/*' : 'image/*')}" class="hidden" onchange="app.handleActivityFileUpload(${index}, event)">
+                    </label>
+                  ` : `
+                    <label class="block text-[10px] font-bold text-purple-700 uppercase mb-1">Paste Media Link / YouTube URL</label>
+                    <input type="url" value="${act.mediaUrl || ''}" onchange="app.setActivityMediaUrl(${index}, this.value)" placeholder="https://..." class="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
+                  `}
+                </div>
+              </div>
+
+              <!-- Media Live Preview Box in Builder -->
+              ${act.mediaUrl ? `
+                <div class="relative inline-block mt-1 p-2 rounded-xl bg-white border border-purple-200 shadow-xs">
+                  <button type="button" onclick="app.removeActivityMedia(${index})" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-sm z-10" title="Remove Media">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                  ${act.mediaType === 'image' ? `
+                    <img src="${act.mediaUrl}" class="max-h-36 rounded-lg object-cover">
+                  ` : (act.mediaType === 'audio' ? `
+                    <audio controls class="max-w-xs h-8"><source src="${act.mediaUrl}"></audio>
+                  ` : (act.mediaType === 'video' ? `
+                    ${act.mediaUrl.startsWith('data:video') ? `
+                      <video controls class="max-h-36 rounded-lg"><source src="${act.mediaUrl}"></video>
+                    ` : `
+                      <iframe src="${act.mediaUrl.replace('watch?v=', 'embed/')}" class="w-56 h-32 rounded-lg" allowfullscreen></iframe>
+                    `}
+                  ` : ''))}
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Specific Type Config -->
+            ${this.renderActivityBuilderSpecifics(act, index)}
+          </div>
+        `;
+      }).join('');
     },
 
-    backToTaskList() {
-      window.appState.activeTaskId = null;
-      this.render();
+    getActivityIcon(type) {
+      switch (type) {
+        case 'quiz': return 'fa-circle-check';
+        case 'matching': return 'fa-puzzle-piece';
+        case 'unscramble': return 'fa-arrow-down-a-z';
+        case 'sentence': return 'fa-bars-staggered';
+        case 'typing': return 'fa-keyboard';
+        default: return 'fa-gamepad';
+      }
+    },
+
+    setActivityMediaSourceType(index, source) {
+      if (!window.appState.builderActivities[index]) return;
+      window.appState.builderActivities[index].mediaSource = source;
+      this.renderBuilderActivities();
+    },
+
+    changeActivityMediaType(index, mediaType) {
+      if (!window.appState.builderActivities[index]) return;
+      window.appState.builderActivities[index].mediaType = mediaType;
+      if (mediaType === 'none') {
+        window.appState.builderActivities[index].mediaUrl = '';
+      }
+      this.renderBuilderActivities();
+    },
+
+    setActivityMediaUrl(index, url) {
+      if (!window.appState.builderActivities[index]) return;
+      window.appState.builderActivities[index].mediaUrl = url.trim();
+      this.renderBuilderActivities();
+    },
+
+    handleActivityFileUpload(index, event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const act = window.appState.builderActivities[index];
+      if (!act) return;
+
+      const reader = new FileReader();
+
+      // If image, compress gently to keep lightweight
+      if (file.type.startsWith('image/')) {
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxW = 600;
+            const maxH = 600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height && width > maxW) {
+              height *= maxW / width;
+              width = maxW;
+            } else if (height > maxH) {
+              width *= maxH / height;
+              height = maxH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            act.mediaUrl = canvas.toDataURL('image/jpeg', 0.85);
+            app.renderBuilderActivities();
+            app.showToast('Question image uploaded from device! 🖼️🌸', 'success');
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Audio or Video file
+        reader.onload = (e) => {
+          act.mediaUrl = e.target.result;
+          app.renderBuilderActivities();
+          app.showToast(`Question ${file.type.startsWith('audio/') ? 'Audio' : 'Video'} file uploaded! 🎵✨`, 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+
+    removeActivityMedia(index) {
+      if (!window.appState.builderActivities[index]) return;
+      window.appState.builderActivities[index].mediaUrl = '';
+      this.renderBuilderActivities();
+    },
+
+    renderActivityBuilderSpecifics(act, index) {
+      if (act.type === 'quiz') {
+        return `
+          <div class="space-y-2">
+            <label class="block text-[11px] font-bold text-slate-600 uppercase">4 Options & Correct Answer *</label>
+            <div class="grid grid-cols-2 gap-2">
+              ${[0, 1, 2, 3].map(optIdx => `
+                <input type="text" placeholder="Option ${optIdx + 1}" value="${act.options ? (act.options[optIdx] || '') : ''}" onchange="appState.builderActivities[${index}].options[${optIdx}] = this.value" class="px-2.5 py-1.5 bg-white border border-purple-200 rounded-lg text-xs outline-none">
+              `).join('')}
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-emerald-600 uppercase mb-0.5">Exact Correct Answer *</label>
+              <input type="text" placeholder="e.g. Apple (Must match one of the 4 options)" value="${act.correctAnswer || ''}" onchange="appState.builderActivities[${index}].correctAnswer = this.value" class="w-full px-2.5 py-1.5 bg-emerald-50/50 border border-emerald-300 rounded-lg text-xs font-bold text-emerald-800 outline-none">
+            </div>
+          </div>
+        `;
+      }
+
+      if (act.type === 'matching') {
+        const pairs = act.pairs || [{ left: '', right: '' }, { left: '', right: '' }];
+        return `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-[11px] font-bold text-slate-600 uppercase">Matching Pairs *</label>
+              <button type="button" onclick="appState.builderActivities[${index}].pairs.push({left:'', right:''}); app.renderBuilderActivities();" class="text-[10px] font-bold text-purple-600 hover:underline">+ Add Pair</button>
+            </div>
+            ${pairs.map((p, pIdx) => `
+              <div class="flex items-center gap-2">
+                <input type="text" placeholder="Word (e.g. Cat)" value="${p.left || ''}" onchange="appState.builderActivities[${index}].pairs[${pIdx}].left = this.value" class="w-1/2 px-2.5 py-1.5 bg-white border border-purple-200 rounded-lg text-xs outline-none">
+                <span class="text-purple-400 font-bold"><i class="fa-solid fa-arrows-left-right text-xs"></i></span>
+                <input type="text" placeholder="Match (e.g. Meow / Kitten)" value="${p.right || ''}" onchange="appState.builderActivities[${index}].pairs[${pIdx}].right = this.value" class="w-1/2 px-2.5 py-1.5 bg-white border border-purple-200 rounded-lg text-xs outline-none">
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (act.type === 'unscramble') {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Scrambled Clue</label>
+              <input type="text" placeholder="e.g. P P L E A" value="${act.scrambled || ''}" onchange="appState.builderActivities[${index}].scrambled = this.value" class="w-full px-2.5 py-1.5 bg-white border border-purple-200 rounded-lg text-xs outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-emerald-600 uppercase mb-1">Correct Word *</label>
+              <input type="text" placeholder="e.g. APPLE" value="${act.correctAnswer || ''}" onchange="appState.builderActivities[${index}].correctAnswer = this.value" class="w-full px-2.5 py-1.5 bg-emerald-50 border border-emerald-300 rounded-lg text-xs font-bold text-emerald-800 outline-none">
+            </div>
+          </div>
+        `;
+      }
+
+      if (act.type === 'sentence') {
+        return `
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Full Sentence to Build *</label>
+            <input type="text" placeholder="e.g. I like red apples (System will scramble the words)" value="${act.correctSentence || ''}" onchange="appState.builderActivities[${index}].correctSentence = this.value" class="w-full px-2.5 py-1.5 bg-white border border-purple-200 rounded-lg text-xs font-semibold outline-none">
+          </div>
+        `;
+      }
+
+      if (act.type === 'typing') {
+        return `
+          <div>
+            <label class="block text-[11px] font-bold text-emerald-600 uppercase mb-1">Correct Answer to Type *</label>
+            <input type="text" placeholder="e.g. TEDDY" value="${act.correctAnswer || ''}" onchange="appState.builderActivities[${index}].correctAnswer = this.value" class="w-full px-2.5 py-1.5 bg-emerald-50 border border-emerald-300 rounded-lg text-xs font-bold text-emerald-800 outline-none">
+          </div>
+        `;
+      }
+
+      if (act.type === 'recording') {
+        return `
+          <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-1.5">
+            <label class="block text-[11px] font-bold text-emerald-800 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-microphone-lines text-emerald-600"></i> Speaking / Voice Recording Assignment
+            </label>
+            <p class="text-[11px] text-slate-500">
+              Students will be prompted to record their pronunciation or read the prompt aloud using Vocaroo / audio input.
+            </p>
+          </div>
+        `;
+      }
+
+      return '';
+    },
+
+    // Add a generic question to builder with dropdown type
+    addGenericQuestionToBuilder() {
+      const actId = 'act_' + Date.now();
+      const activity = {
+        id: actId,
+        type: 'quiz', // default type
+        question: '',
+        mediaType: 'none',
+        mediaUrl: '',
+        options: ['', '', '', ''],
+        correctAnswer: ''
+      };
+      window.appState.builderActivities.push(activity);
+      this.renderBuilderActivities();
+    },
+
+    changeActivityType(index, newType) {
+      const act = window.appState.builderActivities[index];
+      if (!act) return;
+      act.type = newType;
+
+      if (newType === 'quiz') {
+        act.options = act.options || ['', '', '', ''];
+        act.correctAnswer = act.correctAnswer || '';
+      } else if (newType === 'matching') {
+        act.pairs = act.pairs || [{ left: '', right: '' }, { left: '', right: '' }];
+      } else if (newType === 'unscramble') {
+        act.scrambled = act.scrambled || '';
+        act.correctAnswer = act.correctAnswer || '';
+      } else if (newType === 'typing') {
+        act.correctAnswer = act.correctAnswer || '';
+      } else if (newType === 'recording') {
+        // no extra fields needed
+      }
+
+      this.renderBuilderActivities();
+    },
+
+    // Module section toggling
+    toggleExtraMaterialModule(show) {
+      const el = document.getElementById('module-extra-material');
+      if (el) el.classList.toggle('hidden', !show);
+    },
+
+    toggleInteractiveTaskModule(show) {
+      const el = document.getElementById('module-interactive-task');
+      if (el) el.classList.toggle('hidden', !show);
+    },
+
+    onAddTaskModuleSelect(value) {
+      if (value === 'material') {
+        this.toggleExtraMaterialModule(true);
+        setTimeout(() => {
+          document.getElementById('module-extra-material')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
+      } else if (value === 'interactive') {
+        this.toggleInteractiveTaskModule(true);
+        if (window.appState.builderActivities.length === 0) {
+          this.addGenericQuestionToBuilder();
+        }
+        setTimeout(() => {
+          document.getElementById('module-interactive-task')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
+      }
+      // reset selector back to default prompt
+      const select = document.getElementById('add-task-module-select');
+      if (select) select.value = '';
+    },
+
+    renderBuilderActivities() {
+      const container = document.getElementById('builder-activities-container');
+      if (!container) return;
+
+      if (window.appState.builderActivities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 border-2 border-dashed border-purple-200 rounded-2xl bg-purple-50/20 text-sm font-semibold text-slate-500">
+            No questions added yet. Click <strong class="text-purple-700 font-extrabold">+ Add Question</strong> above to start!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = window.appState.builderActivities.map((act, index) => {
+        return `
+          <div class="p-5 rounded-3xl bg-white border-2 border-purple-200 shadow-sm space-y-4 relative">
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-purple-100">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-xs">
+                  ${index + 1}
+                </span>
+                <span class="text-sm font-bold uppercase tracking-wider text-purple-950">Question ${index + 1} Type:</span>
+                <select 
+                  onchange="app.changeActivityType(${index}, this.value)" 
+                  class="px-3 py-2 bg-purple-50 border-2 border-purple-300 rounded-2xl text-sm font-bold text-purple-900 outline-none focus:border-purple-500 cursor-pointer shadow-xs"
+                >
+                  <option value="quiz" ${act.type === 'quiz' ? 'selected' : ''}>🔘 Quiz (Multiple Choice)</option>
+                  <option value="matching" ${act.type === 'matching' ? 'selected' : ''}>🧩 Matching (Pairs)</option>
+                  <option value="unscramble" ${act.type === 'unscramble' ? 'selected' : ''}>🔤 Unscramble Letters</option>
+                  <option value="typing" ${act.type === 'typing' ? 'selected' : ''}>⌨️ Typing (Fill in the blank)</option>
+                  <option value="recording" ${act.type === 'recording' ? 'selected' : ''}>🎙️ Recording (Speaking Task)</option>
+                </select>
+              </div>
+
+              <button type="button" onclick="app.removeActivityFromBuilder(${index})" class="text-rose-500 hover:text-rose-700 text-sm font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-rose-50 transition-all">
+                <i class="fa-solid fa-trash-can"></i> Remove
+              </button>
+            </div>
+
+            <!-- Question Prompt -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Question Prompt / Title *</label>
+              <input type="text" value="${act.question || ''}" onchange="appState.builderActivities[${index}].question = this.value" placeholder="e.g. What animal is this? / Read aloud the vocabulary words" class="w-full px-4 py-3 bg-purple-50/40 border-2 border-purple-200 rounded-2xl text-sm font-semibold outline-none focus:border-purple-400 focus:bg-white text-slate-800">
+            </div>
+
+            <!-- Media Section with Both Direct File Upload & URL Link Options -->
+            <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-bold text-purple-900 uppercase flex items-center gap-1.5">
+                  <i class="fa-solid fa-photo-film text-pink-500 text-sm"></i> Question Media (Optional)
+                </span>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="app.setActivityMediaSourceType(${index}, 'file')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${(!act.mediaSource || act.mediaSource === 'file') ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-purple-200 hover:bg-purple-50'}">
+                    <i class="fa-solid fa-upload mr-1"></i> Upload From Device
+                  </button>
+                  <button type="button" onclick="app.setActivityMediaSourceType(${index}, 'url')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${(act.mediaSource === 'url') ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-purple-200 hover:bg-purple-50'}">
+                    <i class="fa-solid fa-link mr-1"></i> Web Link / YouTube
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Media Type</label>
+                  <select onchange="app.changeActivityMediaType(${index}, this.value)" class="w-full px-3 py-2 bg-white border-2 border-purple-200 rounded-xl text-sm font-semibold text-slate-700 outline-none">
+                    <option value="none" ${act.mediaType === 'none' ? 'selected' : ''}>No Media</option>
+                    <option value="image" ${act.mediaType === 'image' ? 'selected' : ''}>🖼️ Image</option>
+                    <option value="audio" ${act.mediaType === 'audio' ? 'selected' : ''}>🎵 Audio Clip (MP3 / Voice)</option>
+                    <option value="video" ${act.mediaType === 'video' ? 'selected' : ''}>🎬 Video (MP4 / YouTube)</option>
+                  </select>
+                </div>
+
+                <div class="${act.mediaType === 'none' ? 'opacity-40 pointer-events-none' : ''}">
+                  ${(!act.mediaSource || act.mediaSource === 'file') ? `
+                    <label class="block text-xs font-bold text-purple-700 uppercase mb-1">Choose File from Device</label>
+                    <label class="cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-purple-50 text-purple-700 rounded-xl border-2 border-purple-300 text-xs font-bold transition-all shadow-xs">
+                      <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                      <span>Select ${act.mediaType === 'audio' ? 'Audio' : (act.mediaType === 'video' ? 'Video' : 'Image')} File</span>
+                      <input type="file" accept="${act.mediaType === 'audio' ? 'audio/*' : (act.mediaType === 'video' ? 'video/*' : 'image/*')}" class="hidden" onchange="app.handleActivityFileUpload(${index}, event)">
+                    </label>
+                  ` : `
+                    <label class="block text-xs font-bold text-purple-700 uppercase mb-1">Paste Media Link / YouTube URL</label>
+                    <input type="url" value="${act.mediaUrl || ''}" onchange="app.setActivityMediaUrl(${index}, this.value)" placeholder="https://..." class="w-full px-3 py-2 bg-white border-2 border-purple-200 rounded-xl text-sm outline-none focus:border-purple-400">
+                  `}
+                </div>
+              </div>
+
+              <!-- Media Live Preview Box in Builder -->
+              ${act.mediaUrl ? `
+                <div class="relative inline-block mt-1 p-2 rounded-2xl bg-white border border-purple-200 shadow-xs">
+                  <button type="button" onclick="app.removeActivityMedia(${index})" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm z-10" title="Remove Media">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                  ${act.mediaType === 'image' ? `
+                    <img src="${act.mediaUrl}" class="max-h-40 rounded-xl object-cover">
+                  ` : (act.mediaType === 'audio' ? `
+                    <audio controls class="max-w-xs h-9"><source src="${act.mediaUrl}"></audio>
+                  ` : (act.mediaType === 'video' ? `
+                    ${act.mediaUrl.startsWith('data:video') ? `
+                      <video controls class="max-h-40 rounded-xl"><source src="${act.mediaUrl}"></video>
+                    ` : `
+                      <iframe src="${act.mediaUrl.replace('watch?v=', 'embed/')}" class="w-64 h-36 rounded-xl" allowfullscreen></iframe>
+                    `}
+                  ` : ''))}
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Specific Type Config with Bigger Fonts -->
+            ${this.renderActivityBuilderSpecifics(act, index)}
+          </div>
+        `;
+      }).join('');
+    },
+
+    renderActivityBuilderSpecifics(act, index) {
+      if (act.type === 'quiz') {
+        return `
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-slate-700 uppercase">4 Options & Correct Answer *</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              ${[0, 1, 2, 3].map(optIdx => `
+                <input type="text" placeholder="Option ${optIdx + 1}" value="${act.options ? (act.options[optIdx] || '') : ''}" onchange="appState.builderActivities[${index}].options[${optIdx}] = this.value" class="px-3.5 py-2.5 bg-white border border-purple-200 rounded-xl text-sm font-semibold outline-none focus:border-purple-400">
+              `).join('')}
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-emerald-700 uppercase mb-1">Exact Correct Answer *</label>
+              <input type="text" placeholder="e.g. Apple (Must match one of the 4 options)" value="${act.correctAnswer || ''}" onchange="appState.builderActivities[${index}].correctAnswer = this.value" class="w-full px-3.5 py-2.5 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-sm font-bold text-emerald-800 outline-none focus:border-emerald-500">
+            </div>
+          </div>
+        `;
+      }
+
+      if (act.type === 'matching') {
+        const pairs = act.pairs || [{ left: '', right: '' }, { left: '', right: '' }];
+        return `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-700 uppercase">Matching Pairs *</label>
+              <button type="button" onclick="appState.builderActivities[${index}].pairs.push({left:'', right:''}); app.renderBuilderActivities();" class="text-xs font-bold text-purple-700 hover:text-pink-600 flex items-center gap-1">+ Add Pair</button>
+            </div>
+            ${pairs.map((p, pIdx) => `
+              <div class="flex items-center gap-2.5">
+                <input type="text" placeholder="Word (e.g. Cat)" value="${p.left || ''}" onchange="appState.builderActivities[${index}].pairs[${pIdx}].left = this.value" class="w-1/2 px-3 py-2 bg-white border border-purple-200 rounded-xl text-sm font-semibold outline-none focus:border-purple-400">
+                <span class="text-purple-400 font-bold px-1"><i class="fa-solid fa-arrows-left-right text-sm"></i></span>
+                <input type="text" placeholder="Match (e.g. Meow / Kitten)" value="${p.right || ''}" onchange="appState.builderActivities[${index}].pairs[${pIdx}].right = this.value" class="w-1/2 px-3 py-2 bg-white border border-purple-200 rounded-xl text-sm font-semibold outline-none focus:border-purple-400">
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (act.type === 'unscramble') {
+        return `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Scrambled Clue</label>
+              <input type="text" placeholder="e.g. P P L E A" value="${act.scrambled || ''}" onchange="appState.builderActivities[${index}].scrambled = this.value" class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-xl text-sm font-bold tracking-widest outline-none focus:border-purple-400">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-emerald-700 uppercase mb-1">Correct Word *</label>
+              <input type="text" placeholder="e.g. APPLE" value="${act.correctAnswer || ''}" onchange="appState.builderActivities[${index}].correctAnswer = this.value" class="w-full px-3.5 py-2.5 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-sm font-bold text-emerald-800 outline-none focus:border-emerald-500">
+            </div>
+          </div>
+        `;
+      }
+
+      if (act.type === 'sentence') {
+        return `
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Sentence to Build *</label>
+            <input type="text" placeholder="e.g. I like red apples (System will automatically scramble words)" value="${act.correctSentence || ''}" onchange="appState.builderActivities[${index}].correctSentence = this.value" class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-xl text-sm font-semibold outline-none focus:border-purple-400">
+          </div>
+        `;
+      }
+
+      if (act.type === 'typing') {
+        return `
+          <div>
+            <label class="block text-xs font-bold text-emerald-700 uppercase mb-1">Correct Answer to Type *</label>
+            <input type="text" placeholder="e.g. TEDDY" value="${act.correctAnswer || ''}" onchange="appState.builderActivities[${index}].correctAnswer = this.value" class="w-full px-3.5 py-2.5 bg-emerald-50 border-2 border-emerald-300 rounded-xl text-sm font-bold text-emerald-800 outline-none focus:border-emerald-500">
+          </div>
+        `;
+      }
+
+      if (act.type === 'recording') {
+        return `
+          <div class="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-1.5">
+            <label class="block text-xs font-bold text-emerald-900 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-microphone-lines text-emerald-600 text-sm"></i> Speaking / Voice Recording Assignment
+            </label>
+            <p class="text-xs text-slate-600 leading-relaxed font-medium">
+              Students will record their pronunciation or read the prompt aloud using Vocaroo recorder directly on their task page.
+            </p>
+          </div>
+        `;
+      }
+
+      return '';
+    },
+    renderBuilderActivities() {
+      const container = document.getElementById('builder-activities-container');
+      if (!container) return;
+
+      if (window.appState.builderActivities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 border-2 border-dashed border-purple-200 rounded-2xl bg-purple-50/20 text-xs text-slate-400">
+            No questions added yet. Click <strong>"+ Add Question"</strong> above to start!
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = window.appState.builderActivities.map((act, index) => {
+        return `
+          <div class="p-4 rounded-2xl bg-white border border-purple-200 shadow-sm space-y-3 relative">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-purple-100">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                  ${index + 1}
+                </span>
+                <span class="text-xs font-bold uppercase tracking-wider text-purple-900">Question ${index + 1} Type:</span>
+                <select 
+                  onchange="app.changeActivityType(${index}, this.value)" 
+                  class="px-2.5 py-1 bg-purple-50 border border-purple-300 rounded-xl text-xs font-bold text-purple-900 outline-none focus:border-purple-500 cursor-pointer shadow-xs"
+                >
+                  <option value="quiz" ${act.type === 'quiz' ? 'selected' : ''}>🔘 Quiz (Multiple Choice)</option>
+                  <option value="matching" ${act.type === 'matching' ? 'selected' : ''}>🧩 Matching (Pairs)</option>
+                  <option value="unscramble" ${act.type === 'unscramble' ? 'selected' : ''}>🔤 Unscramble Letters</option>
+                  <option value="typing" ${act.type === 'typing' ? 'selected' : ''}>⌨️ Typing (Fill in the blank)</option>
+                  <option value="recording" ${act.type === 'recording' ? 'selected' : ''}>🎙️ Recording (Speaking Task)</option>
+                </select>
+              </div>
+
+              <button type="button" onclick="app.removeActivityFromBuilder(${index})" class="text-rose-400 hover:text-rose-600 text-xs font-bold flex items-center gap-1">
+                <i class="fa-solid fa-trash-can"></i> Remove
+              </button>
+            </div>
+
+            <!-- Question Prompt -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Question Prompt / Title *</label>
+              <input type="text" value="${act.question || ''}" onchange="appState.builderActivities[${index}].question = this.value" placeholder="e.g. What animal is this? / Pronounce the word apple" class="w-full px-3 py-2 bg-purple-50/30 border border-purple-200 rounded-xl text-xs font-medium outline-none focus:border-purple-400">
+            </div>
+
+            <!-- Media Section with Both Direct File Upload & URL Link Options -->
+            <div class="p-3 rounded-2xl bg-purple-50/40 border border-purple-100 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-[11px] font-bold text-purple-900 uppercase flex items-center gap-1.5">
+                  <i class="fa-solid fa-photo-film text-pink-500"></i> Question Media (Optional)
+                </span>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="app.setActivityMediaSourceType(${index}, 'file')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${(!act.mediaSource || act.mediaSource === 'file') ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-purple-200'}">
+                    <i class="fa-solid fa-upload mr-1"></i> Upload From Device
+                  </button>
+                  <button type="button" onclick="app.setActivityMediaSourceType(${index}, 'url')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${(act.mediaSource === 'url') ? 'bg-purple-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-purple-200'}">
+                    <i class="fa-solid fa-link mr-1"></i> Web Link / YouTube
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Media Type</label>
+                  <select onchange="app.changeActivityMediaType(${index}, this.value)" class="w-full px-2.5 py-1.5 bg-white border border-purple-200 rounded-xl text-xs font-medium outline-none">
+                    <option value="none" ${act.mediaType === 'none' ? 'selected' : ''}>No Media</option>
+                    <option value="image" ${act.mediaType === 'image' ? 'selected' : ''}>🖼️ Image</option>
+                    <option value="audio" ${act.mediaType === 'audio' ? 'selected' : ''}>🎵 Audio Clip (MP3 / Voice)</option>
+                    <option value="video" ${act.mediaType === 'video' ? 'selected' : ''}>🎬 Video (MP4 / YouTube)</option>
+                  </select>
+                </div>
+
+                <div class="${act.mediaType === 'none' ? 'opacity-40 pointer-events-none' : ''}">
+                  ${(!act.mediaSource || act.mediaSource === 'file') ? `
+                    <label class="block text-[10px] font-bold text-purple-700 uppercase mb-1">Choose File from Device</label>
+                    <label class="cursor-pointer flex items-center justify-center gap-2 px-3 py-1.5 bg-white hover:bg-purple-50 text-purple-700 rounded-xl border border-purple-300 text-xs font-bold transition-all shadow-xs">
+                      <i class="fa-solid fa-cloud-arrow-up"></i>
+                      <span>Choose ${act.mediaType === 'audio' ? 'Audio' : (act.mediaType === 'video' ? 'Video' : 'Image')} File</span>
+                      <input type="file" accept="${act.mediaType === 'audio' ? 'audio/*' : (act.mediaType === 'video' ? 'video/*' : 'image/*')}" class="hidden" onchange="app.handleActivityFileUpload(${index}, event)">
+                    </label>
+                  ` : `
+                    <label class="block text-[10px] font-bold text-purple-700 uppercase mb-1">Paste Media Link / YouTube URL</label>
+                    <input type="url" value="${act.mediaUrl || ''}" onchange="app.setActivityMediaUrl(${index}, this.value)" placeholder="https://..." class="w-full px-3 py-1.5 bg-white border border-purple-200 rounded-xl text-xs outline-none focus:border-purple-400">
+                  `}
+                </div>
+              </div>
+
+              <!-- Media Live Preview Box in Builder -->
+              ${act.mediaUrl ? `
+                <div class="relative inline-block mt-1 p-2 rounded-xl bg-white border border-purple-200 shadow-xs">
+                  <button type="button" onclick="app.removeActivityMedia(${index})" class="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-sm z-10" title="Remove Media">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                  ${act.mediaType === 'image' ? `
+                    <img src="${act.mediaUrl}" class="max-h-36 rounded-lg object-cover">
+                  ` : (act.mediaType === 'audio' ? `
+                    <audio controls class="max-w-xs h-8"><source src="${act.mediaUrl}"></audio>
+                  ` : (act.mediaType === 'video' ? `
+                    ${act.mediaUrl.startsWith('data:video') ? `
+                      <video controls class="max-h-36 rounded-lg"><source src="${act.mediaUrl}"></video>
+                    ` : `
+                      <iframe src="${act.mediaUrl.replace('watch?v=', 'embed/')}" class="w-56 h-32 rounded-lg" allowfullscreen></iframe>
+                    `}
+                  ` : ''))}
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Specific Type Config -->
+            ${this.renderActivityBuilderSpecifics(act, index)}
+          </div>
+        `;
+      }).join('');
+    },
+
+    checkTypingAnswer(actIndex, correctAnswer) {
+      const input = document.getElementById(`typing-input-${actIndex}`);
+      const val = input.value.trim().toLowerCase();
+      const feedback = document.getElementById(`act-feedback-${actIndex}`);
+
+      if (val === correctAnswer.trim().toLowerCase()) {
+        feedback.innerHTML = `<span class="text-xs font-bold text-emerald-600 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Perfect spelling! ⭐</span>`;
+        this.updateSimulatorScore(1);
+      } else {
+        feedback.innerHTML = `<span class="text-xs font-bold text-rose-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Oops! Check your spelling!</span>`;
+      }
+    },
+
+    checkUnscrambleAnswer(actIndex, correctAnswer) {
+      const input = document.getElementById(`unscramble-input-${actIndex}`);
+      const val = input.value.trim().toUpperCase();
+      const feedback = document.getElementById(`act-feedback-${actIndex}`);
+
+      if (val === correctAnswer.trim().toUpperCase()) {
+        feedback.innerHTML = `<span class="text-xs font-bold text-emerald-600 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Excellent! You solved it! ⭐</span>`;
+        this.updateSimulatorScore(1);
+      } else {
+        feedback.innerHTML = `<span class="text-xs font-bold text-rose-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Keep trying! Think of the letters.</span>`;
+      }
+    },
+
+    addWordToSentence(actIndex, word, elem) {
+      const target = document.getElementById(`sentence-target-${actIndex}`);
+      const current = target.dataset.sentence ? target.dataset.sentence.split(' ') : [];
+      current.push(word);
+      target.dataset.sentence = current.join(' ');
+      target.innerText = current.join(' ');
+      elem.classList.add('opacity-40', 'pointer-events-none');
+    },
+
+    resetSentence(actIndex) {
+      const target = document.getElementById(`sentence-target-${actIndex}`);
+      target.dataset.sentence = '';
+      target.innerText = 'Click the words below in order...';
+      const container = document.getElementById(`sentence-words-${actIndex}`);
+      if (container) {
+        Array.from(container.children).forEach(c => c.classList.remove('opacity-40', 'pointer-events-none'));
+      }
+      document.getElementById(`act-feedback-${actIndex}`).innerHTML = '';
+    },
+
+    checkSentenceAnswer(actIndex, correctSentence) {
+      const target = document.getElementById(`sentence-target-${actIndex}`);
+      const current = (target.dataset.sentence || '').trim().toLowerCase();
+      const feedback = document.getElementById(`act-feedback-${actIndex}`);
+
+      if (current === correctSentence.trim().toLowerCase()) {
+        feedback.innerHTML = `<span class="text-xs font-bold text-emerald-600 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Wonderful sentence structure! ⭐</span>`;
+        this.updateSimulatorScore(1);
+      } else {
+        feedback.innerHTML = `<span class="text-xs font-bold text-rose-500 flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Order is not quite right. Press Reset to try again!</span>`;
+      }
+    },
+
+    checkMatchingAnswer(actIndex, pairIndex, correctRight, selectedRight) {
+      const indicator = document.getElementById(`match-stat-${actIndex}-${pairIndex}`);
+      if (selectedRight === correctRight) {
+        indicator.innerHTML = `<i class="fa-solid fa-check text-emerald-500"></i>`;
+      } else {
+        indicator.innerHTML = `<i class="fa-solid fa-xmark text-rose-400"></i>`;
+      }
+    },
+
+    updateSimulatorScore(points) {
+      const scoreElem = document.getElementById('current-score-text');
+      if (scoreElem) {
+        const cur = parseInt(scoreElem.innerText) || 0;
+        scoreElem.innerText = cur + points;
+      }
+    },
+
+    renderInteractiveActivityPlayer(act, index) {
+      return `
+        <div class="p-4 sm:p-5 rounded-3xl bg-white border border-purple-100 shadow-sm space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-purple-50">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-3 py-1 rounded-xl">
+              <i class="fa-solid ${this.getActivityIcon(act.type)} mr-1"></i> Challenge ${index + 1}
+            </span>
+          </div>
+
+          <h4 class="text-sm sm:text-base font-bold text-slate-800">${act.question}</h4>
+
+          <!-- Render Media if available -->
+          ${act.mediaUrl ? `
+            <div class="my-2">
+              ${act.mediaType === 'image' ? `
+                <img src="${act.mediaUrl}" class="max-h-48 rounded-2xl border border-purple-200 object-cover shadow-sm">
+              ` : (act.mediaType === 'audio' ? `
+                <audio controls class="w-full max-w-sm rounded-xl"><source src="${act.mediaUrl}"></audio>
+              ` : (act.mediaType === 'video' ? `
+                ${act.mediaUrl.startsWith('data:video') ? `
+                  <video controls class="max-w-md w-full rounded-2xl border border-purple-200 shadow-sm"><source src="${act.mediaUrl}"></video>
+                ` : `
+                  <div class="aspect-video max-w-md rounded-2xl overflow-hidden border border-purple-200 shadow-sm">
+                    <iframe src="${act.mediaUrl.replace('watch?v=', 'embed/')}" class="w-full h-full" allowfullscreen></iframe>
+                  </div>
+                `}
+              ` : ''))}
+            </div>
+          ` : ''}
+
+          <!-- Player Forms by Type -->
+          ${act.type === 'quiz' ? `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              ${(act.options || []).map(opt => `
+                <button type="button" onclick="app.checkQuizAnswer(${index}, '${opt.replace(/'/g, "\\'")}', '${(act.correctAnswer || '').replace(/'/g, "\\'")}')" class="p-3 text-left bg-purple-50/50 hover:bg-purple-100/70 border border-purple-200 rounded-2xl text-xs sm:text-sm font-semibold text-slate-700 transition-all active:scale-95">
+                  <i class="fa-regular fa-circle-dot mr-2 text-purple-400"></i> ${opt}
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          ${act.type === 'unscramble' ? `
+            <div class="space-y-2">
+              <div class="text-lg font-mono font-bold tracking-widest text-purple-600 bg-purple-50 p-2.5 rounded-xl inline-block border border-purple-200">
+                ${act.scrambled || 'L E T T E R S'}
+              </div>
+              <div class="flex gap-2">
+                <input type="text" id="unscramble-input-${index}" placeholder="Type un-scrambled word..." class="flex-1 px-3.5 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs sm:text-sm uppercase font-bold outline-none focus:border-purple-400">
+                <button type="button" onclick="app.checkUnscrambleAnswer(${index}, '${(act.correctAnswer || '').replace(/'/g, "\\'")}')" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-xs font-bold shadow-xs">Check</button>
+              </div>
+            </div>
+          ` : ''}
+
+          ${act.type === 'typing' ? `
+            <div class="flex gap-2">
+              <input type="text" id="typing-input-${index}" placeholder="Type your answer here..." class="flex-1 px-3.5 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs sm:text-sm font-semibold outline-none focus:border-purple-400">
+              <button type="button" onclick="app.checkTypingAnswer(${index}, '${(act.correctAnswer || '').replace(/'/g, "\\'")}')" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl text-xs font-bold shadow-xs">Check</button>
+            </div>
+          ` : ''}
+
+          ${act.type === 'recording' ? `
+            <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-3">
+              <div class="flex items-center gap-3">
+                <span class="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-sm shadow-xs">
+                  <i class="fa-solid fa-microphone-lines"></i>
+                </span>
+                <div>
+                  <h5 class="text-xs font-bold text-emerald-950">Speaking & Voice Recording Task</h5>
+                  <p class="text-[11px] text-slate-500">Record your speech on Vocaroo and paste the link below:</p>
+                </div>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <a href="https://vocaroo.com" target="_blank" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap">
+                  <i class="fa-solid fa-record-vinyl"></i> Record on Vocaroo
+                </a>
+                <input type="url" placeholder="Paste your recording link here (https://vocaroo.com/...)" class="flex-1 px-3 py-2 bg-white border border-emerald-300 rounded-xl text-xs outline-none focus:border-emerald-500">
+              </div>
+            </div>
+          ` : ''}
+
+          ${act.type === 'sentence' ? `
+            <div class="space-y-2.5">
+              <div id="sentence-target-${index}" class="min-h-[44px] p-3 rounded-2xl bg-pink-50/40 border border-pink-200 text-xs sm:text-sm font-bold text-purple-900 flex items-center">
+                Click the words below in order...
+              </div>
+              <div id="sentence-words-${index}" class="flex flex-wrap gap-2">
+                ${((act.correctSentence || '').split(' ').sort(() => Math.random() - 0.5)).map(word => `
+                  <button type="button" onclick="app.addWordToSentence(${index}, '${word.replace(/'/g, "\\'")}', this)" class="px-3 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-800 text-xs font-bold border border-purple-200 shadow-xs transition-all">
+                    ${word}
+                  </button>
+                `).join('')}
+              </div>
+              <div class="flex gap-2 pt-1">
+                <button type="button" onclick="app.resetSentence(${index})" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50">Reset</button>
+                <button type="button" onclick="app.checkSentenceAnswer(${index}, '${(act.correctSentence || '').replace(/'/g, "\\'")}')" class="px-4 py-1.5 rounded-xl bg-purple-500 hover:bg-purple-600 text-white text-xs font-bold shadow-xs">Check Sentence</button>
+              </div>
+            </div>
+          ` : ''}
+
+          ${act.type === 'matching' ? `
+            <div class="space-y-2">
+              ${(act.pairs || []).map((p, pIdx) => `
+                <div class="flex items-center gap-3 p-2 rounded-xl bg-purple-50/30 border border-purple-100">
+                  <span class="w-1/3 text-xs font-bold text-slate-800">${p.left}</span>
+                  <i class="fa-solid fa-arrow-right text-xs text-purple-300"></i>
+                  <select onchange="app.checkMatchingAnswer(${index}, ${pIdx}, '${p.right.replace(/'/g, "\\'")}', this.value)" class="flex-1 px-2.5 py-1.5 bg-white border border-purple-200 rounded-xl text-xs font-semibold outline-none">
+                    <option value="">-- Match with --</option>
+                    ${(act.pairs || []).map(item => `<option value="${item.right}">${item.right}</option>`).join('')}
+                  </select>
+                  <span id="match-stat-${index}-${pIdx}" class="w-5 text-center text-xs"></span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          <div id="act-feedback-${index}" class="min-h-[20px] pt-1"></div>
+        </div>
+      `;
     },
 
     // Teacher Task Creation
-    async handleCreateTask(e) {
+    handleCreateTask(e) {
       e.preventDefault();
       const title = document.getElementById('task-title').value.trim();
       
@@ -1417,23 +2300,15 @@
       const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
 
       const scheduledDate = document.getElementById('task-date').value;
-      const instructions = document.getElementById('task-instructions').value;
+      const instructions = document.getElementById('task-instructions').value.trim();
 
-      const linkRows = document.querySelectorAll('#task-links-container .link-row');
-      const links = [];
-      linkRows.forEach(row => {
-        const u = row.querySelector('.link-url-input').value.trim();
-        const t = row.querySelector('.link-title-input').value.trim();
-        if (u) links.push({ title: t || 'Lesson Link', url: u });
-      });
+      const linkTitles = Array.from(document.querySelectorAll('.create-link-title')).map(i => i.value.trim());
+      const linkUrls = Array.from(document.querySelectorAll('.create-link-url')).map(i => i.value.trim());
+      const links = linkUrls.map((url, idx) => ({ title: linkTitles[idx] || 'Resource Link', url })).filter(item => item.url);
 
-      const matRows = document.querySelectorAll('#task-materials-container .material-row');
-      const fileAttachments = [];
-      matRows.forEach(row => {
-        const u = row.querySelector('.material-url-input').value.trim();
-        const t = row.querySelector('.material-title-input').value.trim();
-        if (u) fileAttachments.push({ title: t || 'Lesson Material', url: u });
-      });
+      const matTitles = Array.from(document.querySelectorAll('.create-mat-title')).map(i => i.value.trim());
+      const matUrls = Array.from(document.querySelectorAll('.create-mat-url')).map(i => i.value.trim());
+      const fileAttachments = matUrls.map((url, idx) => ({ title: matTitles[idx] || 'Material', url })).filter(item => item.url);
 
       if (majorSelect === '__new__' && !majorCustom) {
         this.showToast('Please type a name for the new Major Topic!', 'error');
@@ -1451,7 +2326,7 @@
         assignedTo = checked;
       }
 
-      await window.store.ensureTopic(majorTopic, subTopic);
+      window.store.ensureTopic(majorTopic, subTopic);
 
       const newTask = {
         id: 'task_' + Date.now(),
@@ -1462,18 +2337,41 @@
         instructions,
         links,
         fileAttachments,
-        link: links[0]?.url || '',
-        fileAttachment: fileAttachments[0]?.url || '',
+        activities: window.appState.builderActivities || [],
         assignedTo,
         createdAt: new Date().toISOString().split('T')[0]
       };
 
-      await window.store.addTask(newTask);
-      this.showToast(`Daily task for ${scheduledDate} assigned! 🎉`, 'success');
+      window.store.addTask(newTask);
+      window.appState.builderActivities = [];
+      this.showToast(`Daily task for ${scheduledDate} assigned with games! 🎉`, 'success');
       this.switchTeacherTab('assignments');
     },
 
-    // Topic dropdown handlers
+    addCreateLinkRow() {
+      const container = document.getElementById('create-links-list');
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.innerHTML = `
+        <input type="text" placeholder="Title (e.g. YouTube Video)" class="create-link-title w-1/3 px-3 py-1.5 bg-pink-50/40 border border-pink-200 rounded-xl text-xs font-semibold outline-none focus:border-purple-400">
+        <input type="url" placeholder="https://..." class="create-link-url flex-1 px-3 py-1.5 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-purple-400">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+      `;
+      container.appendChild(div);
+    },
+
+    addCreateMaterialRow() {
+      const container = document.getElementById('create-materials-list');
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.innerHTML = `
+        <input type="text" placeholder="Title (e.g. Worksheet Image)" class="create-mat-title w-1/3 px-3 py-1.5 bg-pink-50/40 border border-pink-200 rounded-xl text-xs font-semibold outline-none focus:border-purple-400">
+        <input type="url" placeholder="https://..." class="create-mat-url flex-1 px-3 py-1.5 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none focus:border-purple-400">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+      `;
+      container.appendChild(div);
+    },
+
     onMajorTopicChange(selectVal) {
       const customInput = document.getElementById('task-major-custom-wrap');
       if (selectVal === '__new__') {
@@ -1524,7 +2422,7 @@
       }
     },
 
-    // Handle Student Homework Photo Selection
+    // Student Homework Photo Selection
     handleImageSelection(taskId, event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1549,16 +2447,15 @@
       document.getElementById(`img-preview-box-${taskId}`).innerHTML = '';
     },
 
-    // Student Task Submission
-    async handleSubmitTask(e, taskId) {
+    handleSubmitTask(e, taskId) {
       e.preventDefault();
       const commentText = document.getElementById(`submission-text-${taskId}`).value.trim();
-      const vocarooLink = document.getElementById(`vocaroo-link-${taskId}`).value.trim();
+      const vocarooUrl = (document.getElementById(`vocaroo-url-${taskId}`)?.value || '').trim();
       const imgInput = document.getElementById(`stored-img-${taskId}`);
       const imagePreview = imgInput ? imgInput.value : '';
 
-      if (!commentText && !imagePreview && !vocarooLink) {
-        this.showToast('Please type your answer, paste audio link, or upload a photo of your work!', 'error');
+      if (!commentText && !imagePreview && !vocarooUrl) {
+        this.showToast('Please type your answer, paste a Vocaroo link, or upload a photo of your work!', 'error');
         return;
       }
 
@@ -1570,7 +2467,7 @@
         taskId,
         studentId,
         commentText,
-        vocarooLink,
+        vocarooUrl,
         imagePreview,
         submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         status: 'submitted',
@@ -1578,18 +2475,17 @@
         teacherComment: existingSub ? existingSub.teacherComment : ''
       };
 
-      await window.store.saveSubmission(subData);
+      window.store.saveSubmission(subData);
       this.showToast('Awesome! Your homework is submitted to Mẹ Chan! 💖', 'success');
       this.render();
     },
 
-    // Teacher Review
-    async handleReviewSubmission(e, subId) {
+    handleReviewSubmission(e, subId) {
       e.preventDefault();
       const sticker = document.getElementById(`sticker-select-${subId}`).value;
       const comment = document.getElementById(`comment-input-${subId}`).value.trim();
 
-      await window.store.reviewSubmission(subId, sticker, comment);
+      window.store.reviewSubmission(subId, sticker, comment);
       this.showToast('Feedback & cute sticker saved for student! 🌸', 'success');
       this.render();
     },
@@ -1618,6 +2514,40 @@
         dates.push({ iso, dayName, dayNum });
       }
       return dates;
+    },
+
+    switchTeacherTab(tab) {
+      window.appState.currentTab = tab;
+      window.appState.previewTaskId = null;
+      this.render();
+    },
+
+    previewTaskAsStudent(taskId) {
+      window.appState.currentTab = 'materials';
+      window.appState.previewTaskId = taskId;
+      this.render();
+      this.showToast('Switched to Student Simulator Mode! 🌸✨', 'success');
+    },
+
+    exitTaskPreview() {
+      window.appState.previewTaskId = null;
+      this.render();
+    },
+
+    selectDate(dateStr) {
+      window.appState.selectedDate = dateStr;
+      window.appState.activeTaskId = null;
+      this.render();
+    },
+
+    viewTaskDetail(taskId) {
+      window.appState.activeTaskId = taskId;
+      this.render();
+    },
+
+    backToTaskList() {
+      window.appState.activeTaskId = null;
+      this.render();
     },
 
     renderNavbar() {
@@ -1769,7 +2699,7 @@
               </span>
               Mẹ Chan's Teaching Desk
             </h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Assign daily tasks, organize topic hierarchies, check submitted homework & add stickers.</p>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Assign daily tasks, organize topics, build interactive activities & review student submissions.</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button onclick="app.openChangeTeacherPinModal()" class="px-3.5 py-2.5 rounded-2xl border-2 border-purple-200 bg-purple-50/50 hover:bg-purple-100/60 text-purple-700 text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all">
@@ -1792,12 +2722,15 @@
           <button onclick="app.switchTeacherTab('assignments')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'assignments' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
             <i class="fa-solid fa-calendar-check"></i> Scheduled Tasks (${tasks.length})
           </button>
+          <button onclick="app.switchTeacherTab('materials')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'materials' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
+            <i class="fa-solid fa-book-bookmark"></i> Teaching Materials (${tasks.length})
+          </button>
           <button onclick="app.switchTeacherTab('submissions')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'submissions' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
             <i class="fa-solid fa-envelope-open-text"></i> Submissions & Feedback
             ${totalPending > 0 ? `<span class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">${totalPending}</span>` : ''}
           </button>
           <button onclick="app.switchTeacherTab('create')" class="pb-3 text-xs sm:text-sm font-bold whitespace-nowrap border-b-2 transition-all flex items-center gap-2 ${currentTab === 'create' ? 'border-pink-500 text-pink-600' : 'border-transparent text-slate-400 hover:text-slate-700'}">
-            <i class="fa-solid fa-pen-nib"></i> Compose Task
+            <i class="fa-solid fa-pen-nib"></i> Compose Task & Games
           </button>
         </div>
 
@@ -1837,33 +2770,32 @@
                   </div>
 
                   <div class="pt-3 border-t border-pink-50 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1.5">
-                      <button 
-                        type="button" 
-                        onclick="app.openEditStudentModal('${s.id}')" 
-                        class="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all border border-purple-200 flex items-center gap-1"
-                        title="Edit name and avatar"
-                      >
-                        <i class="fa-solid fa-user-pen text-[11px]"></i>
-                        <span>Edit Info</span>
-                      </button>
-                      <button 
-                        type="button" 
-                        onclick="app.promptDeleteStudent('${s.id}', '${s.name.replace(/'/g, "\\'")}')" 
-                        class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-all border border-rose-200 flex items-center gap-1"
-                        title="Delete student"
-                      >
-                        <i class="fa-solid fa-trash-can text-[11px]"></i>
-                        <span>Delete</span>
-                      </button>
-                    </div>
+                    <button 
+                      type="button" 
+                      onclick="app.openEditStudentModal('${s.id}')" 
+                      class="px-2.5 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-bold transition-all flex items-center gap-1 border border-pink-200"
+                      title="Edit student name & avatar"
+                    >
+                      <i class="fa-solid fa-pen text-[10px]"></i>
+                      <span>Edit</span>
+                    </button>
                     <button 
                       type="button" 
                       onclick="app.openChangePasswordModal('${s.id}', true)" 
-                      class="px-2.5 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-bold transition-all flex items-center gap-1 border border-pink-200"
+                      class="px-2.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold transition-all flex items-center gap-1 border border-purple-200"
+                      title="Reset student password"
                     >
                       <i class="fa-solid fa-key text-[10px]"></i>
                       <span>Reset Pass</span>
+                    </button>
+                    <button 
+                      type="button" 
+                      onclick="app.promptDeleteStudent('${s.id}', '${s.name.replace(/'/g, "\\'")}')" 
+                      class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition-all flex items-center gap-1 border border-rose-200"
+                      title="Delete this student"
+                    >
+                      <i class="fa-solid fa-trash-can text-[10px]"></i>
+                      <span>Delete</span>
                     </button>
                   </div>
                 </div>
@@ -1922,6 +2854,15 @@
                   <div class="flex items-center gap-2 self-end md:self-start pt-1">
                     <button 
                       type="button" 
+                      onclick="app.previewTaskAsStudent('${task.id}')" 
+                      class="px-3 py-1.5 text-xs bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl border border-pink-200 transition-all flex items-center gap-1.5 font-bold"
+                      title="Test and play this mission as a student"
+                    >
+                      <i class="fa-solid fa-gamepad"></i>
+                      <span>Try as Student</span>
+                    </button>
+                    <button 
+                      type="button" 
                       onclick="app.handleDuplicateTask('${task.id}')" 
                       class="px-3 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl border border-emerald-200 transition-all flex items-center gap-1.5 font-bold"
                       title="Duplicate this task"
@@ -1951,6 +2892,202 @@
                 </div>
               `;
             }).join('')}
+          </div>
+        `;
+      }
+
+      // 2B. Teaching Materials & Interactive Student Simulator Tab
+      if (tab === 'materials') {
+        const previewTaskId = window.appState.previewTaskId;
+        const previewTask = previewTaskId ? tasks.find(t => t.id === previewTaskId) : null;
+
+        if (previewTask) {
+          const activities = Array.isArray(previewTask.activities) ? previewTask.activities : [];
+          const taskLinks = Array.isArray(previewTask.links) ? previewTask.links : (previewTask.link ? [{ title: 'Lesson Link', url: previewTask.link }] : []);
+          const taskMaterials = Array.isArray(previewTask.fileAttachments) ? previewTask.fileAttachments : (previewTask.fileAttachment ? [{ title: 'Material', url: previewTask.fileAttachment }] : []);
+
+          return `
+            <div class="space-y-6">
+              <!-- Simulator Notice & Back Button -->
+              <div class="p-4 rounded-3xl bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3 text-center sm:text-left">
+                  <span class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  </span>
+                  <div>
+                    <h3 class="font-bold text-sm sm:text-base">Student Mode Simulator (Preview)</h3>
+                    <p class="text-xs text-white/90">You are experiencing this lesson and interactive games exactly as your students see it!</p>
+                  </div>
+                </div>
+                <button 
+                  onclick="app.exitTaskPreview()" 
+                  class="px-4 py-2 bg-white text-purple-700 hover:bg-purple-50 font-bold text-xs rounded-2xl shadow-xs transition-all flex items-center gap-1.5"
+                >
+                  <i class="fa-solid fa-arrow-left"></i>
+                  <span>Back to Material Archive</span>
+                </button>
+              </div>
+
+              <!-- Full Interactive Student Task Player -->
+              <div class="rounded-3xl p-6 sm:p-8 bg-white border-2 border-purple-200 shadow-soft">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-3 py-1 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-xl text-xs font-bold shadow-xs">
+                      ${previewTask.majorTopic}
+                    </span>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-xl text-xs font-bold border border-purple-200">
+                      ${previewTask.subTopic}
+                    </span>
+                    <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold">
+                      <i class="fa-solid fa-calendar mr-1"></i> ${previewTask.scheduledDate}
+                    </span>
+                  </div>
+                  <span class="px-3.5 py-1 rounded-full text-xs font-bold bg-pink-100 text-pink-700 border border-pink-200">
+                    <i class="fa-solid fa-eye mr-1"></i> Teacher Simulator
+                  </span>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">${previewTask.title}</h2>
+                <div class="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 text-sm sm:text-base text-slate-700 whitespace-pre-line leading-relaxed mb-6">
+                  <span class="block text-xs font-bold text-pink-600 uppercase mb-2">Instructions:</span>
+                  ${previewTask.instructions}
+                </div>
+
+                <!-- Interactive Activities Player (Fully Functional for Teacher Testing) -->
+                ${activities.length > 0 ? `
+                  <div class="my-6 p-6 rounded-3xl bg-gradient-to-br from-purple-50/70 via-pink-50/50 to-white border-2 border-purple-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-purple-100">
+                      <div>
+                        <h3 class="text-lg font-extrabold text-purple-900 flex items-center gap-2">
+                          <i class="fa-solid fa-gamepad text-pink-500"></i> Interactive Challenges (${activities.length})
+                        </h3>
+                        <p class="text-xs text-slate-500">Test clicking, spelling, sentence building, and typing answers!</p>
+                      </div>
+                      <div class="px-4 py-1.5 bg-white border border-purple-200 rounded-2xl text-xs font-bold text-purple-700 shadow-xs">
+                        Score: <span id="current-score-text">0</span>/${activities.length}
+                      </div>
+                    </div>
+                    <div class="space-y-6">
+                      ${activities.map((act, index) => this.renderInteractiveActivityPlayer(act, index)).join('')}
+                    </div>
+                  </div>
+                ` : '<div class="p-4 bg-slate-50 rounded-2xl text-center text-xs text-slate-400 italic mb-6">No interactive questions added for this mission.</div>'}
+
+                <!-- Attached Resources & Materials -->
+                ${(taskLinks.length > 0 || taskMaterials.length > 0) ? `
+                  <div class="space-y-3 mb-6 pt-3 border-t border-purple-100">
+                    ${taskLinks.length > 0 ? `
+                      <div>
+                        <span class="block text-[11px] font-bold uppercase text-purple-700 mb-1.5">Resource Links:</span>
+                        <div class="flex flex-wrap gap-2.5">
+                          ${taskLinks.map((l, idx) => `
+                            <a href="${l.url}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-bold border border-purple-200 shadow-xs transition-all">
+                              <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+                              <span>${l.title || `Resource ${idx + 1}`}</span>
+                            </a>
+                          `).join('')}
+                        </div>
+                      </div>
+                    ` : ''}
+
+                    ${taskMaterials.length > 0 ? `
+                      <div>
+                        <span class="block text-[11px] font-bold uppercase text-pink-700 mb-1.5">Lesson Materials:</span>
+                        <div class="flex flex-wrap gap-2.5">
+                          ${taskMaterials.map((m, idx) => `
+                            <a href="${m.url}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold border border-pink-200 shadow-xs transition-all">
+                              <i class="fa-regular fa-image text-[11px]"></i>
+                              <span>${m.title || `Material ${idx + 1}`}</span>
+                            </a>
+                          `).join('')}
+                        </div>
+                      </div>
+                    ` : ''}
+                  </div>
+                ` : ''}
+
+                <!-- Mock Submission Form in Simulator -->
+                <div class="p-5 rounded-2xl bg-pink-50/40 border border-pink-200">
+                  <h4 class="text-xs font-bold text-slate-600 uppercase mb-2">Student Response Simulator</h4>
+                  <p class="text-xs text-slate-400 mb-3">This is the submission form students see to type answers, paste Vocaroo recordings, or attach work photos.</p>
+                  <textarea rows="2" disabled placeholder="Students type their notes & answers here..." class="w-full px-3.5 py-2 bg-white/70 border border-pink-200 rounded-xl text-xs text-slate-500 cursor-not-allowed mb-2"></textarea>
+                  <div class="flex items-center justify-between">
+                    <span class="text-[11px] text-purple-600 font-bold"><i class="fa-solid fa-circle-check"></i> Submissions sync directly to your desk</span>
+                    <button type="button" onclick="app.showToast('Simulator: Test response verified! ✨', 'success')" class="px-4 py-2 bg-pink-500 text-white rounded-xl text-xs font-bold shadow-sm">
+                      Test Submit Feedback
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Materials List (Archive View)
+        return `
+          <div class="space-y-4">
+            <div class="p-4 rounded-3xl bg-purple-50/70 border border-purple-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div>
+                <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                  <i class="fa-solid fa-box-archive text-purple-600"></i> Teaching Materials & Mission Library
+                </h3>
+                <p class="text-xs text-slate-500">All created assignments are stored here forever. Click "Preview as Student" to play the quiz & games!</p>
+              </div>
+              <span class="px-3.5 py-1.5 rounded-2xl bg-white border border-purple-200 text-purple-800 text-xs font-bold shadow-xs">
+                ${tasks.length} Saved Missions
+              </span>
+            </div>
+
+            ${tasks.length === 0 ? '<p class="text-slate-400 text-center py-10">No materials saved yet. Create a task in the Compose tab!</p>' : ''}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${tasks.map(task => {
+                const actCount = Array.isArray(task.activities) ? task.activities.length : 0;
+                const linksCount = (Array.isArray(task.links) ? task.links.length : 0) + (task.link ? 1 : 0);
+                const matsCount = (Array.isArray(task.fileAttachments) ? task.fileAttachments.length : 0) + (task.fileAttachment ? 1 : 0);
+
+                return `
+                  <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card flex flex-col justify-between gap-3 hover:border-purple-300 transition-all">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="px-2.5 py-0.5 rounded-xl text-[11px] font-bold bg-pink-100 text-pink-700">
+                          ${task.majorTopic}
+                        </span>
+                        <span class="text-xs text-slate-400 font-bold">
+                          ${task.scheduledDate}
+                        </span>
+                      </div>
+                      <h4 class="text-base font-bold text-slate-800 mb-1">${task.title}</h4>
+                      <p class="text-xs text-purple-600 font-semibold mb-2">Sub-Topic: ${task.subTopic}</p>
+                      <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">${task.instructions}</p>
+
+                      <div class="flex flex-wrap items-center gap-2 pt-3">
+                        <span class="px-2.5 py-1 rounded-xl bg-purple-50 text-purple-700 text-[11px] font-bold border border-purple-100 flex items-center gap-1">
+                          <i class="fa-solid fa-gamepad"></i> ${actCount} Game(s)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-xl bg-pink-50 text-pink-700 text-[11px] font-bold border border-pink-100 flex items-center gap-1">
+                          <i class="fa-solid fa-link"></i> ${linksCount} Link(s)
+                        </span>
+                        <span class="px-2.5 py-1 rounded-xl bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-100 flex items-center gap-1">
+                          <i class="fa-regular fa-image"></i> ${matsCount} Material(s)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-pink-50 flex items-center justify-between">
+                      <button 
+                        type="button" 
+                        onclick="app.previewTaskAsStudent('${task.id}')" 
+                        class="w-full py-2 px-3 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white font-bold text-xs shadow-md shadow-pink-200 transition-all flex items-center justify-center gap-2"
+                      >
+                        <i class="fa-solid fa-circle-play"></i>
+                        <span>Preview as Student & Play</span>
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
           </div>
         `;
       }
@@ -1997,11 +3134,11 @@
                       </p>
                     </div>
 
-                    ${sub.vocarooLink ? `
-                      <div class="pt-1">
-                        <span class="text-xs font-bold text-slate-500 block mb-1"><i class="fa-solid fa-microphone-lines text-purple-600 mr-1"></i> Audio Submission Link:</span>
-                        <a href="${sub.vocarooLink}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold border border-purple-200 transition-all">
-                          <i class="fa-solid fa-play text-[10px]"></i> Listen on Vocaroo (${sub.vocarooLink})
+                    ${sub.vocarooUrl ? `
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 block mb-1.5"><i class="fa-solid fa-microphone text-pink-500 mr-1"></i> Audio Recording (Vocaroo):</span>
+                        <a href="${sub.vocarooUrl}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-all">
+                          <i class="fa-solid fa-headphones"></i> Listen to Student Recording: ${sub.vocarooUrl}
                         </a>
                       </div>
                     ` : ''}
@@ -2048,221 +3185,338 @@
         `;
       }
 
-      // 4. Compose / Assign task by date
+      // 4. Compose / Assign task with Interactive Game Builder
       if (tab === 'create') {
         const topicGroups = window.store.getTopicGroups();
         const firstGroup = topicGroups[0] || { major: 'English', subs: ['Phonics ABC & Vocabulary'] };
 
         return `
-          <div class="bg-white rounded-3xl p-6 sm:p-8 border border-pink-100 shadow-card max-w-3xl mx-auto">
-            <h3 class="text-xl font-bold text-slate-800 mb-1 flex items-center gap-2">
-              <i class="fa-solid fa-calendar-plus text-pink-500"></i> Assign Task by Calendar Date
-            </h3>
-            <p class="text-xs text-slate-400 mb-6">Create a daily to-do mission. Enter breaks lines naturally, and attach multiple links or material URLs.</p>
+          <div class="bg-white rounded-3xl p-6 sm:p-10 border border-pink-100 shadow-card max-w-4xl mx-auto space-y-8">
+            <div>
+              <h3 class="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                <i class="fa-solid fa-calendar-plus text-pink-500"></i> Compose Mission
+              </h3>
+              <p class="text-base sm:text-lg text-slate-500 font-medium leading-relaxed">
+                Fill in the details below, choose which module to add, then click <strong class="text-purple-700 font-bold">Preview Mission</strong> before publishing!
+              </p>
+            </div>
 
-            <form onsubmit="app.handleCreateTask(event)" class="space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form id="create-task-form" onsubmit="app.handleCreateTask(event)" class="space-y-8">
+              <!-- Basic Info with Extra Large Font -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Scheduled Date *</label>
-                  <input type="date" id="task-date" required value="${window.appState.selectedDate}" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+                  <label class="block text-sm sm:text-base font-extrabold text-slate-700 uppercase tracking-wide mb-2">Scheduled Date *</label>
+                  <input type="date" id="task-date" required value="${window.appState.selectedDate}" class="w-full px-5 py-3.5 bg-pink-50/40 border-2 border-pink-200 rounded-2xl text-base sm:text-lg font-bold text-slate-800 outline-none focus:border-purple-400 focus:bg-white shadow-xs">
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Title *</label>
-                  <input type="text" id="task-title" required placeholder="e.g. Phonics Letter B practice" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400">
+                  <label class="block text-sm sm:text-base font-extrabold text-slate-700 uppercase tracking-wide mb-2">Task Title *</label>
+                  <input type="text" id="task-title" required placeholder="e.g. Phonics Letter B Practice" class="w-full px-5 py-3.5 bg-pink-50/40 border-2 border-pink-200 rounded-2xl text-base sm:text-lg font-bold text-slate-800 outline-none focus:border-purple-400 focus:bg-white placeholder:text-slate-400 shadow-xs">
                 </div>
               </div>
 
-              <!-- Topic Hierarchy with Dynamic Dropdown & Custom Inputs -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-purple-50/30 border border-purple-100">
-                <!-- Major Topic Selection -->
+              <!-- Topic Hierarchy with Extra Large Font -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6 rounded-3xl bg-purple-50/40 border-2 border-purple-200">
                 <div>
-                  <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Major Topic (Category) *</label>
+                  <label class="block text-sm sm:text-base font-extrabold text-purple-950 uppercase tracking-wide mb-2">Major Topic (Category) *</label>
                   <select 
                     id="task-major-select" 
                     onchange="app.onMajorTopicChange(this.value)"
-                    class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-2xl text-sm font-semibold text-slate-700 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
+                    class="w-full px-5 py-3.5 bg-white border-2 border-purple-200 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
                   >
                     ${topicGroups.map(g => `<option value="${g.major}">${g.major}</option>`).join('')}
                     <option value="__new__">✨ + Add New Major Topic...</option>
                   </select>
 
-                  <div id="task-major-custom-wrap" class="hidden mt-2">
+                  <div id="task-major-custom-wrap" class="hidden mt-3">
                     <input 
                       type="text" 
                       id="task-major-custom" 
-                      placeholder="Type new Major Topic (e.g. Science, Math)" 
-                      class="w-full px-3.5 py-2 bg-white border-2 border-pink-300 rounded-xl text-xs outline-none focus:border-purple-400 font-medium placeholder-slate-400 shadow-inner"
+                      placeholder="Type new Major Topic (e.g. Science, Storytelling)" 
+                      class="w-full px-4 py-3 bg-white border-2 border-pink-300 rounded-2xl text-base font-bold outline-none focus:border-purple-400 placeholder-slate-400 shadow-inner"
                     >
                   </div>
                 </div>
 
-                <!-- Sub Topic Selection -->
                 <div>
-                  <label class="block text-xs font-bold text-purple-900 uppercase mb-1">Sub-Topic (Detail) *</label>
+                  <label class="block text-sm sm:text-base font-extrabold text-purple-950 uppercase tracking-wide mb-2">Sub-Topic (Detail) *</label>
                   <select 
                     id="task-sub-select" 
                     onchange="app.onSubTopicChange(this.value)"
-                    class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-2xl text-sm font-semibold text-slate-700 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
+                    class="w-full px-5 py-3.5 bg-white border-2 border-purple-200 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-purple-400 cursor-pointer shadow-xs"
                   >
                     ${(firstGroup.subs || []).map(s => `<option value="${s}">${s}</option>`).join('')}
                     <option value="__new__">✨ + Add New Sub-Topic...</option>
                   </select>
 
-                  <div id="task-sub-custom-wrap" class="hidden mt-2">
+                  <div id="task-sub-custom-wrap" class="hidden mt-3">
                     <input 
                       type="text" 
                       id="task-sub-custom" 
-                      placeholder="Type new Sub-Topic (e.g. Unit 3 Quiz)" 
-                      class="w-full px-3.5 py-2 bg-white border-2 border-pink-300 rounded-xl text-xs outline-none focus:border-purple-400 font-medium placeholder-slate-400 shadow-inner"
+                      placeholder="Type new Sub-Topic (e.g. Unit 3 Phonics Quiz)" 
+                      class="w-full px-4 py-3 bg-white border-2 border-pink-300 rounded-2xl text-base font-bold outline-none focus:border-purple-400 placeholder-slate-400 shadow-inner"
                     >
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Task Instructions (Shift+Enter or Enter to break lines) *</label>
-                <textarea id="task-instructions" rows="4" required placeholder="Detail what students should do today...&#10;1. Step one&#10;2. Step two" class="w-full px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-2xl text-sm outline-none focus:border-purple-400 leading-relaxed"></textarea>
-              </div>
-
-              <!-- Multiple Links Container -->
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="block text-xs font-bold text-slate-600 uppercase">Resource Links (YouTube, Quizlet, Web...)</label>
-                  <button type="button" onclick="app.addCreateLinkRow()" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-plus"></i> Add Link
-                  </button>
-                </div>
-                <div id="task-links-container" class="space-y-2">
-                  <div class="flex items-center gap-2 link-row">
-                    <input type="text" placeholder="Title (e.g. Phonics Song)" class="link-title-input w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
-                    <input type="url" placeholder="https://..." class="link-url-input flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+              <!-- ================= ADD TASK MENU DROPDOWN ================= -->
+              <div class="p-6 rounded-3xl bg-gradient-to-r from-pink-100/90 via-purple-100/90 to-pink-100/90 border-2 border-pink-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <span class="w-14 h-14 rounded-2xl bg-white text-purple-600 flex items-center justify-center text-2xl shadow-xs">
+                    <i class="fa-solid fa-layer-group"></i>
+                  </span>
+                  <div>
+                    <h4 class="text-lg sm:text-xl font-extrabold text-slate-800">Add Task Modules:</h4>
+                    <p class="text-sm text-slate-600 font-medium">Choose an option below to open its specific editing box!</p>
                   </div>
                 </div>
+
+                <div class="w-full sm:w-auto">
+                  <select 
+                    id="add-task-module-select" 
+                    onchange="app.onAddTaskModuleSelect(this.value)" 
+                    class="w-full sm:w-auto px-5 py-3.5 bg-white border-2 border-purple-400 hover:border-purple-500 rounded-2xl text-base font-extrabold text-purple-900 outline-none shadow-sm cursor-pointer"
+                  >
+                    <option value="">➕ Choose Task Module to Add...</option>
+                    <option value="material">📄 Extra Material (Instructions, Links, Files, Student Answer)</option>
+                    <option value="interactive">🎮 Interactive Task (Quiz, Matching, Unscramble, Typing, Recording)</option>
+                  </select>
+                </div>
               </div>
 
-              <!-- Multiple Materials Container -->
-              <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <label class="block text-xs font-bold text-slate-600 uppercase">Image / Material Files</label>
-                  <button type="button" onclick="app.addCreateMaterialRow()" class="text-xs font-bold text-pink-600 hover:text-pink-800 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-plus"></i> Add Material
+              <!-- ================= MODULE 1: EXTRA MATERIAL ================= -->
+              <div id="module-extra-material" class="hidden space-y-6 p-7 rounded-3xl bg-pink-50/40 border-2 border-pink-200 shadow-sm relative transition-all">
+                <div class="flex items-center justify-between pb-3 border-b border-pink-200">
+                  <h4 class="text-lg sm:text-xl font-extrabold text-pink-900 flex items-center gap-2.5">
+                    <i class="fa-solid fa-file-lines text-pink-500 text-xl"></i> Module 1: Extra Material & Instructions
+                  </h4>
+                  <button type="button" onclick="app.toggleExtraMaterialModule(false)" class="text-slate-500 hover:text-rose-600 text-sm font-bold px-3 py-1.5 rounded-xl hover:bg-pink-100/60 transition-all flex items-center gap-1" title="Close this box">
+                    <i class="fa-solid fa-xmark"></i> Hide Box
                   </button>
                 </div>
-                <div id="task-materials-container" class="space-y-2">
-                  <div class="flex items-center gap-2 material-row">
-                    <input type="text" placeholder="Name (e.g. Flashcard 1)" class="material-title-input w-2/5 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
-                    <input type="url" placeholder="Image/File URL https://..." class="material-url-input flex-1 px-3 py-2 bg-pink-50/40 border border-pink-200 rounded-xl text-xs outline-none">
+
+                <!-- Instructions with Large Font -->
+                <div>
+                  <label class="block text-sm sm:text-base font-extrabold text-slate-700 uppercase tracking-wide mb-2">Task Instructions (Preserves line breaks) *</label>
+                  <textarea id="task-instructions" rows="5" placeholder="Write step-by-step instructions for students..." class="w-full px-5 py-4 bg-white border-2 border-pink-200 rounded-2xl text-base sm:text-lg outline-none focus:border-purple-400 leading-relaxed font-normal shadow-xs"></textarea>
+                </div>
+
+                <!-- Multiple Links with Larger Font -->
+                <div class="p-5 rounded-2xl bg-white border-2 border-purple-200 space-y-4">
+                  <div class="flex items-center justify-between">
+                    <label class="text-sm font-extrabold text-purple-900 uppercase tracking-wide">Resource Links (YouTube, British Council, etc.)</label>
+                    <button type="button" onclick="app.addCreateLinkRow()" class="text-sm font-bold text-purple-700 hover:text-pink-600 flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-purple-50">
+                      <i class="fa-solid fa-plus text-xs"></i> Add Link
+                    </button>
                   </div>
+                  <div id="create-links-list" class="space-y-3">
+                    <div class="flex items-center gap-3">
+                      <input type="text" placeholder="Title (e.g. YouTube Video)" class="create-link-title w-1/3 px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-xl text-base font-semibold outline-none focus:border-purple-400">
+                      <input type="url" placeholder="https://..." class="create-link-url flex-1 px-4 py-2.5 bg-purple-50/40 border border-purple-200 rounded-xl text-base outline-none focus:border-purple-400">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Multiple Materials with Larger Font -->
+                <div class="p-5 rounded-2xl bg-white border-2 border-pink-200 space-y-4">
+                  <div class="flex items-center justify-between">
+                    <label class="text-sm font-extrabold text-pink-900 uppercase tracking-wide">Lesson Materials (Worksheets, Picture URLs)</label>
+                    <button type="button" onclick="app.addCreateMaterialRow()" class="text-sm font-bold text-pink-700 hover:text-purple-600 flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-pink-50">
+                      <i class="fa-solid fa-plus text-xs"></i> Add Material
+                    </button>
+                  </div>
+                  <div id="create-materials-list" class="space-y-3">
+                    <div class="flex items-center gap-3">
+                      <input type="text" placeholder="Title (e.g. Worksheet Image)" class="create-mat-title w-1/3 px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-xl text-base font-semibold outline-none focus:border-purple-400">
+                      <input type="url" placeholder="https://..." class="create-mat-url flex-1 px-4 py-2.5 bg-pink-50/40 border border-pink-200 rounded-xl text-base outline-none focus:border-purple-400">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Student Answer Option Toggle -->
+                <div class="p-5 rounded-2xl bg-white border-2 border-pink-200 flex items-center gap-3">
+                  <input type="checkbox" id="task-enable-student-answer" checked class="w-6 h-6 text-pink-600 rounded cursor-pointer">
+                  <label for="task-enable-student-answer" class="text-base font-bold text-slate-800 cursor-pointer">
+                    Enable Student Response Box (Allows students to submit written answers, homework photos, or Vocaroo links)
+                  </label>
                 </div>
               </div>
 
-              <!-- Assign To -->
+              <!-- ================= MODULE 2: INTERACTIVE TASK ================= -->
+              <div id="module-interactive-task" class="hidden p-7 rounded-3xl bg-gradient-to-br from-purple-50/70 via-pink-50/40 to-white border-2 border-purple-300 shadow-sm space-y-6 transition-all">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-purple-200">
+                  <div>
+                    <h4 class="text-lg sm:text-xl font-extrabold text-purple-950 flex items-center gap-2.5">
+                      <i class="fa-solid fa-gamepad text-pink-500 text-xl"></i> Module 2: Interactive Tasks & Games
+                    </h4>
+                    <p class="text-sm text-slate-600 font-medium">Click <strong>+ Add Question</strong> to insert a challenge, then choose its type (Quiz, Matching, Unscramble, Typing, Recording)!</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button 
+                      type="button" 
+                      onclick="app.addGenericQuestionToBuilder()" 
+                      class="px-5 py-3 bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-95 text-white rounded-2xl text-sm font-extrabold shadow-md shadow-purple-200 transition-all flex items-center gap-2"
+                    >
+                      <i class="fa-solid fa-plus"></i> Add Question
+                    </button>
+                    <button type="button" onclick="app.toggleInteractiveTaskModule(false)" class="text-slate-500 hover:text-rose-600 text-sm font-bold px-3 py-2 rounded-xl hover:bg-purple-100/60 transition-all ml-1 flex items-center gap-1" title="Close this box">
+                      <i class="fa-solid fa-xmark"></i> Hide Box
+                    </button>
+                  </div>
+                </div>
+
+                <div id="builder-activities-container" class="space-y-5">
+                  <!-- Populated dynamically via JS -->
+                </div>
+              </div>
+
+              <!-- Assign To with Larger Font -->
               <div class="pt-2">
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Assign to Students</label>
-                <div class="flex items-center gap-3 mb-2">
-                  <input type="checkbox" id="assign-all-students" checked onchange="document.getElementById('specific-students-box').classList.toggle('hidden', this.checked)" class="w-4 h-4 text-pink-600 rounded">
-                  <label for="assign-all-students" class="text-xs font-bold text-slate-700">Assign to ALL students</label>
+                <label class="block text-sm sm:text-base font-extrabold text-slate-700 uppercase tracking-wide mb-2">Assign to Students</label>
+                <div class="flex items-center gap-3 mb-3">
+                  <input type="checkbox" id="assign-all-students" checked onchange="document.getElementById('specific-students-box').classList.toggle('hidden', this.checked)" class="w-6 h-6 text-pink-600 rounded cursor-pointer">
+                  <label for="assign-all-students" class="text-base sm:text-lg font-bold text-slate-800 cursor-pointer">Assign to ALL students</label>
                 </div>
 
-                <div id="specific-students-box" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-pink-100">
+                <div id="specific-students-box" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-pink-100">
                   ${students.map(s => `
-                    <label class="flex items-center gap-2 p-2 rounded-xl bg-pink-50/50 hover:bg-pink-100/50 text-xs font-medium cursor-pointer">
-                      <input type="checkbox" value="${s.id}" class="assign-student-cb w-4 h-4 text-pink-500 rounded">
+                    <label class="flex items-center gap-3 p-3 rounded-2xl bg-pink-50/60 hover:bg-pink-100/60 text-base font-bold cursor-pointer">
+                      <input type="checkbox" value="${s.id}" class="assign-student-cb w-5 h-5 text-pink-500 rounded">
                       <span>${s.name}</span>
                     </label>
                   `).join('')}
                 </div>
               </div>
 
-              <div class="flex justify-end gap-3 pt-4 border-t border-pink-100">
-                <button type="button" onclick="app.switchTeacherTab('assignments')" class="px-5 py-2.5 text-xs font-bold rounded-2xl border border-slate-200 text-slate-600">Cancel</button>
-                <button type="submit" class="px-6 py-2.5 text-xs font-bold rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200">Publish Mission</button>
+              <!-- Form Action Buttons with PREVIEW MISSION BUTTON -->
+              <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-pink-100">
+                <button type="button" onclick="app.switchTeacherTab('assignments')" class="w-full sm:w-auto px-6 py-3.5 text-base font-bold rounded-2xl border-2 border-slate-300 text-slate-600 hover:bg-slate-50 transition-all">
+                  Cancel
+                </button>
+                <button type="button" onclick="app.openPrepublishPreview()" class="w-full sm:w-auto px-7 py-3.5 text-base font-extrabold rounded-2xl border-2 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-800 shadow-sm flex items-center justify-center gap-2 transition-all">
+                  <i class="fa-solid fa-eye text-purple-600"></i>
+                  <span>Preview Mission</span>
+                </button>
+                <button type="submit" class="w-full sm:w-auto px-8 py-3.5 text-base font-extrabold rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200 hover:opacity-95 transition-all flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-calendar-check"></i>
+                  <span>Publish Mission</span>
+                </button>
               </div>
             </form>
           </div>
         `;
       }
     },
+    // Pre-Publish Mission Preview Handlers
+    openPrepublishPreview() {
+      const title = (document.getElementById('task-title')?.value || '').trim() || 'Untitled Mission';
+      const scheduledDate = document.getElementById('task-date')?.value || window.appState.selectedDate;
 
-    // ================= 3. STUDENT PORTAL (CALENDAR + TO-DO LIST) =================
-    renderStudentView(container) {
-      const studentId = window.appState.activeStudentId;
-      const student = window.store.getStudents().find(s => s.id === studentId);
-      const allTasks = window.store.getTasks().filter(t => t.assignedTo.includes('all') || t.assignedTo.includes(studentId));
-      const submissions = window.store.getSubmissions().filter(s => s.studentId === studentId);
-      const selectedDate = window.appState.selectedDate;
-      const activeTaskId = window.appState.activeTaskId;
+      const majorSelect = document.getElementById('task-major-select')?.value;
+      const majorCustom = (document.getElementById('task-major-custom')?.value || '').trim();
+      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
 
-      const dailyTasks = allTasks.filter(t => t.scheduledDate === selectedDate);
-      const calendarDates = this.getCalendarDates();
-      const activeTask = activeTaskId ? dailyTasks.find(t => t.id === activeTaskId) : null;
+      const subSelect = document.getElementById('task-sub-select')?.value;
+      const subCustom = (document.getElementById('task-sub-custom')?.value || '').trim();
+      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
 
-      container.innerHTML = `
-        <!-- Student Greeting Header -->
-        <div class="bg-gradient-to-r from-pink-100/80 via-purple-100/80 to-rose-100/80 rounded-3xl p-6 sm:p-8 border-2 border-white shadow-soft mb-8 flex flex-col sm:flex-row items-center justify-between gap-5">
-          <div class="flex items-center gap-4 text-center sm:text-left">
-            <img src="${student.avatar}" class="w-20 h-20 rounded-3xl object-cover ring-4 ring-white shadow-md">
-            <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-bold text-pink-600 bg-white/70 px-3 py-1 rounded-full border border-pink-200">Personal Learning Box</span>
-                <button 
-                  onclick="app.openChangePasswordModal('${student.id}', false)" 
-                  class="text-[11px] font-bold text-purple-700 bg-white/80 hover:bg-white px-2.5 py-1 rounded-full border border-purple-200 shadow-xs transition-all flex items-center gap-1"
-                >
-                  <i class="fa-solid fa-lock text-[10px]"></i> Change Password
-                </button>
-              </div>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1">${student.name}'s Missions</h2>
-              <p class="text-xs text-slate-500 font-medium mt-0.5">Click any date to see your to-do items. Select a task to complete it!</p>
+      const instructions = (document.getElementById('task-instructions')?.value || '').trim();
+
+      const linkTitles = Array.from(document.querySelectorAll('.create-link-title')).map(i => i.value.trim());
+      const linkUrls = Array.from(document.querySelectorAll('.create-link-url')).map(i => i.value.trim());
+      const links = linkUrls.map((url, idx) => ({ title: linkTitles[idx] || 'Resource Link', url })).filter(item => item.url);
+
+      const matTitles = Array.from(document.querySelectorAll('.create-mat-title')).map(i => i.value.trim());
+      const matUrls = Array.from(document.querySelectorAll('.create-mat-url')).map(i => i.value.trim());
+      const fileAttachments = matUrls.map((url, idx) => ({ title: matTitles[idx] || 'Material', url })).filter(item => item.url);
+
+      const activities = window.appState.builderActivities || [];
+
+      const bodyContainer = document.getElementById('prepublish-preview-body');
+      if (!bodyContainer) return;
+
+      bodyContainer.innerHTML = `
+        <div class="rounded-3xl p-6 bg-gradient-to-br from-purple-50/50 via-pink-50/30 to-white border-2 border-purple-200 shadow-sm space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-purple-100">
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-xl text-xs font-bold shadow-xs">
+                ${majorTopic}
+              </span>
+              <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-xl text-xs font-bold border border-purple-200">
+                ${subTopic}
+              </span>
             </div>
-          </div>
-
-          <div class="bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-pink-200 text-center shadow-xs">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Your Total Completed</span>
-            <span class="text-2xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              ${submissions.length} / ${allTasks.length}
+            <span class="text-xs font-bold text-slate-500">
+              <i class="fa-solid fa-calendar mr-1"></i> Date: ${scheduledDate}
             </span>
           </div>
-        </div>
 
-        <!-- Interactive Calendar Strip -->
-        <div class="bg-white rounded-3xl p-5 border border-pink-100 shadow-card mb-8">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-              <i class="fa-regular fa-calendar-check text-pink-500"></i> Learning Calendar
-            </h3>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 font-medium hidden sm:inline">Pick date:</span>
-              <input type="date" value="${selectedDate}" onchange="app.selectDate(this.value)" class="text-xs font-bold bg-pink-50 border border-pink-200 text-slate-700 px-3 py-1.5 rounded-xl outline-none">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">${title}</h2>
+
+          ${instructions ? `
+            <div class="bg-white p-5 rounded-2xl border border-pink-200 text-base text-slate-700 whitespace-pre-line leading-relaxed shadow-xs">
+              <span class="block text-xs font-bold text-pink-600 uppercase mb-2">Instructions:</span>
+              ${instructions}
             </div>
-          </div>
+          ` : '<p class="text-xs italic text-slate-400">No instructions written yet.</p>'}
 
-          <!-- Date pills slider -->
-          <div class="grid grid-cols-7 gap-2">
-            ${calendarDates.map(item => {
-              const isSelected = item.iso === selectedDate;
-              const hasTasks = allTasks.some(t => t.scheduledDate === item.iso);
-              return `
-                <button 
-                  onclick="app.selectDate('${item.iso}')" 
-                  class="flex flex-col items-center justify-center p-3 rounded-2xl transition-all relative ${isSelected ? 'bg-gradient-to-b from-pink-500 to-purple-500 text-white shadow-md shadow-pink-200 scale-105' : 'bg-pink-50/50 hover:bg-pink-100/60 text-slate-700'}"
-                >
-                  <span class="text-[11px] font-medium opacity-80">${item.dayName}</span>
-                  <span class="text-lg font-bold">${item.dayNum}</span>
-                  ${hasTasks ? `
-                    <span class="w-2 h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-pink-500'} mt-1"></span>
-                  ` : `
-                    <span class="w-2 h-2 mt-1"></span>
-                  `}
-                </button>
-              `;
-            }).join('')}
-          </div>
+          <!-- Attached Links & Materials -->
+          ${(links.length > 0 || fileAttachments.length > 0) ? `
+            <div class="space-y-3 pt-2 border-t border-purple-100">
+              ${links.length > 0 ? `
+                <div class="flex flex-wrap gap-2">
+                  <span class="w-full text-xs font-bold uppercase text-purple-700">Links:</span>
+                  ${links.map(l => `
+                    <span class="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200 flex items-center gap-1.5">
+                      <i class="fa-solid fa-link text-[10px]"></i> ${l.title}
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
+              ${fileAttachments.length > 0 ? `
+                <div class="flex flex-wrap gap-2">
+                  <span class="w-full text-xs font-bold uppercase text-pink-700">Materials:</span>
+                  ${fileAttachments.map(m => `
+                    <span class="px-3 py-1.5 rounded-xl bg-pink-50 text-pink-700 text-xs font-bold border border-pink-200 flex items-center gap-1.5">
+                      <i class="fa-regular fa-image text-[10px]"></i> ${m.title}
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+
+          <!-- Interactive Questions Preview -->
+          ${activities.length > 0 ? `
+            <div class="mt-4 p-5 rounded-2xl bg-white border border-purple-200 space-y-4">
+              <h4 class="text-sm font-extrabold text-purple-900 flex items-center gap-2">
+                <i class="fa-solid fa-gamepad text-pink-500"></i> Interactive Challenges (${activities.length})
+              </h4>
+              <div class="space-y-4">
+                ${activities.map((act, idx) => this.renderInteractiveActivityPlayer(act, idx)).join('')}
+              </div>
+            </div>
+          ` : '<p class="text-xs italic text-slate-400">No interactive questions attached.</p>'}
         </div>
-
-        <!-- VIEW SWITCH: DETAILED TASK VIEW OR CONCISE TO-DO LIST -->
-        ${activeTask ? this.renderSingleTaskDetail(activeTask, submissions.find(s => s.taskId === activeTask.id)) : this.renderConciseTodoList(dailyTasks, submissions, selectedDate)}
       `;
+
+      document.getElementById('prepublish-preview-modal').classList.remove('hidden');
+    },
+
+    closePrepublishPreview() {
+      document.getElementById('prepublish-preview-modal').classList.add('hidden');
+    },
+
+    confirmPublishFromPreview() {
+      this.closePrepublishPreview();
+      const form = document.getElementById('create-task-form');
+      if (form) {
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      }
     },
 
     // 3A. Concise To-Do List View
@@ -2284,12 +3538,11 @@
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
               <span>To-Do List:</span>
-              <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm border border-pink-200">${selectedDate}</span>
+              <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm sm:text-base border border-pink-200">${selectedDate}</span>
             </h3>
             <span class="text-xs font-bold text-slate-400">${dailyTasks.length} task(s)</span>
           </div>
 
-          <!-- Concise Task Items -->
           <div class="space-y-3">
             ${dailyTasks.map(task => {
               const sub = submissions.find(s => s.taskId === task.id);
@@ -2298,46 +3551,44 @@
 
               let cardStyle = 'bg-white border-pink-100 hover:border-pink-300';
               let statusBadge = `
-                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1">
-                  <i class="fa-regular fa-circle text-[10px]"></i> To-Do
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-500 flex items-center gap-1">
+                  <i class="fa-regular fa-circle text-[9px]"></i> To-Do
                 </span>
               `;
 
               if (isReviewed) {
-                cardStyle = 'bg-amber-50/70 border-2 border-amber-300 shadow-md shadow-amber-200/50 hover:border-amber-400 ring-2 ring-amber-200';
+                cardStyle = 'bg-amber-50/80 border-2 border-amber-300 shadow-md shadow-amber-200/40 hover:border-amber-400 ring-2 ring-amber-200';
                 statusBadge = `
-                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-amber-950 flex items-center gap-1 shadow-xs">
-                    <i class="fa-solid fa-star text-white text-[10px]"></i> Graded
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-amber-950 flex items-center gap-1 shadow-xs">
+                    <i class="fa-solid fa-star text-white text-[9px]"></i> Graded
                   </span>
                 `;
               } else if (isSubmitted) {
                 cardStyle = 'bg-purple-50/40 border-2 border-purple-200 hover:border-purple-300';
                 statusBadge = `
-                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1">
-                    <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> Submitted
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 flex items-center gap-1">
+                    <i class="fa-solid fa-clock-rotate-left text-[9px]"></i> Submitted
                   </span>
                 `;
               }
 
               return `
                 <div 
-                  onclick="app.viewTaskDetail('${task.id}')"
-                  class="p-4 rounded-2xl border ${cardStyle} cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 group hover:translate-x-1"
+                  onclick="app.viewTaskDetail('${task.id}')" 
+                  class="p-4 rounded-2xl border ${cardStyle} cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 group hover:translate-x-1 shadow-xs"
                 >
                   <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl bg-pink-100/70 text-pink-600 flex items-center justify-center text-xs font-bold">
+                    <span class="w-8 h-8 rounded-xl bg-pink-100/70 text-pink-600 flex items-center justify-center text-xs group-hover:bg-pink-500 group-hover:text-white transition-all">
                       <i class="fa-solid fa-book-open"></i>
                     </span>
-                    <h4 class="text-base font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
                       ${task.title}
                     </h4>
                   </div>
 
                   <div class="flex items-center gap-2">
                     ${statusBadge}
-                    <span class="w-6 h-6 rounded-lg bg-pink-50 group-hover:bg-pink-500 group-hover:text-white text-pink-600 flex items-center justify-center text-xs transition-all">
-                      <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                    </span>
+                    <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-pink-500 transition-all"></i>
                   </div>
                 </div>
               `;
@@ -2347,7 +3598,7 @@
       `;
     },
 
-    // 3B. Single Task Full Detail View (When Clicked)
+    // 3B. Single Task Full Detail View
     renderSingleTaskDetail(task, submission) {
       const isReviewed = submission && submission.status === 'reviewed';
       const isSubmitted = !!submission;
@@ -2356,24 +3607,21 @@
         ? 'border-4 border-amber-300 bg-amber-50/30 ring-4 ring-amber-100' 
         : 'border-2 border-pink-100 bg-white';
 
-      const taskLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Open Lesson Link', url: task.link }] : []);
-      const taskMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'View Lesson Material', url: task.fileAttachment }] : []);
+      const taskLinks = Array.isArray(task.links) ? task.links : (task.link ? [{ title: 'Resource Link', url: task.link }] : []);
+      const taskMaterials = Array.isArray(task.fileAttachments) ? task.fileAttachments : (task.fileAttachment ? [{ title: 'Material', url: task.fileAttachment }] : []);
+      const activities = Array.isArray(task.activities) ? task.activities : [];
 
       return `
-        <div class="space-y-6">
-          <!-- Back to To-Do List Button -->
+        <div class="space-y-6 max-w-4xl mx-auto">
           <button 
-            onclick="app.backToTaskList()"
+            onclick="app.backToTaskList()" 
             class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white border border-pink-200 text-pink-600 hover:bg-pink-50 font-bold text-xs shadow-xs transition-all"
           >
             <i class="fa-solid fa-arrow-left"></i>
             <span>Back to To-Do List</span>
           </button>
 
-          <!-- Detailed Task Card -->
           <div class="rounded-3xl p-6 sm:p-8 ${containerHighlight} shadow-soft">
-            
-            <!-- Topic Badges & Status -->
             <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div class="flex flex-wrap items-center gap-2">
                 <span class="px-3 py-1 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-xl text-xs font-bold shadow-xs">
@@ -2399,19 +3647,18 @@
               `)}
             </div>
 
-            <!-- Task Title & Full Instructions with Line Breaks -->
             <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-800 mb-3">${task.title}</h2>
-            <div class="bg-pink-50/50 p-5 sm:p-6 rounded-2xl border border-pink-100 text-base sm:text-lg text-slate-700 whitespace-pre-line leading-relaxed mb-6 font-normal">
+            <div class="bg-pink-50/50 p-5 rounded-2xl border border-pink-100 text-base sm:text-lg text-slate-700 leading-relaxed mb-6 whitespace-pre-line font-medium">
               <span class="block text-xs font-bold text-pink-600 uppercase mb-2">Instructions:</span>
               ${task.instructions}
             </div>
 
-            <!-- Lesson Links & Multiple Files Display -->
+            <!-- Attached Resource Links -->
             ${(taskLinks.length > 0 || taskMaterials.length > 0) ? `
-              <div class="space-y-3 mb-6">
+              <div class="space-y-3 mb-6 pt-2 border-t border-pink-100">
                 ${taskLinks.length > 0 ? `
                   <div>
-                    <span class="block text-[11px] font-bold uppercase text-purple-700 mb-1.5">Lesson Links:</span>
+                    <span class="block text-[11px] font-bold uppercase text-purple-700 mb-1.5">Resource Links:</span>
                     <div class="flex flex-wrap gap-2.5">
                       ${taskLinks.map((l, idx) => `
                         <a href="${l.url}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-purple-50 text-purple-700 hover:bg-purple-100 text-xs font-bold border border-purple-200 shadow-xs transition-all">
@@ -2425,7 +3672,7 @@
 
                 ${taskMaterials.length > 0 ? `
                   <div>
-                    <span class="block text-[11px] font-bold uppercase text-pink-700 mb-1.5">Lesson Materials & Worksheets:</span>
+                    <span class="block text-[11px] font-bold uppercase text-pink-700 mb-1.5">Lesson Materials:</span>
                     <div class="flex flex-wrap gap-2.5">
                       ${taskMaterials.map((m, idx) => `
                         <a href="${m.url}" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-pink-50 text-pink-700 hover:bg-pink-100 text-xs font-bold border border-pink-200 shadow-xs transition-all">
@@ -2439,55 +3686,75 @@
               </div>
             ` : ''}
 
-            <!-- Teacher's Comment & Sticker Box (Highlighted with Gold) -->
+            <!-- Interactive Challenges for Student -->
+            ${activities.length > 0 ? `
+              <div class="my-6 p-6 rounded-3xl bg-gradient-to-br from-purple-50/70 via-pink-50/40 to-white border-2 border-purple-200 shadow-sm">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-purple-100">
+                  <div>
+                    <h3 class="text-base sm:text-lg font-extrabold text-purple-900 flex items-center gap-2">
+                      <i class="fa-solid fa-gamepad text-pink-500"></i> Interactive Mission Challenges (${activities.length})
+                    </h3>
+                    <p class="text-xs text-slate-500">Complete all questions below before submitting!</p>
+                  </div>
+                </div>
+                <div class="space-y-6">
+                  ${activities.map((act, index) => this.renderInteractiveActivityPlayer(act, index)).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Teacher Feedback Box -->
             ${(submission && submission.teacherComment) ? `
               <div class="bg-gradient-to-r from-amber-100 via-amber-50 to-yellow-100 p-5 rounded-3xl border-2 border-amber-300 shadow-md mb-6 flex items-start gap-4">
                 <span class="text-3xl">${submission.sticker || '⭐'}</span>
                 <div>
                   <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">Mẹ Chan's Feedback & Praise</span>
-                  <p class="text-base sm:text-lg font-bold text-slate-800 mt-1 whitespace-pre-line">${submission.teacherComment}</p>
-                  <p class="text-xs text-amber-700 mt-1">Reward Sticker: <span class="font-bold">${submission.sticker}</span></p>
+                  <p class="text-sm sm:text-base font-bold text-slate-800 mt-1">${submission.teacherComment}</p>
+                  <p class="text-[11px] text-amber-700 mt-1">Reward Sticker: <span class="font-bold">${submission.sticker}</span></p>
                 </div>
               </div>
             ` : ''}
 
-            <!-- Answer & Homework Submission Area -->
+            <!-- Answer Submission Area -->
             <div class="pt-6 border-t border-pink-100">
               <h4 class="text-sm font-bold uppercase tracking-wider text-slate-700 mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-file-arrow-up text-pink-500"></i> Your Answer, Audio & Photo Submission
+                <i class="fa-solid fa-file-arrow-up text-pink-500"></i> Your Answer & Homework Submission
               </h4>
 
               <form onsubmit="app.handleSubmitTask(event, '${task.id}')" class="space-y-4">
-                <!-- Text Answer Box -->
                 <div>
                   <label class="block text-xs font-bold text-slate-500 mb-1">Your Written Answer / Message to Mẹ Chan:</label>
                   <textarea 
                     id="submission-text-${task.id}" 
                     rows="3" 
                     placeholder="Write your homework answers, sentences, or questions here..." 
-                    class="w-full px-4 py-3 bg-pink-50/30 border border-pink-200 rounded-2xl text-sm focus:border-purple-400 focus:bg-white outline-none"
+                    class="w-full px-4 py-3 bg-pink-50/30 border border-pink-200 rounded-2xl text-xs sm:text-sm focus:border-purple-400 focus:bg-white outline-none"
                   >${submission ? (submission.commentText || '') : ''}</textarea>
                 </div>
 
-                <!-- Vocaroo Audio Tool & Link Input -->
-                <div class="p-4 rounded-2xl bg-purple-50/40 border border-purple-100 space-y-2">
-                  <div class="flex items-center justify-between">
-                    <label class="block text-xs font-bold text-purple-900">
-                      <i class="fa-solid fa-microphone-lines mr-1"></i> Audio Speaking Drill (Vocaroo)
-                    </label>
-                    <a href="https://vocaroo.com/" target="_blank" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
-                      <span>Open Vocaroo Website</span>
-                      <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
+                <!-- Vocaroo Recording Link Box -->
+                <div class="p-3.5 rounded-2xl bg-emerald-50/50 border border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <span class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-base">
+                      <i class="fa-solid fa-microphone"></i>
+                    </span>
+                    <div>
+                      <span class="text-xs font-bold text-emerald-900 block">Speaking Audio Practice (Vocaroo)</span>
+                      <p class="text-[11px] text-slate-500">Click to record your voice on Vocaroo, then paste link below!</p>
+                    </div>
                   </div>
+                  <a href="https://vocaroo.com" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-record-vinyl"></i> Open Vocaroo Recorder
+                  </a>
+                </div>
+                <div>
                   <input 
                     type="url" 
-                    id="vocaroo-link-${task.id}" 
-                    placeholder="Paste your Vocaroo recording link here (e.g. https://vocaroo.com/...)" 
-                    value="${submission ? (submission.vocarooLink || '') : ''}"
-                    class="w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-xl text-xs sm:text-sm outline-none focus:border-purple-400"
-                  />
-                  <p class="text-[11px] text-slate-400">Click the link above to record your voice on Vocaroo, then copy and paste the link here!</p>
+                    id="vocaroo-url-${task.id}" 
+                    value="${submission ? (submission.vocarooUrl || '') : ''}" 
+                    placeholder="Paste your Vocaroo recording link (e.g. https://vocaroo.com/...)" 
+                    class="w-full px-4 py-2.5 bg-emerald-50/30 border border-emerald-200 rounded-2xl text-xs sm:text-sm font-medium outline-none focus:border-emerald-400"
+                  >
                 </div>
 
                 <!-- Photo Upload Button & Submit Action -->
