@@ -467,6 +467,37 @@
           <div id="edit-task-activities-container" class="space-y-4"></div>
         </div>
 
+        <!-- Custom HTML Game in Edit Modal -->
+        <div class="pt-4 border-t border-purple-100 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-extrabold uppercase text-teal-800 flex items-center gap-2">
+              <i class="fa-solid fa-code text-teal-600"></i> Custom HTML Game File
+            </h4>
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer px-3.5 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 flex items-center gap-1.5 shadow-xs">
+                <i class="fa-solid fa-file-arrow-up"></i> Upload .HTML File
+                <input type="file" accept=".html,.htm" class="hidden" onchange="app.handleCustomHtmlFileUpload(event, 'edit')">
+              </label>
+              <button type="button" onclick="app.clearEditHtmlGame()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-500 text-xs font-bold hover:bg-slate-50">
+                Remove
+              </button>
+            </div>
+          </div>
+          <p id="edit-custom-html-status" class="text-xs text-slate-500 font-bold">No HTML game attached</p>
+          <input type="hidden" id="edit-custom-html-code" value="">
+          <input type="hidden" id="edit-custom-html-title" value="">
+        </div>
+
+        <!-- Assigned Students in Edit Modal -->
+        <div class="pt-4 border-t border-purple-100 space-y-2.5">
+          <label class="block text-xs font-extrabold text-purple-900 uppercase">Assigned To Students *</label>
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="edit-assign-all-students" onchange="document.getElementById('edit-specific-students-box').classList.toggle('hidden', this.checked)" class="w-4 h-4 text-purple-600 rounded">
+            <label for="edit-assign-all-students" class="text-sm font-bold text-slate-700 cursor-pointer">Assign to ALL students</label>
+          </div>
+          <div id="edit-specific-students-box" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2"></div>
+        </div>
+
         <div class="flex justify-end gap-3 pt-5 border-t border-purple-100">
           <button type="button" onclick="app.closeEditTaskModal()" class="px-5 py-2.5 text-xs font-bold rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50">
             Cancel
@@ -559,10 +590,18 @@
     }
   ];
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  function getLocalTodayStr() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  const todayStr = getLocalTodayStr();
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
 
   const INITIAL_TASKS = [
     {
@@ -637,8 +676,21 @@
       this.topicGroups = JSON.parse(localStorage.getItem('mc_topic_groups')) || INITIAL_TOPIC_GROUPS;
       this.teacherPin = localStorage.getItem('mc_teacher_pin') || '1234';
       this.isCloudConnected = false;
+      this.isWriting = false;
       this.db = null;
       this.initFirebase();
+    }
+
+    saveLocalCache() {
+      try {
+        localStorage.setItem('mc_students', JSON.stringify(this.students));
+        localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
+        localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
+        localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
+        localStorage.setItem('mc_teacher_pin', this.teacherPin);
+      } catch (storageErr) {
+        console.warn("LocalStorage quota warning:", storageErr.message);
+      }
     }
 
     async initFirebase() {
@@ -664,22 +716,29 @@
       const docRef = doc(this.db, 'meChanClass', 'mainDatabase');
       
       onSnapshot(docRef, async (docSnap) => {
+        if (this.isWriting) return;
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (Array.isArray(data.students)) this.students = data.students;
-          if (Array.isArray(data.tasks)) this.tasks = data.tasks;
+          if (Array.isArray(data.tasks)) {
+            const localTasks = JSON.parse(localStorage.getItem('mc_tasks') || '[]');
+            this.tasks = data.tasks.map(cloudTask => {
+              if (cloudTask.customHtmlGame && !cloudTask.customHtmlGame.code) {
+                const localMatch = localTasks.find(lt => lt.id === cloudTask.id);
+                if (localMatch && localMatch.customHtmlGame && localMatch.customHtmlGame.code) {
+                  cloudTask.customHtmlGame.code = localMatch.customHtmlGame.code;
+                }
+              }
+              return cloudTask;
+            });
+          }
           if (Array.isArray(data.submissions)) this.submissions = data.submissions;
           if (Array.isArray(data.topicGroups)) this.topicGroups = data.topicGroups;
           if (data.teacherPin) {
             this.teacherPin = data.teacherPin;
-            localStorage.setItem('mc_teacher_pin', this.teacherPin);
           }
 
-          localStorage.setItem('mc_students', JSON.stringify(this.students));
-          localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
-          localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
-          localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
-          
+          this.saveLocalCache();
           if (window.app) window.app.render();
         } else {
           try {
@@ -700,25 +759,50 @@
     }
 
     async syncToCloud() {
-      localStorage.setItem('mc_students', JSON.stringify(this.students));
-      localStorage.setItem('mc_tasks', JSON.stringify(this.tasks));
-      localStorage.setItem('mc_submissions', JSON.stringify(this.submissions));
-      localStorage.setItem('mc_topic_groups', JSON.stringify(this.topicGroups));
-      localStorage.setItem('mc_teacher_pin', this.teacherPin);
+      this.saveLocalCache();
 
       if (this.isCloudConnected && this.db) {
+        this.isWriting = true;
         try {
           const docRef = doc(this.db, 'meChanClass', 'mainDatabase');
-          await setDoc(docRef, {
+          const cleanPayload = JSON.parse(JSON.stringify({
             students: this.students,
             tasks: this.tasks,
             submissions: this.submissions,
             topicGroups: this.topicGroups,
             teacherPin: this.teacherPin,
             lastUpdated: new Date().toISOString()
-          }, { merge: true });
+          }));
+          await setDoc(docRef, cleanPayload, { merge: true });
         } catch (e) {
-          console.warn("Firestore sync offline fallback:", e.message);
+          console.warn("Firestore sync warning (optimizing payload size):", e.message);
+          try {
+            const docRef = doc(this.db, 'meChanClass', 'mainDatabase');
+            const lightTasks = this.tasks.map(t => {
+              const copy = JSON.parse(JSON.stringify(t));
+              if (copy.customHtmlGame && copy.customHtmlGame.code && copy.customHtmlGame.code.length > 150000) {
+                copy.customHtmlGame = {
+                  title: copy.customHtmlGame.title || copy.title,
+                  maxScore: copy.customHtmlGame.maxScore || 100,
+                  hasLocalCode: true
+                };
+              }
+              return copy;
+            });
+            const fallbackPayload = JSON.parse(JSON.stringify({
+              students: this.students,
+              tasks: lightTasks,
+              submissions: this.submissions,
+              topicGroups: this.topicGroups,
+              teacherPin: this.teacherPin,
+              lastUpdated: new Date().toISOString()
+            }));
+            await setDoc(docRef, fallbackPayload, { merge: true });
+          } catch (fallbackErr) {
+            console.warn("Firestore fallback warning:", fallbackErr.message);
+          }
+        } finally {
+          setTimeout(() => { this.isWriting = false; }, 500);
         }
       }
     }
@@ -813,6 +897,14 @@
       await this.syncToCloud();
     }
 
+    async toggleArchiveTask(taskId) {
+      const task = this.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.isArchived = !task.isArchived;
+        await this.syncToCloud();
+      }
+    }
+
     async saveSubmission(sub) {
       const index = this.submissions.findIndex(s => s.taskId === sub.taskId && s.studentId === sub.studentId);
       if (index >= 0) {
@@ -841,7 +933,7 @@
     role: 'guest',
     activeStudentId: null,
     currentTab: 'boxes',
-    selectedDate: new Date().toISOString().split('T')[0],
+    selectedDate: getLocalTodayStr(),
     activeTaskId: null,
     builderActivities: [],
     draftQuestion: {
@@ -857,9 +949,16 @@
       correctSentence: ''
     },
     previewMaterialTaskId: null,
+    materialsFilter: 'active',
     editingActivityIndex: -1,
     studentAnswers: {},
-    shuffledActivitiesCache: {}
+    shuffledActivitiesCache: {},
+    customHtmlDraft: {
+      title: '',
+      maxScore: 100,
+      code: '',
+      fileName: ''
+    }
   };
 
   // Preset Avatars Helper
@@ -879,6 +978,23 @@
     init() {
       this.renderNavbar();
       this.render();
+      this.initHtmlGameMessageListener();
+    },
+
+    // Listen for automatic postMessage scores from embedded Custom HTML games
+    initHtmlGameMessageListener() {
+      window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (data && (data.type === 'MECHAN_GAME_SCORE' || data.type === 'GAME_OVER' || typeof data.score !== 'undefined')) {
+          const activeTaskId = window.appState.activeTaskId || window.appState.previewMaterialTaskId;
+          if (!activeTaskId) return;
+          const scoreVal = Number(data.score ?? 0);
+          const maxVal = Number(data.total ?? data.maxScore ?? 100);
+          const scoreInput = document.getElementById(`html-game-score-input-${activeTaskId}`);
+          if (scoreInput) scoreInput.value = scoreVal;
+          this.submitCustomHtmlGameScore(activeTaskId, scoreVal, maxVal, true);
+        }
+      });
     },
 
     showToast(message, type = 'info') {
@@ -1046,6 +1162,17 @@
         window.appState.role = 'student';
         window.appState.activeStudentId = student.id;
         window.appState.activeTaskId = null;
+
+        // Automatically jump to the student's most recent or today's assigned task date
+        const assignedTasks = window.store.getTasks().filter(t => !t.isArchived && this.isTaskAssignedToStudent(t, student.id));
+        const today = getLocalTodayStr();
+        const hasToday = assignedTasks.some(t => t.scheduledDate === today);
+        if (hasToday) {
+          window.appState.selectedDate = today;
+        } else if (assignedTasks.length > 0) {
+          window.appState.selectedDate = assignedTasks[0].scheduledDate || today;
+        }
+
         this.closeStudentModal();
         this.renderNavbar();
         this.render();
@@ -1053,6 +1180,12 @@
       } else {
         document.getElementById('student-login-error').classList.remove('hidden');
       }
+    },
+
+    isTaskAssignedToStudent(task, studentId) {
+      if (!task) return false;
+      if (!Array.isArray(task.assignedTo) || task.assignedTo.length === 0) return true;
+      return task.assignedTo.includes('all') || task.assignedTo.includes(studentId);
     },
 
     logout() {
@@ -1283,26 +1416,253 @@
       };
     },
 
+    async toggleArchiveMaterial(taskId) {
+      await window.store.toggleArchiveTask(taskId);
+      const task = window.store.getTasks().find(t => t.id === taskId);
+      this.showToast(task && task.isArchived ? 'Moved task to Archive! 📦' : 'Restored task to Active Materials! ✨', 'info');
+      this.render();
+    },
+
+    setMaterialsFilter(filterVal) {
+      window.appState.materialsFilter = filterVal;
+      this.render();
+    },
+
+    // Custom HTML Game Upload & Handling
+    handleCustomHtmlFileUpload(event, mode = 'create') {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        const cleanTitle = file.name.replace(/\.[^/.]+$/, "");
+        if (mode === 'create') {
+          window.appState.customHtmlDraft.code = content;
+          window.appState.customHtmlDraft.fileName = file.name;
+          window.appState.customHtmlDraft.title = cleanTitle;
+          const codeBox = document.getElementById('create-custom-html-code');
+          const statusBadge = document.getElementById('create-custom-html-status');
+          if (codeBox) codeBox.value = content;
+          if (statusBadge) {
+            statusBadge.innerHTML = `<span class="text-emerald-600 font-extrabold"><i class="fa-solid fa-circle-check"></i> Ready: ${file.name} (${Math.round(content.length / 1024)} KB)</span>`;
+          }
+          this.showToast(`HTML Game "${file.name}" uploaded! 🎮`, 'success');
+        } else if (mode === 'edit') {
+          const codeBox = document.getElementById('edit-custom-html-code');
+          const titleBox = document.getElementById('edit-custom-html-title');
+          const statusBadge = document.getElementById('edit-custom-html-status');
+          if (codeBox) codeBox.value = content;
+          if (titleBox) titleBox.value = cleanTitle;
+          if (statusBadge) {
+            statusBadge.innerHTML = `<span class="text-emerald-600 font-extrabold"><i class="fa-solid fa-circle-check"></i> Loaded: ${file.name} (${Math.round(content.length / 1024)} KB)</span>`;
+          }
+          this.showToast(`Updated HTML file "${file.name}"! 🎮`, 'success');
+        }
+      };
+      reader.readAsText(file);
+    },
+
+    clearCustomHtmlDraft() {
+      window.appState.customHtmlDraft = { title: '', maxScore: 100, code: '', fileName: '' };
+      const codeBox = document.getElementById('create-custom-html-code');
+      const statusBadge = document.getElementById('create-custom-html-status');
+      if (codeBox) codeBox.value = '';
+      if (statusBadge) statusBadge.innerHTML = 'No file uploaded yet';
+      this.showToast('Removed HTML file.', 'info');
+    },
+
+    clearEditHtmlGame() {
+      const codeBox = document.getElementById('edit-custom-html-code');
+      const titleBox = document.getElementById('edit-custom-html-title');
+      const statusBadge = document.getElementById('edit-custom-html-status');
+      if (codeBox) codeBox.value = '';
+      if (titleBox) titleBox.value = '';
+      if (statusBadge) statusBadge.innerHTML = 'No HTML game attached';
+      this.showToast('Removed HTML game from task.', 'info');
+    },
+
+    openHtmlGameBox(taskId) {
+      const wrap = document.getElementById(`html-game-active-area-${taskId}`);
+      const startBtn = document.getElementById(`html-game-start-btn-${taskId}`);
+      if (wrap) wrap.classList.remove('hidden');
+      if (startBtn) startBtn.classList.add('hidden');
+      this.hydrateCustomHtmlIframes();
+    },
+
+    async finishAndCloseHtmlGame(taskId) {
+      const task = window.store.getTasks().find(t => t.id === taskId);
+      if (!task) return;
+
+      // Close / hide the game container
+      const wrap = document.getElementById(`html-game-active-area-${taskId}`);
+      if (wrap) wrap.classList.add('hidden');
+
+      const studentId = window.appState.activeStudentId;
+      const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+      if (window.appState.role === 'student' && studentId) {
+        const existingSub = window.store.getSubmissions().find(s => s.taskId === taskId && s.studentId === studentId);
+        const prevHistory = existingSub && Array.isArray(existingSub.quizAttempts) ? existingSub.quizAttempts : [];
+        const playCount = prevHistory.length + 1;
+
+        const attemptRecord = {
+          attemptNumber: playCount,
+          score: 'Completed',
+          total: 'Done',
+          percentage: 100,
+          gameType: 'HTML Game',
+          completedAt: nowTime
+        };
+
+        const newHistory = [...prevHistory, attemptRecord];
+
+        const subData = {
+          id: existingSub ? existingSub.id : ('sub_' + Date.now()),
+          taskId,
+          studentId,
+          commentText: existingSub ? existingSub.commentText : '',
+          vocarooUrl: existingSub ? existingSub.vocarooUrl : '',
+          imagePreview: existingSub ? existingSub.imagePreview : '',
+          submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          status: 'submitted',
+          quizScore: `Played ${playCount} time(s)`,
+          quizPercentage: 100,
+          quizAttempts: newHistory,
+          interactiveAnswersDetail: existingSub ? existingSub.interactiveAnswersDetail : [],
+          sticker: existingSub ? existingSub.sticker : '',
+          teacherComment: existingSub ? existingSub.teacherComment : ''
+        };
+
+        await window.store.saveSubmission(subData);
+        this.showToast(`🎉 Awesome! You finished the game (Completed ${playCount} time${playCount > 1 ? 's' : ''})!`, 'success');
+        this.render();
+      } else {
+        this.showToast('Game closed! (In student mode, this logs +1 play count automatically)', 'info');
+        const startBtn = document.getElementById(`html-game-start-btn-${taskId}`);
+        if (startBtn) startBtn.classList.remove('hidden');
+      }
+    },
+
+    // Inject Auto-Bridge Helper into Teacher's HTML Game so it can report scores
+    prepareHtmlGameSrcDoc(rawHtml, taskId, maxScore = 100) {
+      const bridgeScript = `
+        <script>
+          window.submitScoreToMeChan = function(score, total) {
+            window.parent.postMessage({
+              type: 'MECHAN_GAME_SCORE',
+              taskId: '${taskId}',
+              score: score,
+              total: total || ${maxScore}
+            }, '*');
+          };
+        <\/script>
+      `;
+      if (rawHtml.includes('</body>')) {
+        return rawHtml.replace('</body>', bridgeScript + '</body>');
+      }
+      return rawHtml + bridgeScript;
+    },
+
+    toggleFullscreenHtmlGame(taskId) {
+      const iframeWrap = document.getElementById(`html-game-wrap-${taskId}`);
+      if (!iframeWrap) return;
+      if (!document.fullscreenElement) {
+        if (iframeWrap.requestFullscreen) iframeWrap.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    },
+
+    reloadHtmlGameIframe(taskId) {
+      const iframe = document.getElementById(`html-game-iframe-${taskId}`);
+      if (iframe) {
+        iframe.srcdoc = iframe.srcdoc;
+        this.showToast('Game restarted! 🔄', 'info');
+      }
+    },
+
+    async submitCustomHtmlGameScore(taskId, manualScore = null, maxScoreParam = null, isAuto = false) {
+      const task = window.store.getTasks().find(t => t.id === taskId);
+      if (!task) return;
+
+      const maxScore = maxScoreParam || (task.customHtmlGame && task.customHtmlGame.maxScore) || 100;
+      const inputElem = document.getElementById(`html-game-score-input-${taskId}`);
+      const rawScore = manualScore !== null ? manualScore : (inputElem ? Number(inputElem.value) : 0);
+
+      if (isNaN(rawScore) || rawScore < 0) {
+        this.showToast('Please enter a valid score achieved in the game!', 'error');
+        return;
+      }
+
+      const percentage = maxScore > 0 ? Math.min(100, Math.round((rawScore / maxScore) * 100)) : 100;
+      const studentId = window.appState.activeStudentId || 'teacher_preview';
+
+      const attemptRecord = {
+        attemptNumber: 1,
+        score: rawScore,
+        total: maxScore,
+        percentage,
+        gameType: 'HTML Game',
+        completedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      };
+
+      if (window.appState.role === 'student' && studentId) {
+        const existingSub = window.store.getSubmissions().find(s => s.taskId === taskId && s.studentId === studentId);
+        const prevHistory = existingSub && Array.isArray(existingSub.quizAttempts) ? existingSub.quizAttempts : [];
+        attemptRecord.attemptNumber = prevHistory.length + 1;
+
+        const newHistory = [...prevHistory, attemptRecord];
+
+        const subData = {
+          id: existingSub ? existingSub.id : ('sub_' + Date.now()),
+          taskId,
+          studentId,
+          commentText: existingSub ? existingSub.commentText : '',
+          vocarooUrl: existingSub ? existingSub.vocarooUrl : '',
+          imagePreview: existingSub ? existingSub.imagePreview : '',
+          submittedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          status: 'submitted',
+          quizScore: `${rawScore}/${maxScore}`,
+          quizPercentage: percentage,
+          quizAttempts: newHistory,
+          interactiveAnswersDetail: existingSub ? existingSub.interactiveAnswersDetail : [],
+          sticker: existingSub ? existingSub.sticker : '',
+          teacherComment: existingSub ? existingSub.teacherComment : ''
+        };
+
+        await window.store.saveSubmission(subData);
+      }
+
+      this.showToast(
+        `${isAuto ? '🎉 Auto-Recorded' : '✅ Saved'} HTML Game Score: ${rawScore}/${maxScore} (Attempt logged)!`,
+        'success'
+      );
+      this.render();
+    },
+
     // Progress Calculation
     getStudentProgress(studentId) {
       const allTasks = window.store.getTasks();
-      const studentTasks = allTasks.filter(t => t.assignedTo.includes('all') || t.assignedTo.includes(studentId));
+      const studentTasks = allTasks.filter(t => !t.isArchived && this.isTaskAssignedToStudent(t, studentId));
       const submissions = window.store.getSubmissions().filter(s => s.studentId === studentId);
 
       const total = studentTasks.length;
-      const completed = submissions.length;
+      const completed = submissions.filter(s => studentTasks.some(t => t.id === s.taskId)).length;
       const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
       return { total, completed, percent };
     },
 
     getCalendarDates() {
       const dates = [];
-      const base = new Date();
-      base.setDate(base.getDate() - 2);
+      const centerDateStr = window.appState.selectedDate || getLocalTodayStr();
+      const parts = centerDateStr.split('-');
+      const base = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date();
+      base.setDate(base.getDate() - 3);
       for (let i = 0; i < 7; i++) {
         const d = new Date(base);
         d.setDate(base.getDate() + i);
-        const iso = d.toISOString().split('T')[0];
+        const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
         const dayNum = d.getDate();
         dates.push({ iso, dayName, dayNum });
@@ -1352,6 +1712,12 @@
         }
       } else if (moduleVal === 'interactive_task') {
         const box = document.getElementById('module-interactive-task-box');
+        if (box) {
+          box.classList.remove('hidden');
+          box.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else if (moduleVal === 'custom_html_game') {
+        const box = document.getElementById('module-custom-html-box');
         if (box) {
           box.classList.remove('hidden');
           box.scrollIntoView({ behavior: 'smooth' });
@@ -1771,7 +2137,6 @@
           <textarea 
             id="draft-q-text" 
             rows="2" 
-            required 
             placeholder="Type your question prompt clearly here..." 
             class="w-full px-4 py-3 bg-purple-50/30 border-2 border-purple-200 rounded-2xl text-base font-bold text-slate-800 outline-none focus:border-purple-500 focus:bg-white transition-all shadow-inner"
           >${draft.question || ''}</textarea>
@@ -1978,77 +2343,116 @@
     },
 
     // Handling Task Creation Form Submit
-    handleCreateTask(e) {
-      e.preventDefault();
-      const title = document.getElementById('task-title').value.trim();
+    async handleCreateTask(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      try {
+        const titleInput = document.getElementById('task-title');
+        const title = titleInput ? titleInput.value.trim() : '';
 
-      const majorSelect = document.getElementById('task-major-select').value;
-      const majorCustom = document.getElementById('task-major-custom').value.trim();
-      const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
-
-      const subSelect = document.getElementById('task-sub-select').value;
-      const subCustom = document.getElementById('task-sub-custom').value.trim();
-      const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
-
-      if (majorSelect === '__new__' && !majorCustom) {
-        this.showToast('Please enter a name for the new Major Topic!', 'error');
-        return;
-      }
-      if (subSelect === '__new__' && !subCustom) {
-        this.showToast('Please enter a name for the new Sub-Topic!', 'error');
-        return;
-      }
-
-      const scheduledDate = document.getElementById('task-date').value;
-
-      // Extra material inputs
-      const instructions = document.getElementById('task-instructions') ? document.getElementById('task-instructions').value.trim() : '';
-      
-      const linkRows = document.querySelectorAll('#create-links-container .link-row');
-      const links = Array.from(linkRows).map(r => ({
-        title: r.querySelector('.link-title').value.trim(),
-        url: r.querySelector('.link-url').value.trim()
-      })).filter(l => l.url);
-
-      const matRows = document.querySelectorAll('#create-materials-container .material-row');
-      const materials = Array.from(matRows).map(r => ({
-        title: r.querySelector('.material-title').value.trim(),
-        url: r.querySelector('.material-url').value.trim()
-      })).filter(m => m.url);
-
-      const selectAll = document.getElementById('assign-all-students').checked;
-      let assignedTo = ['all'];
-      if (!selectAll) {
-        const checked = Array.from(document.querySelectorAll('.assign-student-cb:checked')).map(cb => cb.value);
-        if (checked.length === 0) {
-          this.showToast('Please select at least one student!', 'error');
+        if (!title) {
+          this.showToast('Please enter a Task Title!', 'error');
+          if (titleInput) titleInput.focus();
           return;
         }
-        assignedTo = checked;
+
+        const majorSelectElem = document.getElementById('task-major-select');
+        const majorCustomElem = document.getElementById('task-major-custom');
+        const majorSelect = majorSelectElem ? majorSelectElem.value : 'English';
+        const majorCustom = majorCustomElem ? majorCustomElem.value.trim() : '';
+        const majorTopic = (majorSelect === '__new__' ? majorCustom : majorSelect) || 'English';
+
+        const subSelectElem = document.getElementById('task-sub-select');
+        const subCustomElem = document.getElementById('task-sub-custom');
+        const subSelect = subSelectElem ? subSelectElem.value : 'General';
+        const subCustom = subCustomElem ? subCustomElem.value.trim() : '';
+        const subTopic = (subSelect === '__new__' ? subCustom : subSelect) || 'General';
+
+        if (majorSelect === '__new__' && !majorCustom) {
+          this.showToast('Please enter a name for the new Major Topic!', 'error');
+          return;
+        }
+        if (subSelect === '__new__' && !subCustom) {
+          this.showToast('Please enter a name for the new Sub-Topic!', 'error');
+          return;
+        }
+
+        const dateElem = document.getElementById('task-date');
+        const scheduledDate = (dateElem && dateElem.value) ? dateElem.value : getLocalTodayStr();
+
+        // Auto-save draft question if teacher typed one on the left but forgot to click "Save Question to List"
+        const pendingDraftText = document.getElementById('draft-q-text') ? document.getElementById('draft-q-text').value.trim() : '';
+        if (pendingDraftText) {
+          this.saveCurrentDraftQuestion();
+        }
+
+        // Extra material inputs
+        const instructions = document.getElementById('task-instructions') ? document.getElementById('task-instructions').value.trim() : '';
+        
+        const linkRows = document.querySelectorAll('#create-links-container .link-row');
+        const links = Array.from(linkRows).map(r => ({
+          title: (r.querySelector('.link-title')?.value || '').trim(),
+          url: (r.querySelector('.link-url')?.value || '').trim()
+        })).filter(l => l.url);
+
+        const matRows = document.querySelectorAll('#create-materials-container .material-row');
+        const materials = Array.from(matRows).map(r => ({
+          title: (r.querySelector('.material-title')?.value || '').trim(),
+          url: (r.querySelector('.material-url')?.value || '').trim()
+        })).filter(m => m.url);
+
+        const selectAllCheckbox = document.getElementById('assign-all-students');
+        const selectAll = selectAllCheckbox ? selectAllCheckbox.checked : true;
+        let assignedTo = ['all'];
+        if (!selectAll) {
+          const checked = Array.from(document.querySelectorAll('.assign-student-cb:checked')).map(cb => cb.value);
+          if (checked.length === 0) {
+            this.showToast('Please select at least one student to assign!', 'error');
+            return;
+          }
+          assignedTo = checked;
+        }
+
+        // Collect Custom HTML Game if uploaded
+        const htmlCodeInput = document.getElementById('create-custom-html-code');
+        const customHtmlCode = (htmlCodeInput && htmlCodeInput.value.trim()) ? htmlCodeInput.value.trim() : (window.appState.customHtmlDraft.code || '');
+        const customHtmlGame = customHtmlCode ? {
+          title: window.appState.customHtmlDraft.title || title,
+          maxScore: 100,
+          code: customHtmlCode
+        } : null;
+
+        const newTask = {
+          id: 'task_' + Date.now(),
+          title,
+          majorTopic,
+          subTopic,
+          scheduledDate,
+          instructions,
+          links,
+          materials,
+          activities: [...(window.appState.builderActivities || [])],
+          customHtmlGame,
+          isArchived: false,
+          assignedTo,
+          createdAt: getLocalTodayStr()
+        };
+
+        // Sync selectedDate so student and teacher immediately see this task's date
+        window.appState.selectedDate = scheduledDate;
+
+        // Reset builder state and switch view immediately so UI never hangs
+        window.appState.builderActivities = [];
+        window.appState.customHtmlDraft = { title: '', maxScore: 100, code: '', fileName: '' };
+
+        window.store.ensureTopic(majorTopic, subTopic);
+        window.store.addTask(newTask);
+
+        this.showToast(`Daily mission "${title}" assigned for ${scheduledDate}! 🎉`, 'success');
+        this.switchTeacherTab('assignments');
+      } catch (err) {
+        console.error('Publish Task Error:', err);
+        this.showToast('Error publishing mission: ' + err.message, 'error');
       }
-
-      window.store.ensureTopic(majorTopic, subTopic);
-
-      const newTask = {
-        id: 'task_' + Date.now(),
-        title,
-        majorTopic,
-        subTopic,
-        scheduledDate,
-        instructions,
-        links,
-        materials,
-        activities: window.appState.builderActivities || [],
-        assignedTo,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-
-      window.store.addTask(newTask);
-      this.showToast(`Daily mission for ${scheduledDate} assigned! 🎉`, 'success');
-
-      // Reset builder state
-      window.appState.builderActivities = [];
-      this.switchTeacherTab('assignments');
     },
 
     // Pre-Publish Mission Preview
@@ -2077,6 +2481,14 @@
         url: r.querySelector('.material-url').value.trim()
       })).filter(m => m.url);
 
+      const htmlCodeInput = document.getElementById('create-custom-html-code');
+      const customHtmlCode = (htmlCodeInput && htmlCodeInput.value.trim()) ? htmlCodeInput.value.trim() : (window.appState.customHtmlDraft.code || '');
+      const customHtmlGame = customHtmlCode ? {
+        title: window.appState.customHtmlDraft.title || title,
+        maxScore: 100,
+        code: customHtmlCode
+      } : null;
+
       const mockTask = {
         id: 'preview_mock_task',
         title,
@@ -2086,7 +2498,8 @@
         instructions,
         links,
         materials,
-        activities: window.appState.builderActivities || []
+        activities: window.appState.builderActivities || [],
+        customHtmlGame
       };
 
       const body = document.getElementById('pre-publish-preview-body');
@@ -2134,8 +2547,27 @@
               </div>
             </div>
           ` : ''}
+
+          <!-- Custom HTML Game Preview -->
+          ${mockTask.customHtmlGame && mockTask.customHtmlGame.code ? `
+            <div class="space-y-3 pt-4 border-t border-teal-100">
+              <h3 class="text-lg font-extrabold text-teal-900 flex items-center gap-2">
+                <i class="fa-solid fa-code text-teal-600"></i> Embedded HTML Game: ${mockTask.customHtmlGame.title}
+              </h3>
+              <div class="w-full h-[460px] rounded-3xl overflow-hidden border-4 border-teal-200 shadow-md bg-white">
+                <iframe class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+              </div>
+            </div>
+          ` : ''}
         </div>
       `;
+
+      if (mockTask.customHtmlGame && mockTask.customHtmlGame.code) {
+        const previewIframe = body.querySelector('iframe');
+        if (previewIframe) {
+          previewIframe.srcdoc = this.prepareHtmlGameSrcDoc(mockTask.customHtmlGame.code, 'preview_mock_task', mockTask.customHtmlGame.maxScore);
+        }
+      }
 
       document.getElementById('pre-publish-preview-modal').classList.remove('hidden');
     },
@@ -2146,7 +2578,7 @@
 
     confirmPublishFromPreview() {
       this.closePreviewMissionModal();
-      document.getElementById('compose-task-form').requestSubmit();
+      this.handleCreateTask();
     },
 
     // Edit Task Modal Functions
@@ -2198,6 +2630,41 @@
 
       this.editModalActivities = Array.isArray(task.activities) ? JSON.parse(JSON.stringify(task.activities)) : [];
       this.renderEditModalActivities();
+
+      // Populate Custom HTML Game fields in Edit Modal
+      const editHtmlTitle = document.getElementById('edit-custom-html-title');
+      const editHtmlCode = document.getElementById('edit-custom-html-code');
+      const editHtmlStatus = document.getElementById('edit-custom-html-status');
+      if (task.customHtmlGame && task.customHtmlGame.code) {
+        if (editHtmlTitle) editHtmlTitle.value = task.customHtmlGame.title || task.title;
+        if (editHtmlCode) editHtmlCode.value = task.customHtmlGame.code || '';
+        if (editHtmlStatus) {
+          editHtmlStatus.innerHTML = `<span class="text-emerald-600 font-extrabold"><i class="fa-solid fa-circle-check"></i> Attached HTML Game (${Math.round(task.customHtmlGame.code.length / 1024)} KB)</span>`;
+        }
+      } else {
+        if (editHtmlTitle) editHtmlTitle.value = '';
+        if (editHtmlCode) editHtmlCode.value = '';
+        if (editHtmlStatus) editHtmlStatus.innerHTML = 'No HTML game attached';
+      }
+
+      // Populate Assigned Students in Edit Modal
+      const students = window.store.getStudents();
+      const isAll = !Array.isArray(task.assignedTo) || task.assignedTo.includes('all');
+      const editAllCb = document.getElementById('edit-assign-all-students');
+      const editSpecBox = document.getElementById('edit-specific-students-box');
+      if (editAllCb && editSpecBox) {
+        editAllCb.checked = isAll;
+        editSpecBox.classList.toggle('hidden', isAll);
+        editSpecBox.innerHTML = students.map(s => {
+          const checked = !isAll && Array.isArray(task.assignedTo) && task.assignedTo.includes(s.id);
+          return `
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-purple-50/50 border border-purple-200 text-xs font-bold cursor-pointer">
+              <input type="checkbox" value="${s.id}" ${checked ? 'checked' : ''} class="edit-assign-student-cb w-4 h-4 text-purple-600 rounded">
+              <span>${s.name}</span>
+            </label>
+          `;
+        }).join('');
+      }
 
       document.getElementById('edit-task-modal').classList.remove('hidden');
     },
@@ -2312,6 +2779,27 @@
         url: r.querySelector('.material-url').value.trim()
       })).filter(m => m.url);
 
+      const editHtmlTitle = document.getElementById('edit-custom-html-title');
+      const editHtmlCode = document.getElementById('edit-custom-html-code');
+      const rawCode = editHtmlCode ? editHtmlCode.value.trim() : '';
+
+      const customHtmlGame = rawCode ? {
+        title: (editHtmlTitle && editHtmlTitle.value.trim()) ? editHtmlTitle.value.trim() : title,
+        maxScore: 100,
+        code: rawCode
+      } : null;
+
+      const editAllCb = document.getElementById('edit-assign-all-students');
+      let assignedTo = ['all'];
+      if (editAllCb && !editAllCb.checked) {
+        const checked = Array.from(document.querySelectorAll('.edit-assign-student-cb:checked')).map(cb => cb.value);
+        if (checked.length === 0) {
+          this.showToast('Please select at least one student!', 'error');
+          return;
+        }
+        assignedTo = checked;
+      }
+
       const updated = {
         id: taskId,
         title,
@@ -2321,7 +2809,9 @@
         instructions,
         links,
         materials,
-        activities: this.editModalActivities
+        activities: this.editModalActivities,
+        customHtmlGame,
+        assignedTo
       };
 
       await window.store.updateTask(updated);
@@ -2943,6 +3433,23 @@
       } else if (role === 'student') {
         this.renderStudentView(root);
       }
+
+      this.hydrateCustomHtmlIframes();
+    },
+
+    hydrateCustomHtmlIframes() {
+      const iframes = document.querySelectorAll('iframe.custom-html-game-frame');
+      iframes.forEach(iframe => {
+        const taskId = iframe.dataset.taskId;
+        const task = window.store.getTasks().find(t => t.id === taskId);
+        if (task && task.customHtmlGame && task.customHtmlGame.code) {
+          iframe.srcdoc = this.prepareHtmlGameSrcDoc(
+            task.customHtmlGame.code,
+            task.id,
+            task.customHtmlGame.maxScore || 100
+          );
+        }
+      });
     },
 
     // 1. Guest View / Homepage
@@ -3216,40 +3723,105 @@
 
       // 3. Teaching Materials Archive tab
       if (tab === 'materials') {
+        const filterMode = window.appState.materialsFilter || 'active';
+        const activeCount = tasks.filter(t => !t.isArchived).length;
+        const archivedCount = tasks.filter(t => !!t.isArchived).length;
+        const filteredTasks = tasks.filter(t => filterMode === 'archived' ? !!t.isArchived : !t.isArchived);
+
         return `
-          <div class="space-y-4">
-            <div class="p-4 bg-purple-50/60 border border-purple-200 rounded-3xl flex items-center justify-between">
+          <div class="space-y-5">
+            <div class="p-5 bg-purple-50/60 border border-purple-200 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 class="text-base font-extrabold text-purple-900 flex items-center gap-2">
-                  <i class="fa-solid fa-book-bookmark text-pink-500"></i> Teaching Materials & Missions Archive
+                <h3 class="text-base sm:text-lg font-extrabold text-purple-900 flex items-center gap-2">
+                  <i class="fa-solid fa-book-bookmark text-pink-500"></i> Teaching Materials & Missions Library
                 </h3>
-                <p class="text-xs text-slate-500">Test and play any task as a student simulator to review questions and answers.</p>
+                <p class="text-xs text-slate-500">Play any task as a student simulator, archive old lessons, or delete tasks you no longer need.</p>
+              </div>
+              <div class="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-purple-200 self-start sm:self-center">
+                <button 
+                  type="button"
+                  onclick="app.setMaterialsFilter('active')" 
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 ${filterMode === 'active' ? 'bg-purple-600 text-white shadow-xs' : 'text-slate-600 hover:bg-purple-50'}"
+                >
+                  <i class="fa-solid fa-folder-open"></i> Active (${activeCount})
+                </button>
+                <button 
+                  type="button"
+                  onclick="app.setMaterialsFilter('archived')" 
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 ${filterMode === 'archived' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:bg-amber-50'}"
+                >
+                  <i class="fa-solid fa-box-archive"></i> Archived (${archivedCount})
+                </button>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              ${tasks.map(task => `
-                <div class="p-5 bg-white rounded-3xl border border-pink-100 shadow-card flex flex-col justify-between space-y-3">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span class="text-[11px] font-bold text-pink-700 bg-pink-100 px-2 py-0.5 rounded-lg">${task.majorTopic}</span>
-                      <span class="text-[11px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-lg">${task.subTopic}</span>
+            ${filteredTasks.length === 0 ? `
+              <div class="text-center py-14 bg-white rounded-3xl border border-pink-100 shadow-card">
+                <i class="fa-solid fa-box-open text-3xl text-purple-300 mb-2 block"></i>
+                <p class="text-sm font-bold text-slate-600">No ${filterMode} materials found.</p>
+              </div>
+            ` : `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${filteredTasks.map(task => `
+                  <div class="p-5 bg-white rounded-3xl border ${task.isArchived ? 'border-amber-200 bg-amber-50/20' : 'border-pink-100'} shadow-card flex flex-col justify-between space-y-4">
+                    <div class="space-y-1.5">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[11px] font-bold text-pink-700 bg-pink-100 px-2.5 py-0.5 rounded-lg">${task.majorTopic}</span>
+                        <span class="text-[11px] font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-lg">${task.subTopic}</span>
+                        ${task.customHtmlGame && task.customHtmlGame.code ? `
+                          <span class="text-[11px] font-extrabold text-teal-800 bg-teal-100 px-2.5 py-0.5 rounded-lg">
+                            <i class="fa-solid fa-code mr-1"></i> HTML Game
+                          </span>
+                        ` : ''}
+                        ${task.isArchived ? `
+                          <span class="text-[10px] font-black uppercase bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md">Archived</span>
+                        ` : ''}
+                      </div>
+                      <h4 class="text-base sm:text-lg font-extrabold text-slate-800">${task.title}</h4>
+                      <p class="text-xs text-slate-400 line-clamp-2">${task.instructions || 'No instructions'}</p>
                     </div>
-                    <h4 class="text-base font-extrabold text-slate-800">${task.title}</h4>
-                    <p class="text-xs text-slate-400 line-clamp-2">${task.instructions || 'No instructions'}</p>
+
+                    <div class="pt-3 border-t border-pink-50 flex flex-wrap items-center justify-between gap-2">
+                      <div class="flex items-center gap-1.5">
+                        <button 
+                          type="button"
+                          onclick="app.openEditTaskModal('${task.id}')" 
+                          class="px-3 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-bold border border-pink-200 transition-all"
+                          title="Edit Material"
+                        >
+                          <i class="fa-solid fa-pen"></i> Edit
+                        </button>
+                        <button 
+                          type="button"
+                          onclick="app.toggleArchiveMaterial('${task.id}')" 
+                          class="px-3 py-1.5 rounded-xl ${task.isArchived ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'} text-xs font-bold border transition-all flex items-center gap-1"
+                          title="${task.isArchived ? 'Restore to Active' : 'Move to Archive'}"
+                        >
+                          <i class="fa-solid ${task.isArchived ? 'fa-box-open' : 'fa-box-archive'}"></i>
+                          <span>${task.isArchived ? 'Restore' : 'Archive'}</span>
+                        </button>
+                        <button 
+                          type="button"
+                          onclick="app.confirmDeleteTask('${task.id}', '${task.title.replace(/'/g, "\\'")}')" 
+                          class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold border border-rose-200 transition-all"
+                          title="Delete Permanently"
+                        >
+                          <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                      </div>
+
+                      <button 
+                        type="button"
+                        onclick="app.previewMaterialAsStudent('${task.id}')" 
+                        class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-extrabold text-xs shadow-sm hover:opacity-95 flex items-center gap-1.5"
+                      >
+                        <i class="fa-solid fa-gamepad"></i> Play as Student
+                      </button>
+                    </div>
                   </div>
-                  <div class="pt-3 border-t border-pink-50 flex items-center justify-between">
-                    <span class="text-xs text-slate-400 font-bold">${(task.activities || []).length} Interactive Games</span>
-                    <button 
-                      onclick="app.previewMaterialAsStudent('${task.id}')" 
-                      class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-extrabold text-xs shadow-sm hover:opacity-95 flex items-center gap-1.5"
-                    >
-                      <i class="fa-solid fa-gamepad"></i> Play as Student
-                    </button>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
+                `).join('')}
+              </div>
+            `}
           </div>
         `;
       }
@@ -3324,6 +3896,21 @@
                     <div id="sub-detail-${sub.id}" class="hidden p-5 sm:p-6 border-t border-pink-100 bg-white/60 space-y-4">
                       
                       <!-- Detailed Interactive Answers -->
+                      ${(sub.quizAttempts && sub.quizAttempts.length > 0) ? `
+                        <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-200 space-y-2">
+                          <span class="text-xs font-black text-teal-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate text-teal-600"></i> Activity / Game Completion History (Completed ${sub.quizAttempts.length} time${sub.quizAttempts.length > 1 ? 's' : ''}):
+                          </span>
+                          <div class="flex flex-wrap gap-2">
+                            ${sub.quizAttempts.map((att, aIdx) => `
+                              <span class="px-3 py-1.5 bg-white rounded-xl border border-teal-200 text-xs font-bold text-slate-700 shadow-xs">
+                                <strong>#${aIdx + 1}:</strong> ${att.score === 'Completed' ? '✅ Finished Game' : `${att.score}/${att.total} (${att.percentage}%)`} <span class="text-slate-400 text-[10px]">@ ${att.completedAt}</span>
+                              </span>
+                            `).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
+
                       ${detailedAnswers.length > 0 ? `
                         <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 space-y-3">
                           <span class="text-xs font-black text-purple-950 uppercase tracking-wider flex items-center gap-1.5">
@@ -3429,7 +4016,7 @@
               <p class="text-sm text-slate-400 mt-1">Design daily learning tasks, rich instructions and engaging interactive questions.</p>
             </div>
 
-            <form id="compose-task-form" onsubmit="app.handleCreateTask(event)" class="space-y-8">
+            <form id="compose-task-form" novalidate onsubmit="app.handleCreateTask(event)" class="space-y-8">
               <!-- Basic Info -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 p-5 bg-pink-50/30 rounded-3xl border border-pink-100">
                 <div>
@@ -3488,17 +4075,18 @@
               <div class="p-5 bg-purple-50/50 rounded-3xl border-2 border-dashed border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <span class="text-sm font-extrabold text-purple-900 block">➕ Add Modules to this Mission:</span>
-                  <p class="text-xs text-slate-500">Pick Extra Material (Instructions/Links) or Interactive Challenges to show the boxes below.</p>
+                  <p class="text-xs text-slate-500">Pick Extra Material, Interactive Challenges, or upload your own ready-made HTML Game.</p>
                 </div>
                 <select id="task-module-selector" onchange="app.handleTaskModuleDropdownSelect(this.value)" class="px-4 py-2.5 bg-white border-2 border-purple-300 rounded-2xl text-sm font-extrabold text-purple-800 outline-none shadow-xs cursor-pointer">
                   <option value="">-- Choose Module to Add --</option>
                   <option value="extra_material">📄 Extra Material (Instructions & Links)</option>
                   <option value="interactive_task">🎮 Interactive Task (Games & Quizzes)</option>
+                  <option value="custom_html_game">🧩 Custom HTML Game (Upload .html File)</option>
                 </select>
               </div>
 
               <!-- MODULE 1: Extra Material Box -->
-              <div id="module-extra-material-box" class="p-6 rounded-3xl bg-pink-50/40 border-2 border-pink-200 space-y-5">
+              <div id="module-extra-material-box" class="hidden p-6 rounded-3xl bg-pink-50/40 border-2 border-pink-200 space-y-5">
                 <div class="flex items-center justify-between pb-3 border-b border-pink-200">
                   <h4 class="text-base font-extrabold text-pink-900 flex items-center gap-2">
                     <i class="fa-solid fa-file-lines text-pink-500"></i> Extra Material & Instructions
@@ -3537,7 +4125,7 @@
               </div>
 
               <!-- MODULE 2: Interactive Task 2-Column Split Builder -->
-              <div id="module-interactive-task-box" class="p-6 rounded-3xl bg-purple-50/50 border-2 border-purple-200 space-y-5">
+              <div id="module-interactive-task-box" class="hidden p-6 rounded-3xl bg-purple-50/50 border-2 border-purple-200 space-y-5">
                 <div class="flex items-center justify-between pb-3 border-b border-purple-200">
                   <h4 class="text-base font-extrabold text-purple-900 flex items-center gap-2">
                     <i class="fa-solid fa-gamepad text-pink-500"></i> Interactive Mission Challenges Builder
@@ -3549,6 +4137,37 @@
 
                 <!-- Live 2-column container -->
                 <div id="interactive-builder-split-wrap"></div>
+              </div>
+
+              <!-- MODULE 3: Custom HTML Game Box (Simplified) -->
+              <div id="module-custom-html-box" class="hidden p-6 rounded-3xl bg-teal-50/50 border-2 border-teal-200 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-teal-200">
+                  <div>
+                    <h4 class="text-base font-extrabold text-teal-900 flex items-center gap-2">
+                      <i class="fa-solid fa-code text-teal-600"></i> Upload Custom HTML Game
+                    </h4>
+                    <p class="text-xs text-slate-500 mt-0.5">Simply upload your <code>.html</code> game file. Students can open it, play, and click <strong>Finish</strong> to log how many times they completed it!</p>
+                  </div>
+                  <button type="button" onclick="app.toggleModuleBox('module-custom-html-box')" class="text-xs font-bold text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-eye-slash mr-1"></i> Hide Box
+                  </button>
+                </div>
+
+                <div class="p-5 bg-white rounded-2xl border-2 border-dashed border-teal-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div class="flex items-center gap-3">
+                    <label class="cursor-pointer px-5 py-3 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:opacity-95 text-white font-extrabold text-sm shadow-md shadow-teal-200 flex items-center gap-2 transition-all active:scale-95">
+                      <i class="fa-solid fa-file-arrow-up text-base"></i>
+                      <span>Upload .HTML File</span>
+                      <input type="file" accept=".html,.htm" class="hidden" onchange="app.handleCustomHtmlFileUpload(event, 'create')">
+                    </label>
+                    <button type="button" onclick="app.clearCustomHtmlDraft()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs font-bold">
+                      Remove File
+                    </button>
+                  </div>
+                  <p id="create-custom-html-status" class="text-xs sm:text-sm text-slate-400 font-bold">No file uploaded yet</p>
+                </div>
+
+                <input type="hidden" id="create-custom-html-code" value="">
               </div>
 
               <!-- Assign To Students -->
@@ -3574,7 +4193,7 @@
                 <button type="button" onclick="app.previewMissionBeforePublish()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white border-2 border-purple-300 text-purple-700 font-extrabold text-sm shadow-xs hover:bg-purple-50 flex items-center justify-center gap-2 transition-all">
                   <i class="fa-solid fa-eye"></i> 👀 Preview Mission
                 </button>
-                <button type="submit" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-extrabold text-sm sm:text-base shadow-md shadow-pink-200 flex items-center justify-center gap-2 transition-all active:scale-95">
+                <button type="button" onclick="app.handleCreateTask(event)" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-extrabold text-sm sm:text-base shadow-md shadow-pink-200 flex items-center justify-center gap-2 transition-all active:scale-95">
                   <i class="fa-solid fa-paper-plane"></i> Publish Mission 🚀
                 </button>
               </div>
@@ -3588,14 +4207,14 @@
     renderStudentView(container) {
       const studentId = window.appState.activeStudentId;
       const student = window.store.getStudents().find(s => s.id === studentId);
-      const allTasks = window.store.getTasks().filter(t => t.assignedTo.includes('all') || t.assignedTo.includes(studentId));
+      const allTasks = window.store.getTasks().filter(t => !t.isArchived && this.isTaskAssignedToStudent(t, studentId));
       const submissions = window.store.getSubmissions().filter(s => s.studentId === studentId);
       const selectedDate = window.appState.selectedDate;
       const activeTaskId = window.appState.activeTaskId;
 
       const dailyTasks = allTasks.filter(t => t.scheduledDate === selectedDate);
       const calendarDates = this.getCalendarDates();
-      const activeTask = activeTaskId ? dailyTasks.find(t => t.id === activeTaskId) : null;
+      const activeTask = activeTaskId ? allTasks.find(t => t.id === activeTaskId) : null;
 
       container.innerHTML = `
         <!-- Student Greeting Header -->
@@ -3620,7 +4239,7 @@
           <div class="bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-pink-200 text-center shadow-xs">
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Your Total Completed</span>
             <span class="text-2xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              ${submissions.length} / ${allTasks.length}
+              ${submissions.filter(s => allTasks.some(t => t.id === s.taskId)).length} / ${allTasks.length}
             </span>
           </div>
         </div>
@@ -3660,86 +4279,111 @@
         </div>
 
         <!-- Single Task View or Concise To-Do List -->
-        ${activeTask ? this.renderSingleTaskDetail(activeTask, submissions.find(s => s.taskId === activeTask.id)) : this.renderConciseTodoList(dailyTasks, submissions, selectedDate)}
+        ${activeTask ? this.renderSingleTaskDetail(activeTask, submissions.find(s => s.taskId === activeTask.id)) : this.renderConciseTodoList(dailyTasks, submissions, selectedDate, allTasks)}
       `;
     },
 
     // 3A. Concise To-Do List View
-    renderConciseTodoList(dailyTasks, submissions, selectedDate) {
-      if (dailyTasks.length === 0) {
-        return `
-          <div class="text-center py-16 bg-white rounded-3xl border border-pink-100 shadow-card max-w-xl mx-auto">
-            <div class="w-16 h-16 bg-pink-50 text-pink-400 rounded-3xl flex items-center justify-center text-2xl mx-auto mb-3">
-              <i class="fa-solid fa-mug-hot"></i>
+    renderConciseTodoList(dailyTasks, submissions, selectedDate, allTasks = []) {
+      const otherDatesTasks = allTasks.filter(t => t.scheduledDate !== selectedDate);
+
+      return `
+        <div class="max-w-xl mx-auto space-y-8">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                <span>To-Do List for:</span>
+                <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm sm:text-base border border-pink-200">${selectedDate}</span>
+              </h3>
+              <span class="text-xs font-bold text-slate-400">${dailyTasks.length} mission(s)</span>
             </div>
-            <h4 class="font-bold text-slate-700 text-base">No tasks for ${selectedDate}!</h4>
-            <p class="text-xs text-slate-400 mt-1">Enjoy your free day or pick another date from the calendar above.</p>
+
+            ${dailyTasks.length === 0 ? `
+              <div class="text-center py-10 bg-white rounded-3xl border border-pink-100 shadow-card">
+                <div class="w-14 h-14 bg-pink-50 text-pink-400 rounded-3xl flex items-center justify-center text-xl mx-auto mb-2">
+                  <i class="fa-solid fa-mug-hot"></i>
+                </div>
+                <h4 class="font-bold text-slate-700 text-sm">No tasks scheduled on ${selectedDate}</h4>
+                <p class="text-xs text-slate-400 mt-1">Check your other assigned missions below or pick another date on the calendar!</p>
+              </div>
+            ` : `
+              <div class="space-y-3.5">
+                ${dailyTasks.map(task => this.renderTodoItemCard(task, submissions)).join('')}
+              </div>
+            `}
           </div>
+
+          ${otherDatesTasks.length > 0 ? `
+            <div class="pt-6 border-t border-pink-200/60">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm sm:text-base font-extrabold text-purple-900 flex items-center gap-2">
+                  <i class="fa-solid fa-list-check text-purple-500"></i> All Other Assigned Missions (${otherDatesTasks.length})
+                </h4>
+                <span class="text-[11px] font-bold text-slate-400">Click any mission to open</span>
+              </div>
+              <div class="space-y-3">
+                ${otherDatesTasks.map(task => this.renderTodoItemCard(task, submissions, true)).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    },
+
+    renderTodoItemCard(task, submissions, showDateBadge = false) {
+      const sub = submissions.find(s => s.taskId === task.id);
+      const isReviewed = sub && sub.status === 'reviewed';
+      const isSubmitted = sub && sub.status === 'submitted';
+
+      let cardStyle = 'bg-white border-pink-100 hover:border-pink-300 shadow-sm';
+      let statusBadge = `
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1.5">
+          <i class="fa-regular fa-circle"></i> To-Do
+        </span>
+      `;
+
+      if (isReviewed) {
+        cardStyle = 'bg-amber-50/70 border-2 border-amber-300 shadow-md shadow-amber-200/50 hover:border-amber-400 ring-2 ring-amber-200';
+        statusBadge = `
+          <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-star text-white"></i> Graded (${sub.sticker || 'Done'})
+          </span>
+        `;
+      } else if (isSubmitted) {
+        cardStyle = 'bg-purple-50/40 border-2 border-purple-200 hover:border-purple-300';
+        statusBadge = `
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-clock-rotate-left"></i> Submitted
+          </span>
         `;
       }
 
       return `
-        <div class="max-w-xl mx-auto">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
-              <span>To-Do List for:</span>
-              <span class="text-pink-600 bg-pink-100/70 px-3 py-1 rounded-2xl text-sm sm:text-base border border-pink-200">${selectedDate}</span>
-            </h3>
-            <span class="text-xs font-bold text-slate-400">${dailyTasks.length} mission(s)</span>
+        <div 
+          onclick="app.selectDate('${task.scheduledDate}'); app.viewTaskDetail('${task.id}');"
+          class="p-4 sm:p-5 rounded-3xl border ${cardStyle} cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 group hover:translate-x-1"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 shrink-0 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-sm font-bold group-hover:bg-pink-500 group-hover:text-white transition-all">
+              <i class="fa-solid fa-book-open"></i>
+            </span>
+            <div class="min-w-0">
+              <h4 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors truncate">
+                ${task.title}
+              </h4>
+              ${showDateBadge ? `
+                <span class="text-[11px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100 inline-block mt-0.5">
+                  <i class="fa-regular fa-calendar mr-1"></i> ${task.scheduledDate}
+                </span>
+              ` : ''}
+            </div>
           </div>
 
-          <div class="space-y-3.5">
-            ${dailyTasks.map(task => {
-              const sub = submissions.find(s => s.taskId === task.id);
-              const isReviewed = sub && sub.status === 'reviewed';
-              const isSubmitted = sub && sub.status === 'submitted';
-
-              let cardStyle = 'bg-white border-pink-100 hover:border-pink-300 shadow-sm';
-              let statusBadge = `
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 flex items-center gap-1.5">
-                  <i class="fa-regular fa-circle"></i> To-Do
-                </span>
-              `;
-
-              if (isReviewed) {
-                cardStyle = 'bg-amber-50/70 border-2 border-amber-300 shadow-md shadow-amber-200/50 hover:border-amber-400 ring-2 ring-amber-200';
-                statusBadge = `
-                  <span class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-400 text-amber-950 flex items-center gap-1.5 shadow-sm">
-                    <i class="fa-solid fa-star text-white"></i> Graded (${sub.sticker || 'Done'})
-                  </span>
-                `;
-              } else if (isSubmitted) {
-                cardStyle = 'bg-purple-50/40 border-2 border-purple-200 hover:border-purple-300';
-                statusBadge = `
-                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 flex items-center gap-1.5">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Submitted
-                  </span>
-                `;
-              }
-
-              return `
-                <div 
-                  onclick="app.viewTaskDetail('${task.id}')"
-                  class="p-4 sm:p-5 rounded-3xl border ${cardStyle} cursor-pointer transition-all duration-200 flex items-center justify-between gap-3 group hover:translate-x-1"
-                >
-                  <div class="flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center text-sm font-bold group-hover:bg-pink-500 group-hover:text-white transition-all">
-                      <i class="fa-solid fa-book-open"></i>
-                    </span>
-                    <h4 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors">
-                      ${task.title}
-                    </h4>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    ${statusBadge}
-                    <span class="text-slate-300 group-hover:text-pink-500 transition-colors">
-                      <i class="fa-solid fa-chevron-right"></i>
-                    </span>
-                  </div>
-                </div>
-              `;
-            }).join('')}
+          <div class="flex items-center gap-2 shrink-0">
+            ${statusBadge}
+            <span class="text-slate-300 group-hover:text-pink-500 transition-colors">
+              <i class="fa-solid fa-chevron-right"></i>
+            </span>
           </div>
         </div>
       `;
@@ -3871,6 +4515,101 @@
                     <i class="fa-solid fa-paper-plane text-base"></i>
                     <span>Submit & Check Interactive Answers</span>
                   </button>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Embedded Custom HTML Game Player (Simple Open -> Play -> Finish & Close) -->
+            ${(task.customHtmlGame && task.customHtmlGame.code) ? `
+              <div class="my-6 p-6 rounded-3xl bg-gradient-to-br from-teal-50/80 via-emerald-50/40 to-white border-2 border-teal-300 shadow-soft space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-500 text-white flex items-center justify-center text-xl shadow-sm">
+                      <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <div>
+                      <span class="text-[11px] font-black uppercase tracking-wider text-teal-700 bg-teal-100 px-2.5 py-0.5 rounded-md">
+                        Interactive HTML Game
+                      </span>
+                      <h3 class="text-lg sm:text-xl font-extrabold text-teal-950 mt-0.5">
+                        ${task.customHtmlGame.title || task.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <!-- Play Count Badge -->
+                  <div class="bg-white px-4 py-2 rounded-2xl border border-teal-200 shadow-xs flex items-center gap-2">
+                    <i class="fa-solid fa-rotate text-teal-600"></i>
+                    <span class="text-xs sm:text-sm font-extrabold text-slate-700">
+                      Completed: <strong class="text-teal-700 text-base">${(submission && Array.isArray(submission.quizAttempts)) ? submission.quizAttempts.length : 0}</strong> time(s)
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Start / Open Game Button -->
+                <div id="html-game-start-btn-${task.id}" class="text-center py-6 bg-white/80 rounded-2xl border-2 border-dashed border-teal-200">
+                  <p class="text-xs sm:text-sm text-slate-500 font-bold mb-3">Click the button below to launch the interactive game!</p>
+                  <button 
+                    type="button" 
+                    onclick="app.openHtmlGameBox('${task.id}')" 
+                    class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-black text-sm sm:text-base shadow-md shadow-teal-200 inline-flex items-center gap-2.5 transition-all active:scale-95"
+                  >
+                    <i class="fa-solid fa-play"></i>
+                    <span>${(submission && Array.isArray(submission.quizAttempts) && submission.quizAttempts.length > 0) ? 'Play Game Again' : 'Start Playing Game'}</span>
+                  </button>
+                </div>
+
+                <!-- Active Game Container (Hidden until Start clicked, closes when Finish clicked) -->
+                <div id="html-game-active-area-${task.id}" class="hidden space-y-4">
+                  <div class="flex flex-wrap items-center justify-between gap-2 bg-teal-900 text-white px-4 py-2.5 rounded-2xl">
+                    <span class="text-xs font-bold flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                      Playing: ${task.customHtmlGame.title || task.title}
+                    </span>
+                    <div class="flex items-center gap-2">
+                      <button 
+                        type="button" 
+                        onclick="app.reloadHtmlGameIframe('${task.id}')" 
+                        class="px-3 py-1 rounded-xl bg-teal-800 hover:bg-teal-700 text-teal-100 text-xs font-bold flex items-center gap-1"
+                      >
+                        <i class="fa-solid fa-rotate-right"></i> Restart
+                      </button>
+                      <button 
+                        type="button" 
+                        onclick="app.toggleFullscreenHtmlGame('${task.id}')" 
+                        class="px-3 py-1 rounded-xl bg-teal-800 hover:bg-teal-700 text-teal-100 text-xs font-bold flex items-center gap-1"
+                      >
+                        <i class="fa-solid fa-expand"></i> Fullscreen
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="html-game-wrap-${task.id}" class="w-full h-[540px] rounded-3xl overflow-hidden border-4 border-teal-300 shadow-lg bg-white relative">
+                    <iframe 
+                      id="html-game-iframe-${task.id}"
+                      data-task-id="${task.id}"
+                      class="custom-html-game-frame w-full h-full border-0"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                    ></iframe>
+                  </div>
+
+                  <!-- Finish & Close Game Bar -->
+                  <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div class="flex items-center gap-3 text-center sm:text-left">
+                      <span class="text-2xl">🎉</span>
+                      <div>
+                        <h5 class="text-sm sm:text-base font-extrabold text-emerald-950">Finished playing the game?</h5>
+                        <p class="text-xs text-emerald-700 font-medium">Click "Finish & Submit Game" to close the game and send your completion count to Mẹ Chan!</p>
+                      </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      onclick="app.finishAndCloseHtmlGame('${task.id}')" 
+                      class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-sm sm:text-base shadow-md shadow-emerald-200 flex items-center justify-center gap-2 transition-all active:scale-95 whitespace-nowrap"
+                    >
+                      <i class="fa-solid fa-circle-check"></i> Finish & Submit Game
+                    </button>
+                  </div>
                 </div>
               </div>
             ` : ''}
